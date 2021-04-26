@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 
+
 class GameScene :public cocos2d::Scene
 {
 public:
@@ -11,6 +12,10 @@ public:
 	virtual bool init();
 
 	CREATE_FUNC(GameScene);
+
+public:
+	cocos2d::Vec2 m_origin;
+	cocos2d::Size m_visibleSize;
 };
 
 

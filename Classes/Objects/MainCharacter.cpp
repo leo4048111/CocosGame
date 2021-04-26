@@ -30,7 +30,7 @@ bool MainCharacter::loadAnimes()
 {
 	try
 	{
-		SpriteFrameCache::getInstance()->addSpriteFramesWithFile("characters/mainCharacter/mainCharacter.plist");
+		SpriteFrameCache::getInstance()->addSpriteFramesWithFile("objects/mainCharacter/mainCharacter.plist");
 		auto cache = SpriteFrameCache::getInstance();
 		for (int c = 0; c <= 7; c++)
 		{
@@ -101,13 +101,13 @@ void MainCharacter::runAction(int dir)
 
 void MainCharacter::update(float delta)
 {
-	double offsetX = 2;
-	double offsetY = 2;
-	/*if (!(keyMap[EventKeyboard::KeyCode::KEY_D] || keyMap[EventKeyboard::KeyCode::KEY_W] || keyMap[EventKeyboard::KeyCode::KEY_S] || keyMap[EventKeyboard::KeyCode::KEY_A]))
+	double offsetX = 1.3f;
+	double offsetY = 1.3f;
+	if (keyMap[EventKeyboard::KeyCode::KEY_SHIFT])
 	{
-		m_sprite->stopAllActions();
-		runAction(standBack);
-	}*/
+		offsetX += 0.4;
+		offsetY += 0.4;
+	}
 	if (keyMap[EventKeyboard::KeyCode::KEY_W])
 	{
 		m_sprite->setPosition(m_sprite->getPosition() + Vec2(0, offsetY));
@@ -143,13 +143,14 @@ void MainCharacter::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2
 	case EventKeyboard::KeyCode::KEY_D:
 		runAction(right);
 		break;
+	default:
+		break;
 	}
 }
 
 void MainCharacter::onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event)
 {
 	keyMap[keycode] = false; //set pressed status to false
-	auto test=m_sprite->getActionByTag(forward);
 	switch(keycode)
 	{
 	case EventKeyboard::KeyCode::KEY_W:
@@ -164,8 +165,9 @@ void MainCharacter::onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos
 	case EventKeyboard::KeyCode::KEY_D:
 		m_sprite->stopActionByTag(right);
 		break;
+	default:
+		break;
 	}
-
 }
 
 void MainCharacter::setControlOnListen()
