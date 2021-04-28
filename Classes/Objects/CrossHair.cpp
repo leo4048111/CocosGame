@@ -17,6 +17,8 @@ bool CrossHair::init()
 	auto crossHair = Sprite::create("objects/crossHair/crosshair_normal.png");
 	crossHair->setScale(0.2f);
 	this->bindSprite(crossHair);
+
+	return true;
 }
 
 void CrossHair::setControlOnListen()

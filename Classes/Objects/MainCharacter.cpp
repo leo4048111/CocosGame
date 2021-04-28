@@ -18,11 +18,11 @@ bool MainCharacter::init()
 	{
 		return false;
 	}
-	Sprite* mainCharacter=Sprite::createWithSpriteFrameName("character_maleAdventurer_backwalk0");
+	Sprite* mainCharacter = Sprite::createWithSpriteFrameName("character_maleAdventurer_backwalk0");
 	mainCharacter->setScale(0.1f);
 	bindSprite(mainCharacter);
-
-	this->setControlOnListen();
+	showHealthBar();
+	return true;
 	
 }
 
@@ -101,34 +101,34 @@ void MainCharacter::runAction(int dir)
 
 void MainCharacter::update(float delta)
 {
-	double offsetX = 1.3f;
-	double offsetY = 1.3f;
-	if (keyMap[EventKeyboard::KeyCode::KEY_SHIFT])
+	double offsetX = 2.0f;
+	double offsetY = 2.0f;
+	if (m_keyMap[EventKeyboard::KeyCode::KEY_SHIFT])
 	{
-		offsetX += 0.4;
-		offsetY += 0.4;
+		offsetX += 1.0;
+		offsetY += 1.0;
 	}
-	if (keyMap[EventKeyboard::KeyCode::KEY_W])
+	if (m_keyMap[EventKeyboard::KeyCode::KEY_W])
 	{
-		m_sprite->setPosition(m_sprite->getPosition() + Vec2(0, offsetY));
+		this->setPosition(this->getPosition() + Vec2(0, offsetY));
 	}
-	if (keyMap[EventKeyboard::KeyCode::KEY_S])
+	if (m_keyMap[EventKeyboard::KeyCode::KEY_S])
 	{
-		m_sprite->setPosition(m_sprite->getPosition() - Vec2(0, offsetY));
+		this->setPosition(this->getPosition() - Vec2(0, offsetY));
 	}
-	if (keyMap[EventKeyboard::KeyCode::KEY_A])
+	if (m_keyMap[EventKeyboard::KeyCode::KEY_A])
 	{
-		m_sprite->setPosition(m_sprite->getPosition() - Vec2(offsetX, 0));
+		this->setPosition(this->getPosition() - Vec2(offsetX, 0));
 	}
-	if (keyMap[EventKeyboard::KeyCode::KEY_D])
+	if (m_keyMap[EventKeyboard::KeyCode::KEY_D])
 	{
-		m_sprite->setPosition(m_sprite->getPosition() + Vec2(offsetX, 0));
+		this->setPosition(this->getPosition() + Vec2(offsetX, 0));
 	}
 }
 
 void MainCharacter::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event)
 {
-	keyMap[keycode] = true; //set pressed status to true
+	m_keyMap[keycode] = true; //set pressed status to true
 	switch (keycode)
 	{
 	case EventKeyboard::KeyCode::KEY_W:
@@ -150,7 +150,7 @@ void MainCharacter::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2
 
 void MainCharacter::onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event)
 {
-	keyMap[keycode] = false; //set pressed status to false
+	m_keyMap[keycode] = false; //set pressed status to false
 	switch(keycode)
 	{
 	case EventKeyboard::KeyCode::KEY_W:
@@ -174,7 +174,34 @@ void MainCharacter::setControlOnListen()
 {
 	auto* dispatcher = Director::getInstance()->getEventDispatcher();
 	auto* keyListener = EventListenerKeyboard::create();
+	auto* mouseListener = EventListenerMouse::create();
+	mouseListener->onMouseDown = CC_CALLBACK_1(MainCharacter::onMouseDown, this);
+	mouseListener->onMouseUp = CC_CALLBACK_1(MainCharacter::onMouseUp, this);
 	keyListener->onKeyPressed = CC_CALLBACK_2(MainCharacter::onKeyPressed, this);
 	keyListener->onKeyReleased = CC_CALLBACK_2(MainCharacter::onKeyReleased, this);
 	dispatcher->addEventListenerWithSceneGraphPriority(keyListener, this);
+	dispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
+}
+
+void MainCharacter::onMouseDown(Event* event)
+{
+	EventMouse* mouseEvent = dynamic_cast<EventMouse*>(event);
+	EventMouse::MouseButton mouseButton = mouseEvent->getMouseButton();
+	m_mouseButtonMap[mouseButton] = true;
+	switch (mouseButton)
+	{
+	case EventMouse::MouseButton::BUTTON_LEFT:
+		
+		break;
+	default:
+		break;
+
+	}
+}
+
+void MainCharacter::onMouseUp(Event* event)
+{
+	EventMouse* mouseEvent = dynamic_cast<EventMouse*>(event);
+	EventMouse::MouseButton mouseButton = mouseEvent->getMouseButton();
+	m_mouseButtonMap[mouseButton] = false;
 }

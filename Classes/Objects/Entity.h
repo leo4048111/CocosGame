@@ -7,12 +7,24 @@ class Entity :public cocos2d::Node
 {
 public:
 	cocos2d::Sprite* m_sprite;
-	//private:
-	//	cocos2d::C* m_control;
+	
+	cocos2d::ProgressTimer* m_healthBar;
+
 public:
 	virtual bool init();
 
 	void bindSprite(cocos2d::Sprite* sprite);
+
+	double getHealthPercentage();
+
+	void setCurrentHealth(double health);
+
+	void showHealthBar();
+
+
+private:
+	double m_maxHealth;
+	double m_currentHealth;
 
 };
 

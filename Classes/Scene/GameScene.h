@@ -7,11 +7,17 @@
 class GameScene :public cocos2d::Scene
 {
 public:
-	static cocos2d::Scene* createGameScene();
+	static GameScene* createGameScene();
 
 	virtual bool init();
 
 	CREATE_FUNC(GameScene);
+
+	void setControlOnListen();
+
+	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event);
+
+	void goToGameSettings();
 
 public:
 	cocos2d::Vec2 m_origin;

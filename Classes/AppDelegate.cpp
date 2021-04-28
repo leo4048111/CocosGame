@@ -122,7 +122,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("background.mp3", 1);
 
     // create a scene. it's an autorelease object
-    auto scene = MenuScene::createMainScene();
+    auto scene = MenuScene::createMenuScene();
 
     // run
     director->runWithScene(scene);

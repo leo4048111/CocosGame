@@ -29,17 +29,23 @@ public:
 
 	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event);
 
+	void onMouseDown(cocos2d::Event* event);
+
+	void onMouseUp(cocos2d::Event* event);
+
 	void setControlOnListen();
 	
 
 private:
+
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_leftWalkAnime;
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_rightWalkAnime;
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_forwardWalkAnime;
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_backWalkAnime;
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_standBackAnime;
 
-	std::map<cocos2d::EventKeyboard::KeyCode, bool> keyMap;
+	std::map<cocos2d::EventKeyboard::KeyCode, bool> m_keyMap;
+	std::map<cocos2d::EventMouse::MouseButton, bool> m_mouseButtonMap;
 
 };
 

@@ -3,7 +3,7 @@
 
 USING_NS_CC;
 
-Scene* MenuScene::createMainScene()
+MenuScene* MenuScene::createMenuScene()
 {
 	return MenuScene::create();
 }
@@ -42,7 +42,7 @@ enum menuItems
 
 void MenuScene::menuCallBack(Ref* sender)
 {
-	MenuItemFont* item = dynamic_cast<MenuItemFont*>(sender);
+	MenuItem* item = dynamic_cast<MenuItem*>(sender);
 	switch (item->getTag())
 	{
 	case sg:
