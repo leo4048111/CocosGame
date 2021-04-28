@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "Entity.h"
+#include "Weapon.h"
 #include <map>
 
 enum actions
@@ -17,7 +18,7 @@ public:
 
 	virtual bool init();
 
-	bool loadAnimes();
+	bool loadGraphs();
 
 	void runAction(int dir);
 
@@ -32,6 +33,9 @@ public:
 	void onMouseDown(cocos2d::Event* event);
 
 	void onMouseUp(cocos2d::Event* event);
+
+	void bindWeapon(Weapon* weapon);
+
 
 	void setControlOnListen();
 	

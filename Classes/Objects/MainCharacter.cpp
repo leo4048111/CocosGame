@@ -14,19 +14,22 @@ bool MainCharacter::init()
 	{
 		return false;
 	}
-	if (!loadAnimes())
+	if (!MainCharacter::loadGraphs())
 	{
 		return false;
 	}
 	Sprite* mainCharacter = Sprite::createWithSpriteFrameName("character_maleAdventurer_backwalk0");
 	mainCharacter->setScale(0.1f);
-	bindSprite(mainCharacter);
-	showHealthBar();
+	MainCharacter::bindSprite(mainCharacter);
+	MainCharacter::showHealthBar();
+	auto weapon = Weapon::createWeapon();
+	MainCharacter::bindWeapon(weapon);
+	weapon->setWeaponType(Weapon::weaponType::razor);
 	return true;
 	
 }
 
-bool MainCharacter::loadAnimes()
+bool MainCharacter::loadGraphs()
 {
 	try
 	{
@@ -61,6 +64,7 @@ bool MainCharacter::loadAnimes()
 	catch (const std::exception& exp)
 	{
 		CCLOG("%s", exp.what());
+		return false;
 	}
 }
 
@@ -204,4 +208,12 @@ void MainCharacter::onMouseUp(Event* event)
 	EventMouse* mouseEvent = dynamic_cast<EventMouse*>(event);
 	EventMouse::MouseButton mouseButton = mouseEvent->getMouseButton();
 	m_mouseButtonMap[mouseButton] = false;
+}
+
+void MainCharacter::bindWeapon(Weapon* weapon)
+{
+	m_sprite->addChild(weapon);
+	weapon->setScale(0.5f);
+	weapon->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+	weapon->setPosition(Vec2(0,m_sprite->getContentSize().height/3));
 }

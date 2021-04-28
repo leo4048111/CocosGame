@@ -1,6 +1,7 @@
 #include "GameScene.h"
 #include "../Objects/MainCharacter.h"
 #include "../Objects/CrossHair.h"
+#include "../Objects/Bullet.h"
 #include "../Layer/GameSettingsLayer.h"
 
 USING_NS_CC;
@@ -32,6 +33,11 @@ bool GameScene::init()
 	crossHair->setPosition(m_origin + m_visibleSize / 2);
 	crossHair->setControlOnListen();
 
+	auto test3d = Sprite3D::create("objects/Weapons/uziGold.obj");
+	test3d->setPosition(Vec2(50, 50));
+	this->addChild(test3d, 100);
+
+	//init background
 	auto testBg = Sprite::create("Map/mainMap.png");
 	this->addChild(testBg,10);
 	testBg->setPosition(m_origin + m_visibleSize / 2);

@@ -31,8 +31,7 @@ bool Entity::init()
 	{
 		return false;
 	}
-	setCurrentHealth(100.0f);
-	m_maxHealth = m_currentHealth;
+	m_maxHealth = m_currentHealth=100.0f;
 	return true;
 }
 
@@ -44,4 +43,6 @@ double Entity::getHealthPercentage()
 void Entity::setCurrentHealth(double currentHealth)
 {
 	m_currentHealth = currentHealth;
+	m_healthBar->setPercentage(getHealthPercentage());
 }
+
