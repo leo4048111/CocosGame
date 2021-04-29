@@ -18,13 +18,23 @@ bool MainCharacter::init()
 	{
 		return false;
 	}
+	//Init sprite
 	Sprite* mainCharacter = Sprite::createWithSpriteFrameName("character_maleAdventurer_backwalk0");
 	mainCharacter->setScale(0.1f);
 	MainCharacter::bindSprite(mainCharacter);
 	MainCharacter::showHealthBar();
+
+	//Init weapon
+	for (int c = 1; c <= MAX_WEAPON_CARRY; c++)
+		m_emptyWeaponSlots.push_back(5-c);
+	m_totalWeapons = 0;
 	auto weapon = Weapon::createWeapon();
-	MainCharacter::bindWeapon(weapon);
+	MainCharacter::addWeapon(weapon);
+	MainCharacter;; swapWeapon(1);
 	weapon->setWeaponType(Weapon::weaponType::razor);
+	auto weapon2 = Weapon::createWeapon();
+	MainCharacter::addWeapon(weapon2);
+	weapon2->setWeaponType(Weapon::weaponType::pistol);
 	return true;
 	
 }
@@ -147,6 +157,24 @@ void MainCharacter::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2
 	case EventKeyboard::KeyCode::KEY_D:
 		runAction(right);
 		break;
+	case EventKeyboard::KeyCode::KEY_1:
+		swapWeapon(1);
+		break;
+	case EventKeyboard::KeyCode::KEY_2:
+		swapWeapon(2);
+		break;
+	case EventKeyboard::KeyCode::KEY_3:
+		swapWeapon(3);
+		break;
+	case EventKeyboard::KeyCode::KEY_4:
+		swapWeapon(4);
+		break;
+	case EventKeyboard::KeyCode::KEY_R:
+		m_currentWeapon->reload();
+		break;
+	case EventKeyboard::KeyCode::KEY_G:
+		dropWeapon();
+		break;
 	default:
 		break;
 	}
@@ -195,7 +223,8 @@ void MainCharacter::onMouseDown(Event* event)
 	switch (mouseButton)
 	{
 	case EventMouse::MouseButton::BUTTON_LEFT:
-		
+		if (m_currentWeapon != nullptr)
+			m_currentWeapon->fire(mouseEvent->getCursorX(),mouseEvent->getCursorY());
 		break;
 	default:
 		break;
@@ -210,10 +239,53 @@ void MainCharacter::onMouseUp(Event* event)
 	m_mouseButtonMap[mouseButton] = false;
 }
 
-void MainCharacter::bindWeapon(Weapon* weapon)
+void MainCharacter::addWeapon(Weapon* weapon)
 {
-	m_sprite->addChild(weapon);
-	weapon->setScale(0.5f);
-	weapon->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-	weapon->setPosition(Vec2(0,m_sprite->getContentSize().height/3));
+	if (MainCharacter::canCarryMoreWeapons())
+	{
+		m_totalWeapons++;
+		m_weapons.insert(std::make_pair(m_emptyWeaponSlots.back(), weapon));
+		m_emptyWeaponSlots.pop_back();
+		m_sprite->addChild(weapon);
+		weapon->setScale(0.5f);
+		weapon->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+		weapon->setPosition(Vec2(0, m_sprite->getContentSize().height / 3));
+		weapon->setVisible(false);
+		weapon->setControlOnListen();
+	}
+}
+
+void MainCharacter::swapWeapon(int num)
+{
+	if (m_currentWeapon != m_weapons[num]&&num<= m_totalWeapons)
+	{
+		if(m_currentWeapon!=nullptr)
+		m_currentWeapon->setVisible(false);
+		m_currentWeapon->pauseControlListen();
+		m_currentWeapon = m_weapons[num];
+		m_currentWeapon->setVisible(true);
+		m_currentWeapon->resumeControlListen();
+	}
+}
+
+bool MainCharacter::canCarryMoreWeapons()
+{
+	return m_emptyWeaponSlots.size() != 0;
+}
+
+void MainCharacter::pickUpWeapon()
+{
+
+}
+
+void MainCharacter::dropWeapon()
+{
+	if (!canCarryMoreWeapons())
+	{
+		if (m_currentWeapon != nullptr)
+		{
+			m_currentWeapon->removeFromParent();
+			this->getParent()->addChild(m_currentWeapon);
+		}
+	}
 }

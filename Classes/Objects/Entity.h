@@ -3,6 +3,7 @@
 
 #include"cocos2d.h"
 
+//The general features of an object
 class Entity :public cocos2d::Node
 {
 public:

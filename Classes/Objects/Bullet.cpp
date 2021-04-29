@@ -14,6 +14,8 @@ bool Bullet::init()
 	{
 		return false;
 	}
-
+	
+	auto ammo = Sprite::create("objects/ammo/ammo_rifle.png");
+	Bullet::bindSprite(ammo);
 	return true;
 }

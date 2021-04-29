@@ -59,7 +59,7 @@ void MenuScene::menuCallBack(Ref* sender)
 void MenuScene::startGame()
 {
 	auto gameScene = GameScene::createGameScene();
-	auto transition = TransitionFlipX::create(1.0f, gameScene);
+	auto transition = TransitionCrossFade::create(1.0f, gameScene);
 	Director::getInstance()->replaceScene(transition);
 }
 
