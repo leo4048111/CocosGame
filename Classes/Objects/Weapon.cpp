@@ -95,28 +95,35 @@ void Weapon::resumeControlListen()
 void Weapon::onMouseMove(Event* event)
 {
 	EventMouse* mouseEvent = dynamic_cast<EventMouse*>(event);
-	Vec2 weaponPosVec = this->getParent()->getPosition();
+	Vec2 weaponPosVec = this->getParent()->getParent()->getPosition();
 	Vec2 mousePosVec = Vec2(mouseEvent->getCursorX(), mouseEvent->getCursorY());
 	Vec2 dst = mousePosVec - weaponPosVec;
 	float radians =M_PI-atan2(dst.y, dst.x);
 	float degree = CC_RADIANS_TO_DEGREES(radians);
-	this->setRotation(-this->getRotation() + degree);
+	this->setRotation(degree);
+	std::string str="m:";
+	str += Value(mousePosVec.x).asString() + "," + Value(mousePosVec.y).asString() + "\n";
+	OutputDebugString(str.c_str());
 }
 
 void Weapon::fire(double dstX, double dstY)
 {
+	std::string str="f:";
+	str += Value(dstX).asString() + "," + Value(dstY).asString()+"\n";
+	OutputDebugString(str.c_str());
 	if (m_ammoInCurrentMagazine)
 	{
 		auto bullet = Sprite::create("objects/ammo/ammo_rifle.png");
-		Vec2 dst = Vec2(dstX, dstY);
-		Vec2 src = this->getParent()->getPosition();
-		Vec2 route = dst - src;
-		double radians = atan2(route.y, -route.x);
-		double degree = CC_RADIANS_TO_DEGREES(radians);
+		Vec2 mousePosVec = Vec2(dstX, dstY);
+		Vec2 weaponPosVec = this->getParent()->getParent()->getPosition();
+		Vec2 dst = mousePosVec - weaponPosVec;
+		float radians = M_PI - atan2(dst.y, dst.x);
+		float degree = CC_RADIANS_TO_DEGREES(radians);
 		bullet->setRotation(degree);
 		bullet->setScale(0.2f);
-		this->getParent()->getParent()->addChild(bullet);
-		auto action = MoveTo::create(4.0f, dst+Vec2(1024,1024));
+		this->getParent()->getParent()->getParent()->addChild(bullet);
+		bullet->setPosition(this->getParent()->convertToWorldSpace(this->getPosition())-Vec2(this->getContentSize().width+10-(cos(degree)* this->getContentSize().width+10), sin(degree) * (this->getContentSize().width+10)));
+		auto action = MoveTo::create(2.0f, mousePosVec);
 	/*	CallFunc* callFunc = CallFunc::create(CC_CALLBACK_0(cleanBullet,this,bullet));
 		auto sequence = Sequence::create(action, callFunc, NULL);*/
 		bullet->runAction(Repeat::create(action, 1));

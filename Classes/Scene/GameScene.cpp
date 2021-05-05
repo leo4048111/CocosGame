@@ -21,6 +21,7 @@ bool GameScene::init()
 	m_visibleSize = Director::getInstance()->getVisibleSize();
 	m_origin = Director::getInstance()->getVisibleOrigin();
 	
+
 	//init main character
 	auto mainCharacter = MainCharacter::createMainCharacter();
 	this->addChild(mainCharacter, 20);
@@ -34,11 +35,11 @@ bool GameScene::init()
 	crossHair->setPosition(m_origin + m_visibleSize / 2);
 	crossHair->setControlOnListen();
 
-	//init background
-	auto testBg = Sprite::create("Map/mainMap.png");
-	this->addChild(testBg,10);
-	testBg->setPosition(m_origin + m_visibleSize / 2);
-	testBg->setScale(0.3f);
+	////init background
+	//auto testBg = Sprite::create("Map/mainMap.png");
+	//this->addChild(testBg,10);
+	//testBg->setPosition(m_origin + m_visibleSize / 2);
+	//testBg->setScale(0.3f);
 
 	//init targets
 	auto target = Target::createTarget();
