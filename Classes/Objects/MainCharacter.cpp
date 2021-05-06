@@ -28,13 +28,14 @@ bool MainCharacter::init()
 	m_magazineSpecLabel = Label::create("0/0", "HeiTi", 20);
 	m_magazineSpecLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
 	m_magazineSpecLabel->setPosition(Vec2(this->getContentSize().width / 2, 0));
+	m_magazineSpecLabel->setScale(0.3f);
 	this->addChild(m_magazineSpecLabel);
 
-	m_weaponSpecMenu = Menu::create();
+	/*m_weaponSpecMenu = Menu::create();
 	m_weaponSpecMenu->setPosition(Vec2(this->getContentSize().width, 0));
 	m_weaponSpecMenu->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
 	m_weaponSpecMenu->alignItemsVerticallyWithPadding(10.0f);
-	this->addChild(m_weaponSpecMenu);
+	this->addChild(m_weaponSpecMenu);*/
 
 	//Init weapon
 	for (int c = 1; c <= MAX_WEAPON_CARRY; c++)
@@ -42,15 +43,14 @@ bool MainCharacter::init()
 	m_totalWeapons = 0;
 	auto weapon = Weapon::createWeapon();
 	MainCharacter::addWeapon(weapon);
-	MainCharacter::swapWeapon(1);
 	weapon->setWeaponType(Weapon::weaponType::razor);
+	MainCharacter::swapWeapon(1);
 	auto weapon2 = Weapon::createWeapon();
-	MainCharacter::addWeapon(weapon2);
 	weapon2->setWeaponType(Weapon::weaponType::pistol);
+	MainCharacter::addWeapon(weapon2);
 
-	this->setControlOnListen(); //Unscheduled, should cause unexpeted scenarios
 
-	//Tag this node
+	this->setControlOnListen(); 
 	this->setName("MainCharacter");
 	return true;
 	
@@ -159,8 +159,9 @@ void MainCharacter::update(float delta)
 
 	//update visual specs
 	if (m_currentWeapon != nullptr)
-		m_magazineSpecLabel->setString(Value(m_currentWeapon->m_ammoInCurrentMagazine).asString() + "/" + Value(m_currentWeapon->m_totalAmmo).asString());
+		m_magazineSpecLabel->setString(Value(m_currentWeapon->m_ammoInCurrentMagazine).asString() + "/" + Value(m_currentWeapon->m_backupAmmo).asString());
 }
+
 void MainCharacter::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event)
 {
 	m_keyMap[keycode] = true; //set pressed status to true
@@ -276,34 +277,39 @@ void MainCharacter::addWeapon(Weapon* weapon)
 		weapon->setVisible(false);
 		weapon->setControlOnListen();
 		
-		//Update Menu
-		auto tmpFont = MenuItemFont::create(weapon->getName());
-		tmpFont->setTag(slot);
-		m_weaponSpecMenu->addChild(tmpFont); // Append the weapon to menu
-		tmpFont->setColor(Color3B(255, 255, 255));
+		////Update Menu
+		//auto tmpFont = MenuItemFont::create(weapon->getName());
+		//tmpFont->setTag(slot);
+		//m_weaponSpecMenu->addChild(tmpFont); // Append the weapon to menu
+		//tmpFont->setColor(Color3B(255, 255, 255));
 	}
 }
 
 void MainCharacter::swapWeapon(int num)
 {
-	if (m_currentWeapon != m_weaponsMap[num]&&num<= m_totalWeapons)
+	if (m_currentWeapon != m_weaponsMap[num] && num <= m_totalWeapons)
 	{
+		int previousSlot = m_currentWeaponSlot;
+		//Update sprite
 		if (m_currentWeapon != nullptr)
 		{
-			int previousSlot = m_currentWeaponSlot;
-			//Update sprite
 			m_currentWeapon->setVisible(false);
 			m_currentWeapon->pauseControlListen();
-			m_currentWeapon = m_weaponsMap[num];
-			m_currentWeapon->setVisible(true);
-			m_currentWeapon->resumeControlListen();
-			m_currentWeaponSlot = num;
+		}
+		m_currentWeapon = m_weaponsMap[num];
+		m_currentWeapon->setVisible(true);
+		m_currentWeapon->resumeControlListen();
+		m_currentWeaponSlot = num;
 
-			//Update spec menu
-			if(m_weaponSpecMenu->getChildByTag(previousSlot)!=nullptr)
+		//Update visual specs
+	/*	if (m_weaponSpecMenu->getChildByTag(previousSlot) != nullptr)
+		{
 			m_weaponSpecMenu->getChildByTag(previousSlot)->setColor(Color3B(255, 255, 255));
 			m_weaponSpecMenu->getChildByTag(m_currentWeaponSlot)->setColor(Color3B(255, 0, 0));
-		}
+		}*/
+		m_magazineSpecLabel->setString(Value(m_currentWeapon->m_ammoInCurrentMagazine).asString() + "/" + Value(m_currentWeapon->m_backupAmmo).asString());
+
+
 
 	}
 }

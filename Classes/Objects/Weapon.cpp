@@ -36,8 +36,8 @@ bool Weapon::init()
 	Weapon::setWeaponType(pistol);
 	m_ammoInCurrentMagazine = 30;
 	m_maxAmmoPerMagazine = 30;
-	m_totalAmmo = 100;
-	this->setName("");
+	m_backupAmmo = 100;
+	this->setName("pistol");
 	return true;
 }
 
@@ -103,16 +103,10 @@ void Weapon::onMouseMove(Event* event)
 	float radians =M_PI-atan2(dst.y, dst.x);
 	float degree = CC_RADIANS_TO_DEGREES(radians);
 	this->setRotation(degree);
-	std::string str="m:";
-	str += Value(mousePosVec.x).asString() + "," + Value(mousePosVec.y).asString() + "\n";
-	OutputDebugString(str.c_str());
 }
 
 void Weapon::fire(double dstX, double dstY)
 {
-	std::string str="f:";
-	str += Value(dstX).asString() + "," + Value(dstY).asString()+"\n";
-	OutputDebugString(str.c_str());
 	if (m_ammoInCurrentMagazine)
 	{
 		auto bullet = Sprite::create("objects/ammo/ammo_rifle.png");
@@ -125,7 +119,7 @@ void Weapon::fire(double dstX, double dstY)
 		bullet->setScale(0.2f);
 		this->getParent()->getParent()->getParent()->addChild(bullet);
 		bullet->setPosition(this->getParent()->convertToWorldSpace(this->getPosition())-Vec2(this->getContentSize().width+10-(cos(degree)* this->getContentSize().width+10), sin(degree) * (this->getContentSize().width+10)));
-		auto action = MoveTo::create(2.0f, mousePosVec);
+		auto action = MoveTo::create(2.0f, mousePosVec+30*dst);
 	/*	CallFunc* callFunc = CallFunc::create(CC_CALLBACK_0(cleanBullet,this,bullet));
 		auto sequence = Sequence::create(action, callFunc, NULL);*/
 		bullet->runAction(Repeat::create(action, 1));
@@ -136,9 +130,9 @@ void Weapon::fire(double dstX, double dstY)
 
 void Weapon::reload()
 {
-	if (m_totalAmmo>=m_maxAmmoPerMagazine)
+	if (m_backupAmmo+m_ammoInCurrentMagazine>=m_maxAmmoPerMagazine)
 	{
-		m_totalAmmo -= m_maxAmmoPerMagazine - m_ammoInCurrentMagazine;
+		m_backupAmmo -= m_maxAmmoPerMagazine - m_ammoInCurrentMagazine;
 		m_ammoInCurrentMagazine = m_maxAmmoPerMagazine;
 	}
 }

@@ -20,8 +20,8 @@ bool CrossHair::init()
 	this->bindSprite(crossHair);
 
 	//Set name
+	this->setControlOnListen();
 	this->setName("CrossHair");
-
 	return true;
 }
 

@@ -36,7 +36,6 @@ bool GameScene::init()
 	auto crossHair = CrossHair::createCrossHair();
 	this->addChild(crossHair, 30);
 	crossHair->setPosition(m_origin + m_visibleSize / 2);
-	crossHair->setControlOnListen();
 
 	////init background
 	//auto testBg = Sprite::create("Map/mainMap.png");
@@ -55,6 +54,7 @@ bool GameScene::init()
 
 
 	this->setControlOnListen();
+	this->scheduleUpdate();
 	return true;
 }
 
@@ -101,7 +101,7 @@ void GameScene::update(float delta)
 	
 	//update timer
 	m_endTime = std::time(NULL);
-	double runTime = static_cast<double>(m_endTime - m_startTime) / CLOCKS_PER_SEC;
+	int runTime = static_cast<int>((m_endTime - m_startTime)*1000 / CLOCKS_PER_SEC);
 	m_labelTimer->setString(Value(runTime).asString()+"s");
 
 	//update hit status

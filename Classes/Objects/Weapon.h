@@ -47,7 +47,7 @@ public:
 	weaponType m_type;
 
 	//Ammo related
-	int m_totalAmmo;
+	int m_backupAmmo;
 	int m_maxAmmoPerMagazine;
 	int m_ammoInCurrentMagazine;
 };
