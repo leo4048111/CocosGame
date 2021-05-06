@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "Entity.h"
 #include "Weapon.h"
+#include "ui/UIScrollView.h"
 #include <map>
 
 #define MAX_WEAPON_CARRY 4
@@ -66,10 +67,13 @@ private:
 	std::map<cocos2d::EventMouse::MouseButton, bool> m_mouseButtonMap;
 
 	//Weapon specs
-	std::map<int,Weapon*> m_weapons;
+	std::map<int,Weapon*> m_weaponsMap;
 	std::vector<int> m_emptyWeaponSlots;
 	Weapon* m_currentWeapon;
+	int m_currentWeaponSlot;
 	int m_totalWeapons;
+	cocos2d::Label* m_magazineSpecLabel;
+	cocos2d::Menu* m_weaponSpecMenu;
 
 };
 

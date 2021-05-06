@@ -14,9 +14,13 @@ bool CrossHair::init()
 		return false;
 	}
 
+	//Init sprite
 	auto crossHair = Sprite::create("objects/crossHair/crosshair_normal.png");
 	crossHair->setScale(0.2f);
 	this->bindSprite(crossHair);
+
+	//Set name
+	this->setName("CrossHair");
 
 	return true;
 }

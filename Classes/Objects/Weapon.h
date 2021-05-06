@@ -42,7 +42,7 @@ public:
 
 	void cleanBullet(cocos2d::Node* node);
 
-private:
+public:
 	//The weapon type
 	weaponType m_type;
 

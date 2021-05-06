@@ -37,6 +37,7 @@ bool Weapon::init()
 	m_ammoInCurrentMagazine = 30;
 	m_maxAmmoPerMagazine = 30;
 	m_totalAmmo = 100;
+	this->setName("");
 	return true;
 }
 
@@ -71,6 +72,7 @@ void Weapon::setWeaponType(weaponType type)
 	auto weapon = Sprite::createWithSpriteFrameName(weaponName.getCString());
 	if(m_sprite!=nullptr)
 	m_sprite->removeFromParentAndCleanup(1);
+	this->setName(weaponName.getCString());
 	Weapon::bindSprite(weapon);
 }
 

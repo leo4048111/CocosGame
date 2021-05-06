@@ -1,9 +1,5 @@
 #include "GameScene.h"
-#include "../Objects/MainCharacter.h"
-#include "../Objects/CrossHair.h"
-#include "../Objects/Bullet.h"
-#include "../Layer/GameSettingsLayer.h"
-#include "../Objects//Target.h"
+
 
 USING_NS_CC;
 
@@ -21,12 +17,19 @@ bool GameScene::init()
 	m_visibleSize = Director::getInstance()->getVisibleSize();
 	m_origin = Director::getInstance()->getVisibleOrigin();
 	
+	//init timer
+	m_startTime = std::time(NULL);
+	m_endTime = std::time(NULL);
+	double runTime = static_cast<double>(m_endTime - m_startTime) / CLOCKS_PER_SEC;
+	m_labelTimer = Label::create(Value(runTime).asString()+"s", "HeiTi", 10);
+	m_labelTimer->setPosition(Vec2(m_origin.x + m_visibleSize.width / 2, m_origin.y + m_visibleSize.height));
+	m_labelTimer->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
+	this->addChild(m_labelTimer);
 
 	//init main character
 	auto mainCharacter = MainCharacter::createMainCharacter();
 	this->addChild(mainCharacter, 20);
 	mainCharacter->setPosition(m_origin + m_visibleSize / 2);
-	mainCharacter->setControlOnListen();
 	mainCharacter->scheduleUpdate();
 
 	//init crosshair
@@ -42,9 +45,14 @@ bool GameScene::init()
 	//testBg->setScale(0.3f);
 
 	//init targets
-	auto target = Target::createTarget();
-	this->addChild(target,20);
-	target->setPosition(m_origin + m_visibleSize / 2);
+	for (int c = 0; c < MIN_TARGETS_COUNT; c++)
+	{
+		auto target = Target::createTarget();
+		this->addChild(target, 20);
+		target->setPosition(m_origin + m_visibleSize / 2);  //should be init with a random parser
+		m_targets.pushBack(target);
+	}
+
 
 	this->setControlOnListen();
 	return true;
@@ -77,3 +85,25 @@ void GameScene::goToGameSettings()
 	
 }
 
+void GameScene::update(float delta)
+{
+	//update target
+	if (m_targets.size() < MIN_TARGETS_COUNT)
+	{
+		for (int c = m_targets.size(); c < MIN_TARGETS_COUNT; c++)
+		{
+			auto target = Target::createTarget();
+			this->addChild(target, 20); 
+			target->setPosition(m_origin + m_visibleSize / 2); //should be init with a random parser
+			m_targets.pushBack(target);
+		}
+	}
+	
+	//update timer
+	m_endTime = std::time(NULL);
+	double runTime = static_cast<double>(m_endTime - m_startTime) / CLOCKS_PER_SEC;
+	m_labelTimer->setString(Value(runTime).asString()+"s");
+
+	//update hit status
+
+}

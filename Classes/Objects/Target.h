@@ -13,8 +13,8 @@ public:
 
 	CREATE_FUNC(Target);
 
-	////auto movement update
-	//void update(float delta);
+	//call method schedule update
+	virtual void update(float delta);
 };
 
 
