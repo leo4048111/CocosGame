@@ -6,6 +6,7 @@ void Entity::bindSprite(Sprite* sprite)
 {
 	//bind sprite
 	m_sprite = sprite;
+	m_sprite->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
 	this->addChild(m_sprite);
 }
 

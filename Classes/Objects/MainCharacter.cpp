@@ -26,8 +26,8 @@ bool MainCharacter::init()
 
 	//Init visual specs
 	m_magazineSpecLabel = Label::create("0/0", "HeiTi", 20);
-	m_magazineSpecLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
-	m_magazineSpecLabel->setPosition(Vec2(this->getContentSize().width / 2, 0));
+	m_magazineSpecLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
+	m_magazineSpecLabel->setPosition(Vec2(this->getContentSize().width / 2, -m_magazineSpecLabel->getContentSize().height));
 	m_magazineSpecLabel->setScale(0.3f);
 	this->addChild(m_magazineSpecLabel);
 
@@ -49,9 +49,8 @@ bool MainCharacter::init()
 	weapon2->setWeaponType(Weapon::weaponType::pistol);
 	MainCharacter::addWeapon(weapon2);
 
-
-	this->setControlOnListen(); 
 	this->setName("MainCharacter");
+	this->setControlOnListen(); 
 	return true;
 	
 }
@@ -133,12 +132,12 @@ void MainCharacter::runAction(int dir)
 void MainCharacter::update(float delta)
 {
 	//Update anime
-	double offsetX = 2.0f;
-	double offsetY = 2.0f;
+	double offsetX = 1.0f;
+	double offsetY = 1.0f;
 	if (m_keyMap[EventKeyboard::KeyCode::KEY_SHIFT])
 	{
-		offsetX += 1.0;
-		offsetY += 1.0;
+		offsetX += 0.5f;
+		offsetY += 0.5f;
 	}
 	if (m_keyMap[EventKeyboard::KeyCode::KEY_W])
 	{
@@ -271,7 +270,6 @@ void MainCharacter::addWeapon(Weapon* weapon)
 		m_weaponsMap.insert(std::make_pair(slot, weapon));
 		m_emptyWeaponSlots.pop_back();
 		m_sprite->addChild(weapon);
-		weapon->setScale(0.5f);
 		weapon->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
 		weapon->setPosition(Vec2(0, m_sprite->getContentSize().height / 3));
 		weapon->setVisible(false);

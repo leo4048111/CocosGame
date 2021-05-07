@@ -1,5 +1,5 @@
-#ifndef _GAME_SETTINGS_SCENE_H_
-#define _GAME_SETTINGS_SCENE_H_
+#ifndef _GAME_SETTINGS_LAYER_H_
+#define _GAME_SETTINGS_LAYER_H_
 
 #include "cocos2d.h"
 
@@ -19,4 +19,4 @@ public:
 	CREATE_FUNC(GameSettingsLayer);
 };
 
-#endif // !_GAME_SETTINGS_SCENE_H_
+#endif // !_GAME_SETTINGS_LAYER_H_

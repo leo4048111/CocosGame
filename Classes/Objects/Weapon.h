@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "Entity.h"
+#include "Layer/BulletLayer.h"
 
 class Weapon :public Entity
 {
@@ -40,8 +41,6 @@ public:
 
 	void reload();
 
-	void cleanBullet(cocos2d::Node* node);
-
 public:
 	//The weapon type
 	weaponType m_type;
@@ -50,6 +49,7 @@ public:
 	int m_backupAmmo;
 	int m_maxAmmoPerMagazine;
 	int m_ammoInCurrentMagazine;
+	cocos2d::Vector<cocos2d::Sprite*> m_allBullets;
 };
 
 

@@ -19,9 +19,8 @@ bool CrossHair::init()
 	crossHair->setScale(0.2f);
 	this->bindSprite(crossHair);
 
-	//Set name
-	this->setControlOnListen();
 	this->setName("CrossHair");
+	this->setControlOnListen();
 	return true;
 }
 

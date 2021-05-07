@@ -24,6 +24,7 @@ bool GameSettingsLayer::init()
 	this->addChild(gameSettingsMenu);
 	gameSettingsMenu->alignItemsVerticallyWithPadding(50);
 
+	this->setName("GameSettingsLayer");
 	return true;
 }
 

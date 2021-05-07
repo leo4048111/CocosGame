@@ -37,7 +37,8 @@ bool Weapon::init()
 	m_ammoInCurrentMagazine = 30;
 	m_maxAmmoPerMagazine = 30;
 	m_backupAmmo = 100;
-	this->setName("pistol");
+	this->setScale(0.5f);
+	this->setName("weapon_pistol");
 	return true;
 }
 
@@ -97,7 +98,7 @@ void Weapon::resumeControlListen()
 void Weapon::onMouseMove(Event* event)
 {
 	EventMouse* mouseEvent = dynamic_cast<EventMouse*>(event);
-	Vec2 weaponPosVec = this->getParent()->getParent()->getPosition();
+	Vec2 weaponPosVec = this->getParent()->getParent()->convertToWorldSpaceAR(this->getParent()->getPosition());
 	Vec2 mousePosVec = Vec2(mouseEvent->getCursorX(), mouseEvent->getCursorY());
 	Vec2 dst = mousePosVec - weaponPosVec;
 	float radians =M_PI-atan2(dst.y, dst.x);
@@ -109,20 +110,37 @@ void Weapon::fire(double dstX, double dstY)
 {
 	if (m_ammoInCurrentMagazine)
 	{
+		//create fire anime
+		auto biu = Sprite::create("objects/UI/ui_biu.png");
+		biu->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+		biu->setPosition(Vec2(0,this->getParent()->getContentSize().height*3/5));
+		biu->setScale(0.2f);
+		this->getParent()->addChild(biu,0,"biu");
+
+		//create bullet
+		auto bulletLayer = this->getParent()->getParent()->getParent()->getParent()->getChildByName("bulletLayer");
 		auto bullet = Sprite::create("objects/ammo/ammo_rifle.png");
+		bulletLayer->addChild(bullet);
 		Vec2 mousePosVec = Vec2(dstX, dstY);
-		Vec2 weaponPosVec = this->getParent()->getParent()->getPosition();
+		Vec2 weaponPosVec = this->getParent()->convertToWorldSpaceAR(this->getPosition());
 		Vec2 dst = mousePosVec - weaponPosVec;
 		float radians = M_PI - atan2(dst.y, dst.x);
 		float degree = CC_RADIANS_TO_DEGREES(radians);
 		bullet->setRotation(degree);
 		bullet->setScale(0.2f);
-		this->getParent()->getParent()->getParent()->addChild(bullet);
-		bullet->setPosition(this->getParent()->convertToWorldSpace(this->getPosition())-Vec2(this->getContentSize().width+10-(cos(degree)* this->getContentSize().width+10), sin(degree) * (this->getContentSize().width+10)));
-		auto action = MoveTo::create(2.0f, mousePosVec+30*dst);
-	/*	CallFunc* callFunc = CallFunc::create(CC_CALLBACK_0(cleanBullet,this,bullet));
-		auto sequence = Sequence::create(action, callFunc, NULL);*/
-		bullet->runAction(Repeat::create(action, 1));
+		bullet->setPosition(this->getParent()->getParent()->getPosition());
+		//DEBUG
+		std::string str1 ="ch:"+ Value(this->getParent()->getPosition().x).asString() + "," + Value(this->getParent()->getPosition().y).asString() + "\n";
+		OutputDebugString(str1.c_str());
+		std::string str2= "bullet:"+Value(bullet->getPosition().x).asString()+","+ Value(bullet->getPosition().y).asString()+"\n";
+		OutputDebugString(str2.c_str());
+		std::string str3 = this->getParent()->getParent()->getName() + "\n";
+		OutputDebugString(str3.c_str());
+		//DEBUG END
+		auto action = MoveTo::create(1.0f, 1024*Vec2(cos(atan2(dst.y, dst.x)),sin(atan2(dst.y, dst.x))));
+		CallFuncN* callFunc = CallFuncN::create(this,callfuncN_selector(BulletLayer::cleanBullet));
+		auto sequence = Sequence::create(action, callFunc, NULL);
+		bullet->runAction(Repeat::create(sequence, 1));
 		
 		m_ammoInCurrentMagazine--;
 	}
@@ -137,12 +155,3 @@ void Weapon::reload()
 	}
 }
 
-void Weapon::cleanBullet(Node* node)
-{
-	Sprite* bullet = dynamic_cast<Sprite*>(node);
-	if (bullet != nullptr)
-	{
-		bullet->stopAllActions();
-		bullet->removeFromParentAndCleanup(1);
-	}
-}

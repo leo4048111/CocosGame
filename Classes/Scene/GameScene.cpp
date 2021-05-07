@@ -1,6 +1,5 @@
 #include "GameScene.h"
 
-
 USING_NS_CC;
 
 GameScene* GameScene::createGameScene()
@@ -16,42 +15,28 @@ bool GameScene::init()
 	}
 	m_visibleSize = Director::getInstance()->getVisibleSize();
 	m_origin = Director::getInstance()->getVisibleOrigin();
+
+	//init UI layer
+	UILayer* uiLayer = UILayer::createUILayer();
+	uiLayer->scheduleUpdate();
+	this->addChild(uiLayer, 100,"UILayer");
+
+	//init map
+	TMXTiledMap* map = TMXTiledMap::create("map/issue_16512.tmx");
+	map->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+	this->addChild(map, 0,"Map");
+	auto winSize = Director::getInstance()->getWinSize();
+	map->setPosition(Vec2(m_origin.x + m_visibleSize.width / 2, m_origin.y + m_visibleSize.height / 2));
+
+	//init sprite layer
+	SpriteLayer* spriteLayer = SpriteLayer::createSpriteLayer();
+	spriteLayer->scheduleUpdate();
+	map->addChild(spriteLayer, 50,"SpriteLayer");
+
+	//init bullet layer
+	BulletLayer* bulletLayer = BulletLayer::createBulletLayer();
 	
-	//init timer
-	m_startTime = std::time(NULL);
-	m_endTime = std::time(NULL);
-	double runTime = static_cast<double>(m_endTime - m_startTime) / CLOCKS_PER_SEC;
-	m_labelTimer = Label::create(Value(runTime).asString()+"s", "HeiTi", 10);
-	m_labelTimer->setPosition(Vec2(m_origin.x + m_visibleSize.width / 2, m_origin.y + m_visibleSize.height));
-	m_labelTimer->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
-	this->addChild(m_labelTimer);
-
-	//init main character
-	auto mainCharacter = MainCharacter::createMainCharacter();
-	this->addChild(mainCharacter, 20);
-	mainCharacter->setPosition(m_origin + m_visibleSize / 2);
-	mainCharacter->scheduleUpdate();
-
-	//init crosshair
-	auto crossHair = CrossHair::createCrossHair();
-	this->addChild(crossHair, 30);
-	crossHair->setPosition(m_origin + m_visibleSize / 2);
-
-	////init background
-	//auto testBg = Sprite::create("Map/mainMap.png");
-	//this->addChild(testBg,10);
-	//testBg->setPosition(m_origin + m_visibleSize / 2);
-	//testBg->setScale(0.3f);
-
-	//init targets
-	for (int c = 0; c < MIN_TARGETS_COUNT; c++)
-	{
-		auto target = Target::createTarget();
-		this->addChild(target, 20);
-		target->setPosition(m_origin + m_visibleSize / 2);  //should be init with a random parser
-		m_targets.pushBack(target);
-	}
-
+	map->addChild(bulletLayer, 50, "bulletLayer");
 
 	this->setControlOnListen();
 	this->scheduleUpdate();
@@ -87,23 +72,10 @@ void GameScene::goToGameSettings()
 
 void GameScene::update(float delta)
 {
-	//update target
-	if (m_targets.size() < MIN_TARGETS_COUNT)
-	{
-		for (int c = m_targets.size(); c < MIN_TARGETS_COUNT; c++)
-		{
-			auto target = Target::createTarget();
-			this->addChild(target, 20); 
-			target->setPosition(m_origin + m_visibleSize / 2); //should be init with a random parser
-			m_targets.pushBack(target);
-		}
-	}
-	
-	//update timer
-	m_endTime = std::time(NULL);
-	int runTime = static_cast<int>((m_endTime - m_startTime)*1000 / CLOCKS_PER_SEC);
-	m_labelTimer->setString(Value(runTime).asString()+"s");
-
-	//update hit status
-
+	//update camera 
+	TMXTiledMap* map = dynamic_cast<TMXTiledMap*>(this->getChildByName("Map"));
+	Vec2 mainCharacterPos = map->getChildByName("SpriteLayer")->getChildByName("MainCharacter")->getPosition();
+	Vec2 mapPos = map->getContentSize() / 2;
+	Vec2 offsetPos = mainCharacterPos - mapPos;
+	map->setPosition(Vec2(m_origin.x + m_visibleSize.width / 2-offsetPos.x, m_origin.y + m_visibleSize.height / 2-offsetPos.y));
 }

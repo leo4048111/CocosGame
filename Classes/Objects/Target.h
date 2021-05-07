@@ -4,6 +4,11 @@
 #include "cocos2d.h"
 #include "Entity.h"
 
+enum
+{
+	moveleft,moveright
+};
+
 class Target :public Entity
 {
 public:
@@ -13,8 +18,16 @@ public:
 
 	CREATE_FUNC(Target);
 
+	//anime 
+	bool loadGraphs();
+
 	//call method schedule update
 	virtual void update(float delta);
+
+private:
+	cocos2d::Vector<cocos2d::SpriteFrame*> m_leftWalkAnime;
+	cocos2d::Vector<cocos2d::SpriteFrame*> m_rightWalkAnime;
+	int m_currentDir;
 };
 
 

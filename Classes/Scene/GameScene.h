@@ -3,13 +3,10 @@
 
 #include "cocos2d.h"
 #include "../Objects/MainCharacter.h"
-#include "../Objects/CrossHair.h"
-#include "../Objects/Bullet.h"
+#include "../Layer/UILayer.h"
 #include "../Layer/GameSettingsLayer.h"
-#include "../Objects//Target.h"
+#include "../Layer//SpriteLayer.h"
 #include <ctime>
-
-#define MIN_TARGETS_COUNT 3
 
 class GameScene :public cocos2d::Scene
 {
@@ -32,15 +29,6 @@ private:
 	//Window specs
 	cocos2d::Vec2 m_origin;
 	cocos2d::Size m_visibleSize;
-
-	//Target specs
-	cocos2d::Vector<Target*> m_targets;
-	int m_targetCount;
-
-	//Timer specs
-	cocos2d::Label* m_labelTimer;
-	time_t m_startTime;
-	time_t m_endTime;
 
 };
 
