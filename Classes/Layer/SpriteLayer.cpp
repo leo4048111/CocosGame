@@ -31,8 +31,9 @@ bool SpriteLayer::init()
 
 void SpriteLayer::update(float delta)
 {
+	int currentTargetCount = m_targets.size();
 	//update target
-	if (m_targets.size() < MIN_TARGETS_COUNT)
+	if (currentTargetCount < MIN_TARGETS_COUNT)
 	{
 		msws_srand();
 		for (int c = m_targets.size(); c < MIN_TARGETS_COUNT; c++)
@@ -49,4 +50,15 @@ void SpriteLayer::update(float delta)
 Vector<Target*>* SpriteLayer::getAllTargets()
 {
 	return &m_targets;
+}
+
+void SpriteLayer::initTargetSpecs()
+{
+	//init target score map
+	m_targetScoreMap.insert(std::make_pair(targetType::ghost, 10));
+}
+
+int SpriteLayer::getThisTargetScore(Target* target)
+{
+	return m_targetScoreMap[target->getTargetType()];
 }

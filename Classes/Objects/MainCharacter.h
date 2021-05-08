@@ -52,7 +52,10 @@ public:
 
 	void pickUpWeapon();
 	
-
+	//MainCharacter spec related
+	void addScore(int score);
+	
+	int getScore();
 private:
 
 	//Anime frames
@@ -74,6 +77,9 @@ private:
 	int m_totalWeapons;
 	cocos2d::Label* m_magazineSpecLabel;
 	cocos2d::Menu* m_weaponSpecMenu;
+
+	//Score retainer
+	int m_currentScore;
 
 };
 

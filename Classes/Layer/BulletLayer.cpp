@@ -36,23 +36,27 @@ void BulletLayer::update(float delta)
 {
 	SpriteLayer* spriteLayer =dynamic_cast<SpriteLayer*>(this->getParent()->getChildByName("SpriteLayer"));
 	Vector<Target*>* allTargets = spriteLayer->getAllTargets();
-	//for (auto currentBullet : m_allBullets)
-	//{
-	//	for (auto currentTarget : *allTargets)
-	//	{
-	//		if (currentBullet->boundingBox().intersectsRect(currentTarget->getBoundingBox())) //bullet hits this target
-	//		{
-	//			if(!currentTarget->receiveDamage(10));
-	//			{
-	//				allTargets->eraseObject(currentTarget);
-	//				currentTarget->removeFromParentAndCleanup(true);
-	//			}
-	//		/*	m_allBullets.eraseObject(currentBullet);*/
-	//			currentBullet->removeFromParentAndCleanup(true);
-	//			break;
-	//		}
-	//	}
-	//}
+	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
+
+	for (auto currentBullet : m_allBullets)
+	{
+		for (auto currentTarget : *allTargets)
+		{
+			targetType currentTargetType = currentTarget->getTargetType();
+			if (currentBullet->boundingBox().intersectsRect(currentTarget->getBoundingBox())) //Collision Detection, has deprecated and should be optimized!
+			{
+				if(!currentTarget->receiveDamage(10));
+				{
+					mainCharacter->addScore(spriteLayer->getThisTargetScore(currentTarget));
+					allTargets->eraseObject(currentTarget);
+					currentTarget->removeFromParentAndCleanup(true);
+				}
+			/*	m_allBullets.eraseObject(currentBullet);*/
+				currentBullet->removeFromParentAndCleanup(true);
+				break;
+			}
+		}
+	}
 }
 
 void BulletLayer::addBullet()

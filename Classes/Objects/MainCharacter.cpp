@@ -24,13 +24,14 @@ bool MainCharacter::init()
 	MainCharacter::bindSprite(mainCharacter);
 	MainCharacter::showHealthBar();
 
-	//Init visual specs
+	//Init specs
 	m_magazineSpecLabel = Label::create("0/0", "HeiTi", 20);
 	m_magazineSpecLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
 	m_magazineSpecLabel->setPosition(Vec2(this->getContentSize().width / 2, -m_magazineSpecLabel->getContentSize().height));
 	m_magazineSpecLabel->setScale(0.3f);
 	this->addChild(m_magazineSpecLabel);
 
+	m_currentScore = 0;
 	/*m_weaponSpecMenu = Menu::create();
 	m_weaponSpecMenu->setPosition(Vec2(this->getContentSize().width, 0));
 	m_weaponSpecMenu->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
@@ -338,4 +339,14 @@ void MainCharacter::dropWeapon()
 			m_weaponSpecMenu->getChildByTag(m_currentWeaponSlot)->removeFromParentAndCleanup(true);
 		}
 	}
+}
+
+void MainCharacter::addScore(int score)
+{
+	m_currentScore += score;
+}
+
+int MainCharacter::getScore()
+{
+	return m_currentScore;
 }

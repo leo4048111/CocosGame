@@ -1,4 +1,5 @@
 #include "UILayer.h"
+#include "../objects/MainCharacter.h"
 #include <ctime>
 USING_NS_CC;
 
@@ -13,7 +14,7 @@ bool UILayer::init()
 	{
 		return false;
 	}
-
+	MainCharacter* mainCharacter =dynamic_cast<MainCharacter*>( this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
 	auto m_visibleSize = Director::getInstance()->getVisibleSize();
 	auto m_origin = Director::getInstance()->getVisibleOrigin();
 
@@ -31,14 +32,48 @@ bool UILayer::init()
 	this->addChild(crossHair, 30, "CrossHair");
 	crossHair->setPosition(m_origin + m_visibleSize / 2);
 
+	//init Score Board
+	m_labelScoreBoard = Label::createWithSystemFont("Score:" + Value(mainCharacter->getScore()).asString() , "HeiTi", 10);
+	this->addChild(m_labelScoreBoard,30,"ScoreBoard");
+	m_labelScoreBoard->setPosition(Vec2(0, m_visibleSize));
+
+	//init round specs
+	m_currentRound = 1;
+	m_lastRound = 0;
+
 	this->setName("UILayer");
 	return true;
 }
 
 void UILayer::update(float delta)
 {
+	auto m_visibleSize = Director::getInstance()->getVisibleSize();
+	auto m_origin = Director::getInstance()->getVisibleOrigin();
+
 	//update timer
 	m_endTime = std::time(NULL);
 	int runTime = static_cast<int>((m_endTime - m_startTime) * 1000 / CLOCKS_PER_SEC);
 	m_labelTimer->setString(Value(runTime).asString() + "s");
+
+	//update score board
+	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
+	m_labelScoreBoard->setString("Score:" + Value(mainCharacter->getScore()).asString());
+
+	//update round count
+	if (m_currentRound != m_lastRound)
+	{
+		//update specs on enter
+		auto currentRoundDisplay = Label::createWithTTF("Round" + Value(m_currentRound).asString(), "fonts/A Damn Mess.ttf");
+		this->addChild(currentRoundDisplay, 100, "CurrentRoundDisplay");
+		currentRoundDisplay->setPosition(m_origin + m_visibleSize / 2);
+
+		//run action, fade in, display once and fade out
+		auto fadeIn = FadeIn::create(1.0f);
+		auto actionFadeIn = Repeat::create(fadeIn, 1);
+		auto fadeOut = FadeOut::create(1.0f);
+		auto actionFadeOut = Repeat::create(fadeOut, 1);
+		auto sequence = Sequence::createWithTwoActions(actionFadeIn, actionFadeOut);
+
+		currentRoundDisplay->runAction(sequence);
+	}
 }

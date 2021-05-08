@@ -13,13 +13,10 @@ bool GameScene::init()
 	{
 		return false;
 	}
+	
+	//init window
 	m_visibleSize = Director::getInstance()->getVisibleSize();
 	m_origin = Director::getInstance()->getVisibleOrigin();
-
-	//init UI layer
-	UILayer* uiLayer = UILayer::createUILayer();
-	uiLayer->scheduleUpdate();
-	this->addChild(uiLayer, 100,"UILayer");
 
 	//init map
 	TMXTiledMap* map = TMXTiledMap::create("map/issue_16512.tmx");
@@ -37,6 +34,11 @@ bool GameScene::init()
 	BulletLayer* bulletLayer = BulletLayer::createBulletLayer();
 	bulletLayer->scheduleUpdate();
 	map->addChild(bulletLayer, 50, "BulletLayer");
+
+	//init UI layer
+	UILayer* uiLayer = UILayer::createUILayer();
+	uiLayer->scheduleUpdate();
+	this->addChild(uiLayer, 100, "UILayer");
 
 	this->setControlOnListen();
 	this->scheduleUpdate();
@@ -77,4 +79,6 @@ void GameScene::update(float delta)
 	Vec2 mapPos = map->getContentSize() / 2;
 	Vec2 offsetPos = mainCharacterPos - mapPos;
 	map->setPosition(Vec2(m_origin.x + m_visibleSize.width / 2-offsetPos.x, m_origin.y + m_visibleSize.height / 2-offsetPos.y));
+
+	
 }

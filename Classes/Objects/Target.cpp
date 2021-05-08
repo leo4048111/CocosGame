@@ -12,9 +12,10 @@ bool Target::loadGraphs()
 	try
 	{
 		SpriteFrameCache::getInstance()->addSpriteFramesWithFile("objects/target/target.plist");
-		auto cache = SpriteFrameCache::getInstance();
+		/*this method is deprecated!*/
+		/*auto cache = SpriteFrameCache::getInstance();
 		m_leftWalkAnime.pushBack(cache->getSpriteFrameByName("target_leftMove"));
-		m_rightWalkAnime.pushBack(cache->getSpriteFrameByName("target_rightMove"));
+		m_rightWalkAnime.pushBack(cache->getSpriteFrameByName("target_rightMove"));*/
 	}
 	catch (const std::exception& exp)
 	{
@@ -30,13 +31,17 @@ bool Target::init()
 	{
 		return false;
 	}
+
+	m_lastUpdateTime = time(NULL);
+	m_currentDir = moveleft;
+
 	Target::loadGraphs();
 	auto target = Sprite::createWithSpriteFrameName("target_leftMove");
 	Target::bindSprite(target);
-	m_currentDir = moveleft;
+	Target::setTargetType(ghost);
 	target->setScale(0.2f);
 	Target::showHealthBar();
-	m_lastUpdateTime = time(NULL);
+
 	return true;
 }
 
@@ -74,4 +79,41 @@ void Target::update(float delta)
 	}
 
 	this->runAction(MoveTo::create(0.5f,Vec2(this->getPosition().x + offsetX, this->getPosition().y+offsetY)));
+}
+
+void Target::setTargetType(targetType type)
+{
+	m_type = type;
+	String targetName,targetLeftMoveFrameName, targetRightMoveFrameName;
+	//Name format as such: target_$TYPE_$DirMove
+	switch (m_type)
+	{
+	case targetType::ghost:
+		targetName = "target_ghost";
+		targetLeftMoveFrameName = "target_ghost_leftMove";
+		targetRightMoveFrameName = "target_ghost_rightMove";
+		break;
+
+	default:
+		return;
+	}
+
+	//reset target sprite display
+	auto target = Sprite::createWithSpriteFrameName(targetName.getCString());
+	if (m_sprite != nullptr)
+		m_sprite->removeFromParentAndCleanup(1);
+	this->setName(targetName.getCString());
+	Target::bindSprite(target);
+
+	//reset target sprite anime frame cache
+	auto cache = SpriteFrameCache::getInstance();
+
+	m_leftWalkAnime.pushBack(cache->getSpriteFrameByName(targetLeftMoveFrameName.getCString()));
+	m_rightWalkAnime.pushBack(cache->getSpriteFrameByName(targetRightMoveFrameName.getCString()));
+
+}
+
+targetType Target::getTargetType()
+{
+	return m_type;
 }

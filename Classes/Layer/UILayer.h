@@ -20,6 +20,13 @@ private:
 	cocos2d::Label* m_labelTimer;
 	time_t m_startTime;
 	time_t m_endTime;
+
+	//round status
+	int m_currentRound;
+	int m_lastRound;
+
+	//score board
+	cocos2d::Label* m_labelScoreBoard;
 };
 
 #endif // !_UI_LAYER_H_
