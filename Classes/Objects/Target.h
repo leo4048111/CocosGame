@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "Entity.h"
+#include <ctime>
 
 enum
 {
@@ -28,6 +29,7 @@ private:
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_leftWalkAnime;
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_rightWalkAnime;
 	int m_currentDir;
+	time_t m_lastUpdateTime;
 };
 
 

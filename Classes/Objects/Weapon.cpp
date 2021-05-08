@@ -106,10 +106,11 @@ void Weapon::onMouseMove(Event* event)
 	this->setRotation(degree);
 }
 
-void Weapon::fire(double dstX, double dstY)
+void Weapon::fire()
 {
 	if (m_ammoInCurrentMagazine)
 	{
+		BulletLayer* bulletLayer =dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getParent()->getParent()->getChildByName("BulletLayer"));
 		//create fire anime
 		auto biu = Sprite::create("objects/UI/ui_biu.png");
 		biu->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
@@ -117,30 +118,7 @@ void Weapon::fire(double dstX, double dstY)
 		biu->setScale(0.2f);
 		this->getParent()->addChild(biu,0,"biu");
 
-		//create bullet
-		auto bulletLayer = this->getParent()->getParent()->getParent()->getParent()->getChildByName("bulletLayer");
-		auto bullet = Sprite::create("objects/ammo/ammo_rifle.png");
-		bulletLayer->addChild(bullet);
-		Vec2 mousePosVec = Vec2(dstX, dstY);
-		Vec2 weaponPosVec = this->getParent()->convertToWorldSpaceAR(this->getPosition());
-		Vec2 dst = mousePosVec - weaponPosVec;
-		float radians = M_PI - atan2(dst.y, dst.x);
-		float degree = CC_RADIANS_TO_DEGREES(radians);
-		bullet->setRotation(degree);
-		bullet->setScale(0.2f);
-		bullet->setPosition(this->getParent()->getParent()->getPosition());
-		//DEBUG
-		std::string str1 ="ch:"+ Value(this->getParent()->getPosition().x).asString() + "," + Value(this->getParent()->getPosition().y).asString() + "\n";
-		OutputDebugString(str1.c_str());
-		std::string str2= "bullet:"+Value(bullet->getPosition().x).asString()+","+ Value(bullet->getPosition().y).asString()+"\n";
-		OutputDebugString(str2.c_str());
-		std::string str3 = this->getParent()->getParent()->getName() + "\n";
-		OutputDebugString(str3.c_str());
-		//DEBUG END
-		auto action = MoveTo::create(1.0f, 1024*Vec2(cos(atan2(dst.y, dst.x)),sin(atan2(dst.y, dst.x))));
-		CallFuncN* callFunc = CallFuncN::create(this,callfuncN_selector(BulletLayer::cleanBullet));
-		auto sequence = Sequence::create(action, callFunc, NULL);
-		bullet->runAction(Repeat::create(sequence, 1));
+		bulletLayer->addBullet();
 		
 		m_ammoInCurrentMagazine--;
 	}

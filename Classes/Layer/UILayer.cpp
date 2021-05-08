@@ -16,7 +16,6 @@ bool UILayer::init()
 
 	auto m_visibleSize = Director::getInstance()->getVisibleSize();
 	auto m_origin = Director::getInstance()->getVisibleOrigin();
-	this->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
 
 	//init timer
 	m_startTime = std::time(NULL);

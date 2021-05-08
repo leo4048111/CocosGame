@@ -35,5 +35,12 @@ void CrossHair::setControlOnListen()
 void CrossHair::onMouseMove(Event* event)
 {
 	EventMouse* mouseEvent = dynamic_cast<EventMouse*>(event);
-	this->setPosition(Vec2(mouseEvent->getCursorX(), mouseEvent->getCursorY()));
+	m_cursorPos.x = mouseEvent->getCursorX();
+	m_cursorPos.y = mouseEvent->getCursorY();
+	this->setPosition(m_cursorPos);
+}
+
+Vec2 CrossHair::getCursorPos()
+{
+	return m_cursorPos;
 }

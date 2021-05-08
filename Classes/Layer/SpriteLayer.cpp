@@ -22,7 +22,6 @@ bool SpriteLayer::init()
 	this->addChild(mainCharacter, 20, "MainCharacter");
 	int mapWidth = this->getContentSize().width;
 	int mapHeight = this->getContentSize().height;
-	mainCharacter->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
 	mainCharacter->setPosition(Vec2(origin.x+visibleSize.width / 2,origin.y+ visibleSize.height / 3));
 	mainCharacter->scheduleUpdate();
 
@@ -45,4 +44,9 @@ void SpriteLayer::update(float delta)
 			target->scheduleUpdate();
 		}
 	}
+}
+
+Vector<Target*>* SpriteLayer::getAllTargets()
+{
+	return &m_targets;
 }

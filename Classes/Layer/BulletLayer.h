@@ -14,6 +14,10 @@ public:
 
 	void cleanBullet(Node* sender);
 
+	virtual void update(float delta);
+
+	void addBullet();
+	
 private:
 	cocos2d::Vector<cocos2d::Sprite*> m_allBullets;
 };

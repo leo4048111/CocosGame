@@ -18,11 +18,13 @@ public:
 
 	double getHealthPercentage();
 
-	void setCurrentHealth(double health);
+	void resetHealthBar();
 
 	void showHealthBar();
 
+	bool receiveDamage(int damage);
 
+	void deadAndCleanUp(Node* node);
 private:
 	double m_maxHealth;
 	double m_currentHealth;

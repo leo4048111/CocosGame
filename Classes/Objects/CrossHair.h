@@ -17,8 +17,12 @@ public:
 	void onMouseMove(cocos2d::Event* event);
 
 	void setControlOnListen();
+
+	cocos2d::Vec2 getCursorPos();
 private:
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_fireAnime;
+	cocos2d::Vec2 m_cursorPos;
+
 };
 
 

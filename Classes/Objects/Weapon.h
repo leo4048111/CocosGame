@@ -37,7 +37,7 @@ public:
 
 	//Ammo and fire related
 
-	void fire(double dstX,double dstY);
+	void fire();
 
 	void reload();
 

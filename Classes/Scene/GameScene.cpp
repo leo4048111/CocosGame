@@ -35,8 +35,8 @@ bool GameScene::init()
 
 	//init bullet layer
 	BulletLayer* bulletLayer = BulletLayer::createBulletLayer();
-	
-	map->addChild(bulletLayer, 50, "bulletLayer");
+	bulletLayer->scheduleUpdate();
+	map->addChild(bulletLayer, 50, "BulletLayer");
 
 	this->setControlOnListen();
 	this->scheduleUpdate();
@@ -67,7 +67,6 @@ void GameScene::goToGameSettings()
 {
 	auto gameSettingsLayer = GameSettingsLayer::createGameSettingsLayer();
 	this->addChild(gameSettingsLayer, 100);
-	
 }
 
 void GameScene::update(float delta)

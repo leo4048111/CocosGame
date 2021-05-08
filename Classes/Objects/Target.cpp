@@ -33,16 +33,21 @@ bool Target::init()
 	Target::loadGraphs();
 	auto target = Sprite::createWithSpriteFrameName("target_leftMove");
 	Target::bindSprite(target);
-	m_currentDir= moveleft;
+	m_currentDir = moveleft;
 	target->setScale(0.2f);
 	Target::showHealthBar();
+	m_lastUpdateTime = time(NULL);
 	return true;
 }
 
 void Target::update(float delta)
 {
+	time_t currentTime = time(NULL);
+	if (currentTime - m_lastUpdateTime < 1)
+		return;
 	//Target always moves towards main character
-	double offset = 0.2f;
+	m_lastUpdateTime = currentTime;
+	double offset = 10.0f;
 	auto mainCharacter=this->getParent()->getChildByName("MainCharacter");
 	Vec2 mainCharacterPos = mainCharacter->getParent()->convertToWorldSpaceAR(mainCharacter->getPosition());
 	Vec2 targetPos = this->getParent()->convertToWorldSpaceAR(this->getPosition());
@@ -68,5 +73,5 @@ void Target::update(float delta)
 		m_currentDir = moveright;
 	}
 
-	this->setPosition(this->getPosition().x + offsetX, this->getPosition().y+offsetY);
+	this->runAction(MoveTo::create(0.5f,Vec2(this->getPosition().x + offsetX, this->getPosition().y+offsetY)));
 }

@@ -18,6 +18,8 @@ public:
 
 	virtual void update(float delta);
 
+	cocos2d::Vector<Target*>* getAllTargets();
+
 private:
 
 	//Target specs

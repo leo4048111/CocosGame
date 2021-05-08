@@ -32,7 +32,8 @@ bool Entity::init()
 	{
 		return false;
 	}
-	m_maxHealth = m_currentHealth=100.0f;
+	m_maxHealth =100.0f;
+	m_currentHealth = 100.0f;
 	return true;
 }
 
@@ -41,9 +42,30 @@ double Entity::getHealthPercentage()
 	return m_currentHealth/m_maxHealth*100;
 }
 
-void Entity::setCurrentHealth(double currentHealth)
+void Entity::resetHealthBar()
 {
-	m_currentHealth = currentHealth;
 	m_healthBar->setPercentage(getHealthPercentage());
 }
 
+bool Entity::receiveDamage(int damage)
+{
+	m_currentHealth -= damage;
+	if (m_currentHealth > 0)
+	{
+		resetHealthBar();
+		return true;
+	}
+	resetHealthBar();
+	this->stopAllActions();
+	this->unscheduleUpdate();
+	auto blink = Repeat::create(Blink::create(2.0f, 10), 1);
+	CallFuncN* callFunc = CallFuncN::create(CC_CALLBACK_1(Entity::deadAndCleanUp,this));
+	auto sequence = Sequence::create(blink, callFunc, NULL);
+	this->runAction(sequence);
+	return false;
+}
+
+void Entity::deadAndCleanUp(Node* node)
+{
+	this->removeFromParentAndCleanup(true);
+}

@@ -226,14 +226,14 @@ void MainCharacter::onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos
 void MainCharacter::setControlOnListen()
 {
 	auto* dispatcher = Director::getInstance()->getEventDispatcher();
-	auto* keyListener = EventListenerKeyboard::create();
 	auto* mouseListener = EventListenerMouse::create();
 	mouseListener->onMouseDown = CC_CALLBACK_1(MainCharacter::onMouseDown, this);
 	mouseListener->onMouseUp = CC_CALLBACK_1(MainCharacter::onMouseUp, this);
+	dispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
+	auto* keyListener = EventListenerKeyboard::create();
 	keyListener->onKeyPressed = CC_CALLBACK_2(MainCharacter::onKeyPressed, this);
 	keyListener->onKeyReleased = CC_CALLBACK_2(MainCharacter::onKeyReleased, this);
 	dispatcher->addEventListenerWithSceneGraphPriority(keyListener, this);
-	dispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
 }
 
 void MainCharacter::onMouseDown(Event* event)
@@ -245,7 +245,7 @@ void MainCharacter::onMouseDown(Event* event)
 	{
 	case EventMouse::MouseButton::BUTTON_LEFT:
 		if (m_currentWeapon != nullptr)
-			m_currentWeapon->fire(mouseEvent->getCursorX(),mouseEvent->getCursorY());
+			m_currentWeapon->fire();
 		break;
 	default:
 		break;
