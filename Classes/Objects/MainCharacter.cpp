@@ -30,8 +30,10 @@ bool MainCharacter::init()
 	m_magazineSpecLabel->setPosition(Vec2(this->getContentSize().width / 2, -m_magazineSpecLabel->getContentSize().height));
 	m_magazineSpecLabel->setScale(0.3f);
 	this->addChild(m_magazineSpecLabel);
+	m_currentSpeed = 0;
+	m_lastSlideTime = time(NULL);
+	this->addSpeed(1.0f);
 
-	m_currentScore = 0;
 	/*m_weaponSpecMenu = Menu::create();
 	m_weaponSpecMenu->setPosition(Vec2(this->getContentSize().width, 0));
 	m_weaponSpecMenu->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
@@ -86,6 +88,9 @@ bool MainCharacter::loadGraphs()
 		{
 			m_standBackAnime.pushBack(cache->getSpriteFrameByName("character_maleAdventurer_standforward" + Value(c).asString()));
 		}
+		m_leftSlideAnime.pushBack(cache->getSpriteFrameByName("character_maleAdventurer_leftslide"));
+		m_rightSlideAnime.pushBack(cache->getSpriteFrameByName("character_maleAdventurer_rightslide"));
+
 		return true;
 	}
 	catch (const std::exception& exp)
@@ -133,12 +138,12 @@ void MainCharacter::runAction(int dir)
 void MainCharacter::update(float delta)
 {
 	//Update anime
-	double offsetX = 1.0f;
-	double offsetY = 1.0f;
+	double offsetX = m_currentSpeed;
+	double offsetY = m_currentSpeed;
 	if (m_keyMap[EventKeyboard::KeyCode::KEY_SHIFT])
 	{
-		offsetX += 0.5f;
-		offsetY += 0.5f;
+		offsetX *= 2;
+		offsetY *= 2;
 	}
 	if (m_keyMap[EventKeyboard::KeyCode::KEY_W])
 	{
@@ -194,8 +199,8 @@ void MainCharacter::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2
 	case EventKeyboard::KeyCode::KEY_R:
 		m_currentWeapon->reload();
 		break;
-	case EventKeyboard::KeyCode::KEY_G:
-		dropWeapon();
+	case EventKeyboard::KeyCode::KEY_SPACE:
+		slide();
 		break;
 	default:
 		break;
@@ -318,11 +323,6 @@ bool MainCharacter::canCarryMoreWeapons()
 	return m_emptyWeaponSlots.size() != 0;
 }
 
-void MainCharacter::pickUpWeapon()
-{
-
-}
-
 void MainCharacter::dropWeapon()
 {
 	if (!canCarryMoreWeapons())
@@ -341,12 +341,53 @@ void MainCharacter::dropWeapon()
 	}
 }
 
-void MainCharacter::addScore(int score)
+Weapon* MainCharacter::getCurrentWeapon()
 {
-	m_currentScore += score;
+	return m_currentWeapon;
 }
 
-int MainCharacter::getScore()
+void MainCharacter::slide()
 {
-	return m_currentScore;
+	time_t currentTime = time(NULL);
+	if (currentTime - m_lastSlideTime >= SLIDE_COOLDOWN)
+	{
+		m_sprite->pauseSchedulerAndActions();
+		Animate* animate = nullptr;
+		Vec2 dst = this->getPosition();
+		if (m_keyMap[EventKeyboard::KeyCode::KEY_A])
+		{
+			animate = Animate::create(Animation::createWithSpriteFrames(m_leftSlideAnime, 0.5f));
+			dst = Vec2(dst.x-m_currentSpeed * 3,dst.y);
+		}
+		else if (m_keyMap[EventKeyboard::KeyCode::KEY_D])
+		{
+			animate = Animate::create(Animation::createWithSpriteFrames(m_rightSlideAnime, 0.5f));
+			dst = Vec2(dst.x + m_currentSpeed * 3, dst.y);
+
+		}
+		else
+		{
+			animate = Animate::create(Animation::createWithSpriteFrames(m_leftSlideAnime, 0.5f));
+			dst = Vec2(dst.x - m_currentSpeed * 3, dst.y);
+		}
+		
+		Action* actionSlide = Repeat::create(animate, 1);
+		auto action = MoveTo::create(0.5f, dst);
+		CallFuncN* callFunc = CallFuncN::create(this,callfuncN_selector(MainCharacter::slideEnd));
+		auto sequence = Sequence::create(action, callFunc, NULL);
+
+		m_sprite->runAction(actionSlide);
+		m_sprite->runAction(sequence);
+		m_lastSlideTime = currentTime;
+	}
+}
+
+void MainCharacter::addSpeed(float speed)
+{
+	m_currentSpeed += speed;
+}
+
+void MainCharacter::slideEnd(Node* sender)
+{
+	this->resumeSchedulerAndActions();
 }

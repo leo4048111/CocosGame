@@ -24,7 +24,11 @@ public:
 
 	bool receiveDamage(int damage);
 
+	void healUp(int heal);
+
 	void deadAndCleanUp(Node* node);
+
+	void runDeadAction();
 private:
 	double m_maxHealth;
 	double m_currentHealth;

@@ -15,6 +15,10 @@ public:
 
 	virtual void update(float delta);
 
+	void addScore(int score);
+
+	int getScore();
+
 private:
 	//Timer specs
 	cocos2d::Label* m_labelTimer;
@@ -27,6 +31,9 @@ private:
 
 	//score board
 	cocos2d::Label* m_labelScoreBoard;
+
+	//Score board specs
+	int m_currentScore;
 };
 
 #endif // !_UI_LAYER_H_

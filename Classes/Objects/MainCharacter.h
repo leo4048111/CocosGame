@@ -6,9 +6,10 @@
 #include "Weapon.h"
 #include "ui/UIScrollView.h"
 #include <map>
+#include <ctime>
 
 #define MAX_WEAPON_CARRY 4
-
+#define SLIDE_COOLDOWN 2.5
 enum actions
 {
 	forward,back,left,right,standBack,standForward
@@ -39,6 +40,11 @@ public:
 
 	void onMouseUp(cocos2d::Event* event);
 
+	void addSpeed(float speed);
+
+	time_t m_lastSlideTime;
+	void slide();
+
 	//Weapon related
 	void addWeapon(Weapon* weapon);
 
@@ -51,11 +57,9 @@ public:
 	void dropWeapon();
 
 	void pickUpWeapon();
+
+	Weapon* getCurrentWeapon();
 	
-	//MainCharacter spec related
-	void addScore(int score);
-	
-	int getScore();
 private:
 
 	//Anime frames
@@ -64,10 +68,14 @@ private:
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_forwardWalkAnime;
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_backWalkAnime;
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_standBackAnime;
+	cocos2d::Vector<cocos2d::SpriteFrame*> m_leftSlideAnime;
+	cocos2d::Vector<cocos2d::SpriteFrame*> m_rightSlideAnime;
 
 	//Control specs
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> m_keyMap;
 	std::map<cocos2d::EventMouse::MouseButton, bool> m_mouseButtonMap;
+	float m_currentSpeed;
+	void slideEnd(cocos2d::Node* sender);
 
 	//Weapon specs
 	std::map<int,Weapon*> m_weaponsMap;
@@ -77,9 +85,6 @@ private:
 	int m_totalWeapons;
 	cocos2d::Label* m_magazineSpecLabel;
 	cocos2d::Menu* m_weaponSpecMenu;
-
-	//Score retainer
-	int m_currentScore;
 
 };
 

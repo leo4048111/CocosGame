@@ -4,48 +4,33 @@
     <dict>
         <key>frames</key>
         <dict>
-            <key>target_ghost</key>
+            <key>collectable_ammo</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
                 <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{625,625}</string>
+                <string>{153,137}</string>
                 <key>spriteSourceSize</key>
-                <string>{625,625}</string>
+                <string>{153,137}</string>
                 <key>textureRect</key>
-                <string>{{0,0},{625,625}}</string>
+                <string>{{0,0},{153,137}}</string>
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>target_ghost_leftMove</key>
+            <key>collectable_sipOfHealth</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
                 <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{625,625}</string>
+                <string>{68,80}</string>
                 <key>spriteSourceSize</key>
-                <string>{625,625}</string>
+                <string>{68,80}</string>
                 <key>textureRect</key>
-                <string>{{625,0},{625,625}}</string>
-                <key>textureRotated</key>
-                <false/>
-            </dict>
-            <key>target_ghost_rightMove</key>
-            <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
-                <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{625,625}</string>
-                <key>spriteSourceSize</key>
-                <string>{625,625}</string>
-                <key>textureRect</key>
-                <string>{{1250,0},{625,625}}</string>
+                <string>{{153,0},{68,80}}</string>
                 <key>textureRotated</key>
                 <false/>
             </dict>
@@ -59,13 +44,13 @@
             <key>premultiplyAlpha</key>
             <false/>
             <key>realTextureFileName</key>
-            <string>target.png</string>
+            <string>collectable.png</string>
             <key>size</key>
-            <string>{1875,625}</string>
+            <string>{221,137}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:5d57d8d051192ab65653ac985abeaf77:6bb9c0badd8e24f690f30639b2b95d1b:8842ea9559c6d52cdd5e97e4bff9126a$</string>
+            <string>$TexturePacker:SmartUpdate:f2ad3acbdadfb892c51e6f51015bdafd:f81951e46c80a5c6dca8abb8c5362d39:5500ae40e1873b2b4bdfdf5ef90eed4a$</string>
             <key>textureFileName</key>
-            <string>target.png</string>
+            <string>collectable.png</string>
         </dict>
     </dict>
 </plist>

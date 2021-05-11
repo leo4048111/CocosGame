@@ -1,6 +1,7 @@
 #include "BulletLayer.h"
 #include "SpriteLayer.h"
 #include "objects/CrossHair.h"
+#include "UILayer.h"
 
 USING_NS_CC;
 
@@ -25,8 +26,7 @@ void BulletLayer::cleanBullet(Node* sender)
 	Sprite* bullet = dynamic_cast<Sprite*>(sender);
 	if (bullet != nullptr)
 	{
-		bullet->stopAllActions();
-		/*m_allBullets.eraseObject(bullet);*/
+		m_allBullets.eraseObject(bullet);
 		bullet->removeFromParentAndCleanup(1);
 	}
 	
@@ -36,25 +36,59 @@ void BulletLayer::update(float delta)
 {
 	SpriteLayer* spriteLayer =dynamic_cast<SpriteLayer*>(this->getParent()->getChildByName("SpriteLayer"));
 	Vector<Target*>* allTargets = spriteLayer->getAllTargets();
-	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
-
+	UILayer* uiLayer = dynamic_cast<UILayer*>(this->getParent()->getParent()->getChildByName("UILayer"));
+	Vector<Sprite*> tmpEraseBullet;
+	Vector<Target*> tmpEraseTarget;
 	for (auto currentBullet : m_allBullets)
 	{
 		for (auto currentTarget : *allTargets)
 		{
 			targetType currentTargetType = currentTarget->getTargetType();
-			if (currentBullet->boundingBox().intersectsRect(currentTarget->getBoundingBox())) //Collision Detection, has deprecated and should be optimized!
+			/*Rect bulletRect = Rect(currentBullet->getParent()->convertToWorldSpaceAR(currentBullet->getBoundingBox().origin), currentBullet->getBoundingBox().size);
+			Rect targetRect = Rect(currentTarget->getParent()->convertToWorldSpaceAR(currentTarget->getBoundingBox().origin), currentTarget->getBoundingBox().size);*/
+			/*MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
+			Rect mainCharactere = Rect(mainCharacter->getParent()->convertToNodeSpace(mainCharacter->m_sprite->getBoundingBox().origin), mainCharacter->m_sprite->getBoundingBox().size);*/
+			Rect bulletRect = currentBullet->getBoundingBox();
+			Rect targetRect = Rect(currentTarget->getBoundingBox().origin,currentTarget->m_sprite->getContentSize()/5);
+			if (bulletRect.intersectsRect(targetRect)) //Collision Detection
 			{
-				if(!currentTarget->receiveDamage(10));
+				OutputDebugString("HIT TARGET\n");
+				if(!currentTarget->receiveDamage(10))
 				{
-					mainCharacter->addScore(spriteLayer->getThisTargetScore(currentTarget));
-					allTargets->eraseObject(currentTarget);
-					currentTarget->removeFromParentAndCleanup(true);
+					uiLayer->addScore(spriteLayer->getThisTargetScore(currentTarget));
+					tmpEraseTarget.pushBack(currentTarget);
 				}
-			/*	m_allBullets.eraseObject(currentBullet);*/
-				currentBullet->removeFromParentAndCleanup(true);
+				tmpEraseBullet.pushBack(currentBullet);
 				break;
 			}
+		}
+	}
+
+	while (!tmpEraseBullet.empty())
+	{
+		auto tmpBullet = tmpEraseBullet.back();
+		try
+		{
+			tmpBullet->stopAllActions();
+			tmpEraseBullet.popBack();
+			m_allBullets.eraseObject(tmpBullet);
+			tmpBullet->removeFromParentAndCleanup(true);
+		}
+		catch (const std::exception& exp)
+		{
+			CCLOG("%s", exp.what());
+		}
+	}
+
+	while (!tmpEraseTarget.empty())
+	{
+		auto tmpTarget = tmpEraseTarget.back();
+		if (tmpTarget != nullptr)
+		{
+			tmpTarget->dropRandomCollectable();
+			tmpEraseTarget.popBack();
+			allTargets->eraseObject(tmpTarget);
+			tmpTarget->runDeadAction();
 		}
 	}
 }
@@ -92,10 +126,10 @@ void BulletLayer::addBullet()
 	SpriteLayer* spriteLayer = dynamic_cast<SpriteLayer*>(this->getParent()->getChildByName("SpriteLayer"));
 	Vector<Target*>* allTargets = spriteLayer->getAllTargets();
 
-	if (!allTargets->back()->receiveDamage(10))
-	{
-		allTargets->eraseObject(allTargets->back());
-	}
+	//if (!allTargets->back()->receiveDamage(10))
+	//{
+	//	allTargets->eraseObject(allTargets->back());
+	//}
 	//DEBUG END
 
 	auto action = MoveTo::create(1.0f, 1024 * Vec2(cos(atan2(dst.y, dst.x)), sin(atan2(dst.y, dst.x))));

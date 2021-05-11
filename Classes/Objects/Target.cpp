@@ -12,10 +12,6 @@ bool Target::loadGraphs()
 	try
 	{
 		SpriteFrameCache::getInstance()->addSpriteFramesWithFile("objects/target/target.plist");
-		/*this method is deprecated!*/
-		/*auto cache = SpriteFrameCache::getInstance();
-		m_leftWalkAnime.pushBack(cache->getSpriteFrameByName("target_leftMove"));
-		m_rightWalkAnime.pushBack(cache->getSpriteFrameByName("target_rightMove"));*/
 	}
 	catch (const std::exception& exp)
 	{
@@ -31,15 +27,16 @@ bool Target::init()
 	{
 		return false;
 	}
+	if (!Target::loadGraphs())
+	{
+		return false;
+	}
 
 	m_lastUpdateTime = time(NULL);
 	m_currentDir = moveleft;
 
-	Target::loadGraphs();
-	auto target = Sprite::createWithSpriteFrameName("target_leftMove");
-	Target::bindSprite(target);
+	
 	Target::setTargetType(ghost);
-	target->setScale(0.2f);
 	Target::showHealthBar();
 
 	return true;
@@ -103,6 +100,7 @@ void Target::setTargetType(targetType type)
 	if (m_sprite != nullptr)
 		m_sprite->removeFromParentAndCleanup(1);
 	this->setName(targetName.getCString());
+	target->setScale(0.2f);
 	Target::bindSprite(target);
 
 	//reset target sprite anime frame cache
@@ -116,4 +114,19 @@ void Target::setTargetType(targetType type)
 targetType Target::getTargetType()
 {
 	return m_type;
+}
+
+void Target::dropSpecificCollectable(collectableType type)
+{
+	CollectableLayer* collectableLayer = dynamic_cast<CollectableLayer*>(this->getParent()->getChildByName("CollectableLayer"));
+	auto collectable = Collectable::createCollectable();
+	collectable->setCollectableType(type);
+	collectableLayer->addCollectable(collectable,this->getPosition().x,this->getPosition().y);
+}
+
+void Target::dropRandomCollectable()
+{
+	srand((unsigned long long)time(NULL));
+	collectableType type = (collectableType)(rand() % 1);
+	dropSpecificCollectable(type);
 }

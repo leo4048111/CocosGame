@@ -9,178 +9,193 @@
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{0,-18}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{192,220}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{1,1},{192,220}}</string>
+                <string>{{0,0},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_backwalk1</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{12,-20}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{160,216}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{1,463},{160,216}}</string>
+                <string>{{192,0},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_backwalk2</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{3,-30}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{176,196}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{219,899},{176,196}}</string>
+                <string>{{384,0},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_forwardwalk0</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{-5,-22}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{142,212}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{1,1343},{142,212}}</string>
+                <string>{{576,0},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_forwardwalk1</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{-2,-16}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{188,206}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{223,1},{188,206}}</string>
+                <string>{{768,0},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_forwardwalk2</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{-7,-24}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{142,208}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{221,333},{142,208}}</string>
+                <string>{{960,0},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_forwardwalk3</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{0,-22}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{136,212}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{215,1445},{136,212}}</string>
+                <string>{{1152,0},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
+            </dict>
+            <key>character_maleAdventurer_leftslide</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{192,256}</string>
+                <key>spriteSourceSize</key>
+                <string>{192,256}</string>
+                <key>textureRect</key>
+                <string>{{1344,0},{192,256}}</string>
+                <key>textureRotated</key>
+                <false/>
             </dict>
             <key>character_maleAdventurer_leftwalk0</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{7,-19}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{150,216}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{1,625},{150,216}}</string>
+                <string>{{1536,0},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_leftwalk1</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{4,-25}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{138,206}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{219,619},{138,206}}</string>
+                <string>{{0,256},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_leftwalk2</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{1,-22}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{124,212}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{1,1487},{124,212}}</string>
+                <string>{{192,256},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_leftwalk3</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{8,-19}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{132,218}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{1,195},{132,218}}</string>
+                <string>{{384,256},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_leftwalk4</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{7,-22}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{152,212}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{219,1077},{152,212}}</string>
+                <string>{{576,256},{192,256}}</string>
                 <key>textureRotated</key>
                 <false/>
             </dict>
@@ -189,195 +204,210 @@
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{4,-25}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{140,206}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{223,191},{140,206}}</string>
+                <string>{{768,256},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_leftwalk6</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{1,-22}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{124,212}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{215,1583},{124,212}}</string>
+                <string>{{960,256},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_leftwalk7</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{6,-20}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{136,216}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{1,929},{136,216}}</string>
+                <string>{{1152,256},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
+            </dict>
+            <key>character_maleAdventurer_rightslide</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{192,256}</string>
+                <key>spriteSourceSize</key>
+                <string>{192,256}</string>
+                <key>textureRect</key>
+                <string>{{1344,256},{192,256}}</string>
+                <key>textureRotated</key>
+                <false/>
             </dict>
             <key>character_maleAdventurer_rightwalk0</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{-7,-19}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{150,216}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{1,777},{150,216}}</string>
+                <string>{{1536,256},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_rightwalk1</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{-4,-25}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{138,206}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{219,759},{138,206}}</string>
+                <string>{{0,512},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_rightwalk2</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{-1,-22}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{124,212}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{1,1613},{124,212}}</string>
+                <string>{{192,512},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_rightwalk3</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{-8,-19}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{132,218}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{1,329},{132,218}}</string>
+                <string>{{384,512},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_rightwalk4</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{-8,-22}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{152,212}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{217,1291},{152,212}}</string>
+                <string>{{576,512},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_rightwalk5</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{-4,-25}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{140,206}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{219,477},{140,206}}</string>
+                <string>{{768,512},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_rightwalk6</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{-1,-22}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{124,212}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{215,1709},{124,212}}</string>
+                <string>{{960,512},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_rightwalk7</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{-7,-20}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{136,216}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{1,1067},{136,216}}</string>
+                <string>{{1152,512},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_standforward0</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{3,-22}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{116,212}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{1,1739},{116,212}}</string>
+                <string>{{1344,512},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>character_maleAdventurer_standforward1</key>
             <dict>
                 <key>aliases</key>
                 <array/>
                 <key>spriteOffset</key>
-                <string>{0,-21}</string>
+                <string>{0,0}</string>
                 <key>spriteSize</key>
-                <string>{136,214}</string>
+                <string>{192,256}</string>
                 <key>spriteSourceSize</key>
                 <string>{192,256}</string>
                 <key>textureRect</key>
-                <string>{{1,1205},{136,214}}</string>
+                <string>{{1536,512},{192,256}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
         </dict>
         <key>metadata</key>
@@ -391,9 +421,9 @@
             <key>realTextureFileName</key>
             <string>mainCharacter.png</string>
             <key>size</key>
-            <string>{430,1856}</string>
+            <string>{1728,768}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:2f99b2c7a0511cafb795856d5e611f3d:1fb27a3982e584aecab9d38c43fc5cec:ebee65fd4a465b155e7b4b310ae6b918$</string>
+            <string>$TexturePacker:SmartUpdate:2ff6c41bfb1cafe3ec6652b16fa6a71f:87ddee3c6ba877750da79bb31f111b0f:ebee65fd4a465b155e7b4b310ae6b918$</string>
             <key>textureFileName</key>
             <string>mainCharacter.png</string>
         </dict>

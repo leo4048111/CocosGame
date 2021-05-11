@@ -14,7 +14,6 @@ bool UILayer::init()
 	{
 		return false;
 	}
-	MainCharacter* mainCharacter =dynamic_cast<MainCharacter*>( this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
 	auto m_visibleSize = Director::getInstance()->getVisibleSize();
 	auto m_origin = Director::getInstance()->getVisibleOrigin();
 
@@ -33,9 +32,10 @@ bool UILayer::init()
 	crossHair->setPosition(m_origin + m_visibleSize / 2);
 
 	//init Score Board
-	m_labelScoreBoard = Label::createWithSystemFont("Score:" + Value(mainCharacter->getScore()).asString() , "HeiTi", 10);
+	m_currentScore = 0;
+	m_labelScoreBoard = Label::createWithSystemFont("Score:0", "HeiTi", 10);
 	this->addChild(m_labelScoreBoard,30,"ScoreBoard");
-	m_labelScoreBoard->setPosition(Vec2(0, m_visibleSize));
+	m_labelScoreBoard->setPosition(Vec2(m_labelScoreBoard->getContentSize().width/2, m_visibleSize.height- m_labelScoreBoard->getContentSize().height));
 
 	//init round specs
 	m_currentRound = 1;
@@ -56,24 +56,35 @@ void UILayer::update(float delta)
 	m_labelTimer->setString(Value(runTime).asString() + "s");
 
 	//update score board
-	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
-	m_labelScoreBoard->setString("Score:" + Value(mainCharacter->getScore()).asString());
+	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("Map")->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
+	m_labelScoreBoard->setString("Score:" + Value(this->getScore()).asString());
 
 	//update round count
 	if (m_currentRound != m_lastRound)
 	{
 		//update specs on enter
-		auto currentRoundDisplay = Label::createWithTTF("Round" + Value(m_currentRound).asString(), "fonts/A Damn Mess.ttf");
+		auto currentRoundDisplay = Label::createWithSystemFont("Round " + Value(m_currentRound).asString(), "HeiTi",20);
 		this->addChild(currentRoundDisplay, 100, "CurrentRoundDisplay");
-		currentRoundDisplay->setPosition(m_origin + m_visibleSize / 2);
+		currentRoundDisplay->setPosition(Vec2(m_origin.x + m_visibleSize.width/2,m_origin.y+m_visibleSize.height*3/4));
 
 		//run action, fade in, display once and fade out
-		auto fadeIn = FadeIn::create(1.0f);
+		auto fadeIn = FadeIn::create(4.0f);
 		auto actionFadeIn = Repeat::create(fadeIn, 1);
 		auto fadeOut = FadeOut::create(1.0f);
 		auto actionFadeOut = Repeat::create(fadeOut, 1);
 		auto sequence = Sequence::createWithTwoActions(actionFadeIn, actionFadeOut);
 
 		currentRoundDisplay->runAction(sequence);
+		m_lastRound = m_currentRound;
 	}
+}
+
+void UILayer::addScore(int score)
+{
+	m_currentScore += score;
+}
+
+int UILayer::getScore()
+{
+	return m_currentScore;
 }

@@ -3,6 +3,8 @@
 
 #include "cocos2d.h"
 #include "Entity.h"
+#include "Collectable.h"
+#include "../Layer/CollectableLayer.h"
 #include <ctime>
 
 enum
@@ -33,6 +35,11 @@ public:
 	void setTargetType(targetType type);
 
 	targetType getTargetType();
+
+	//drop collectables
+	void dropRandomCollectable();
+
+	void dropSpecificCollectable(collectableType type);
 
 private:
 	//target anime update scheduler

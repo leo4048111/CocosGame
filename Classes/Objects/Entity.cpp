@@ -50,22 +50,35 @@ void Entity::resetHealthBar()
 bool Entity::receiveDamage(int damage)
 {
 	m_currentHealth -= damage;
+	resetHealthBar();
 	if (m_currentHealth > 0)
 	{
-		resetHealthBar();
 		return true;
 	}
-	resetHealthBar();
-	this->stopAllActions();
-	this->unscheduleUpdate();
-	auto blink = Repeat::create(Blink::create(2.0f, 10), 1);
-	CallFuncN* callFunc = CallFuncN::create(CC_CALLBACK_1(Entity::deadAndCleanUp,this));
-	auto sequence = Sequence::create(blink, callFunc, NULL);
-	this->runAction(sequence);
+	
 	return false;
 }
 
 void Entity::deadAndCleanUp(Node* node)
 {
 	this->removeFromParentAndCleanup(true);
+}
+
+void Entity::runDeadAction()
+{
+	if (this != nullptr)
+	{
+		this->stopAllActions();
+		this->unscheduleUpdate();
+		auto blink = Repeat::create(Blink::create(2.0f, 10), 1);
+		CallFuncN* callFunc = CallFuncN::create(CC_CALLBACK_1(Entity::deadAndCleanUp, this));
+		auto sequence = Sequence::create(blink, callFunc, NULL);
+		this->runAction(sequence);
+	}
+}
+
+void Entity::healUp(int heal)
+{
+	m_currentHealth += heal;
+	this->resetHealthBar();
 }

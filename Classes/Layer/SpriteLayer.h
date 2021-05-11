@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "Objects/Target.h"
 #include "Objects/MainCharacter.h"
+#include "CollectableLayer.h"
 #include <map>
 
 #define MIN_TARGETS_COUNT 3
@@ -33,6 +34,7 @@ private:
 	cocos2d::Vector<Target*> m_targets;
 	int m_targetCount;
 	std::map<targetType, int> m_targetScoreMap;
+
 };
 
 #endif // !_TARGET_LAYER_H_

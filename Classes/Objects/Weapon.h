@@ -41,6 +41,8 @@ public:
 
 	void reload();
 
+	void getBackupMagazine();
+
 public:
 	//The weapon type
 	weaponType m_type;
@@ -49,7 +51,6 @@ public:
 	int m_backupAmmo;
 	int m_maxAmmoPerMagazine;
 	int m_ammoInCurrentMagazine;
-	cocos2d::Vector<cocos2d::Sprite*> m_allBullets;
 };
 
 

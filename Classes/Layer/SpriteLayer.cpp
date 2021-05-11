@@ -17,6 +17,7 @@ bool SpriteLayer::init()
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	auto origin = Director::getInstance()->getVisibleOrigin();
+
 	//init main character
 	auto mainCharacter = MainCharacter::createMainCharacter();
 	this->addChild(mainCharacter, 20, "MainCharacter");
@@ -25,6 +26,11 @@ bool SpriteLayer::init()
 	mainCharacter->setPosition(Vec2(origin.x+visibleSize.width / 2,origin.y+ visibleSize.height / 3));
 	mainCharacter->scheduleUpdate();
 
+	//init collectable layer
+	auto collectableLayer = CollectableLayer::createCollectableLayer();
+	this->addChild(collectableLayer,20,"CollectableLayer");
+	collectableLayer->scheduleUpdate();
+
 	this->setName("SpriteLayer");
 	return true;
 }
@@ -32,6 +38,7 @@ bool SpriteLayer::init()
 void SpriteLayer::update(float delta)
 {
 	int currentTargetCount = m_targets.size();
+
 	//update target
 	if (currentTargetCount < MIN_TARGETS_COUNT)
 	{

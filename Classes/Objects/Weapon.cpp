@@ -133,3 +133,8 @@ void Weapon::reload()
 	}
 }
 
+void Weapon::getBackupMagazine()
+{
+	m_backupAmmo += m_maxAmmoPerMagazine;
+}
+
