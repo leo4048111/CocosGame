@@ -46,11 +46,14 @@ bool MainCharacter::init()
 	m_totalWeapons = 0;
 	auto weapon = Weapon::createWeapon();
 	MainCharacter::addWeapon(weapon);
-	weapon->setWeaponType(Weapon::weaponType::razor);
+	weapon->setWeaponType(weaponType::pistol);
 	MainCharacter::swapWeapon(1);
 	auto weapon2 = Weapon::createWeapon();
-	weapon2->setWeaponType(Weapon::weaponType::pistol);
+	weapon2->setWeaponType(weaponType::lazer);
 	MainCharacter::addWeapon(weapon2);
+	auto weapon3 = Weapon::createWeapon();
+	weapon3->setWeaponType(weaponType::sniperRifle);
+	MainCharacter::addWeapon(weapon3);
 
 	this->setName("MainCharacter");
 	this->setControlOnListen(); 
@@ -200,7 +203,6 @@ void MainCharacter::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2
 		m_currentWeapon->reload();
 		break;
 	case EventKeyboard::KeyCode::KEY_SPACE:
-		slide();
 		break;
 	default:
 		break;
@@ -346,48 +348,44 @@ Weapon* MainCharacter::getCurrentWeapon()
 	return m_currentWeapon;
 }
 
-void MainCharacter::slide()
-{
-	time_t currentTime = time(NULL);
-	if (currentTime - m_lastSlideTime >= SLIDE_COOLDOWN)
-	{
-		m_sprite->pauseSchedulerAndActions();
-		Animate* animate = nullptr;
-		Vec2 dst = this->getPosition();
-		if (m_keyMap[EventKeyboard::KeyCode::KEY_A])
-		{
-			animate = Animate::create(Animation::createWithSpriteFrames(m_leftSlideAnime, 0.5f));
-			dst = Vec2(dst.x-m_currentSpeed * 3,dst.y);
-		}
-		else if (m_keyMap[EventKeyboard::KeyCode::KEY_D])
-		{
-			animate = Animate::create(Animation::createWithSpriteFrames(m_rightSlideAnime, 0.5f));
-			dst = Vec2(dst.x + m_currentSpeed * 3, dst.y);
-
-		}
-		else
-		{
-			animate = Animate::create(Animation::createWithSpriteFrames(m_leftSlideAnime, 0.5f));
-			dst = Vec2(dst.x - m_currentSpeed * 3, dst.y);
-		}
-		
-		Action* actionSlide = Repeat::create(animate, 1);
-		auto action = MoveTo::create(0.5f, dst);
-		CallFuncN* callFunc = CallFuncN::create(this,callfuncN_selector(MainCharacter::slideEnd));
-		auto sequence = Sequence::create(action, callFunc, NULL);
-
-		m_sprite->runAction(actionSlide);
-		m_sprite->runAction(sequence);
-		m_lastSlideTime = currentTime;
-	}
-}
+//void MainCharacter::slide()  //deprecated!!
+//{
+//	time_t currentTime = time(NULL);
+//	if (currentTime - m_lastSlideTime >= SLIDE_COOLDOWN)
+//	{
+//		m_sprite->pauseSchedulerAndActions();
+//		Animate* animate = nullptr;
+//		Vec2 dst = this->getPosition();
+//		if (m_keyMap[EventKeyboard::KeyCode::KEY_A])
+//		{
+//			animate = Animate::create(Animation::createWithSpriteFrames(m_leftSlideAnime, 0.5f));
+//			dst = Vec2(dst.x-m_currentSpeed * 3,dst.y);
+//		}
+//		else if (m_keyMap[EventKeyboard::KeyCode::KEY_D])
+//		{
+//			animate = Animate::create(Animation::createWithSpriteFrames(m_rightSlideAnime, 0.5f));
+//			dst = Vec2(dst.x + m_currentSpeed * 3, dst.y);
+//
+//		}
+//		else
+//		{
+//			animate = Animate::create(Animation::createWithSpriteFrames(m_leftSlideAnime, 0.5f));
+//			dst = Vec2(dst.x - m_currentSpeed * 3, dst.y);
+//		}
+//		
+//		Action* actionSlide = Repeat::create(animate, 1);
+//		auto action = MoveTo::create(0.5f, dst);
+//		CallFuncN* callFunc = CallFuncN::create(this,callfuncN_selector(MainCharacter::slideEnd));
+//		auto sequence = Sequence::create(action, callFunc, NULL);
+//
+//		m_sprite->runAction(actionSlide);
+//		m_sprite->runAction(sequence);
+//		m_lastSlideTime = currentTime;
+//	}
+//}
 
 void MainCharacter::addSpeed(float speed)
 {
 	m_currentSpeed += speed;
 }
 
-void MainCharacter::slideEnd(Node* sender)
-{
-	this->resumeSchedulerAndActions();
-}

@@ -4,6 +4,8 @@
 #include "cocos2d.h"
 #include "Objects/CrossHair.h"
 
+#define SCORE_PER_ROUND 200
+
 class UILayer :public cocos2d::Layer
 {
 public:
@@ -18,6 +20,8 @@ public:
 	void addScore(int score);
 
 	int getScore();
+
+	int getCurrentRound();
 
 private:
 	//Timer specs

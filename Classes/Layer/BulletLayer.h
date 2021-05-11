@@ -16,7 +16,10 @@ public:
 
 	virtual void update(float delta);
 
+	//Shooting specs
 	void addBullet();
+
+	void addLazer();
 	
 private:
 	cocos2d::Vector<cocos2d::Sprite*> m_allBullets;

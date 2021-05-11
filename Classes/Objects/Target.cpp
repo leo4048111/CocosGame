@@ -114,7 +114,7 @@ void Target::setTargetType(targetType type)
 	if (m_sprite != nullptr)
 		m_sprite->removeFromParentAndCleanup(1);
 	this->setName(targetName.getCString());
-	target->setScale(0.2f);
+	target->setScale(0.1f);
 	Target::bindSprite(target);
 
 	//reset target sprite anime frame cache

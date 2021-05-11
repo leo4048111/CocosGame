@@ -41,6 +41,9 @@ public:
 
 	void dropSpecificCollectable(collectableType type);
 
+	//attack funtions!
+	void fireSpiritualPower();
+
 private:
 	//target anime update scheduler
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_leftWalkAnime;

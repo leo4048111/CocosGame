@@ -7,7 +7,7 @@
 #include "CollectableLayer.h"
 #include <map>
 
-#define MIN_TARGETS_COUNT 10
+#define MIN_TARGETS_COUNT 3
 
 
 class SpriteLayer :public cocos2d::Layer

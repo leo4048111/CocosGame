@@ -43,7 +43,6 @@ public:
 	void addSpeed(float speed);
 
 	time_t m_lastSlideTime;
-	void slide();
 
 	//Weapon related
 	void addWeapon(Weapon* weapon);
@@ -75,7 +74,7 @@ private:
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> m_keyMap;
 	std::map<cocos2d::EventMouse::MouseButton, bool> m_mouseButtonMap;
 	float m_currentSpeed;
-	void slideEnd(cocos2d::Node* sender);
+
 
 	//Weapon specs
 	std::map<int,Weapon*> m_weaponsMap;

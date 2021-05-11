@@ -5,14 +5,14 @@
 #include "Entity.h"
 #include "Layer/BulletLayer.h"
 
+enum weaponType
+{
+	rifle, sawedOff, pistol, sniperRifle, lazer, toxicPistol
+};
+
 class Weapon :public Entity
 {
 public:
-	enum weaponType
-	{
-		rifle, sawedOff, pistol, sniperRifle, razor, toxicPistol
-	};
-
 	//Weapon graph related
 
 	static Weapon* createWeapon();
@@ -23,7 +23,10 @@ public:
 
 	bool loadGraphs();
 
+	//weapon specs related
 	void setWeaponType(weaponType type);
+
+	weaponType getWeaponType();
 
 	//Weapon movement related
 
@@ -38,6 +41,12 @@ public:
 	//Ammo and fire related
 
 	void fire();
+
+	void fireNormalBullet();
+
+	void fireLazer();
+
+
 
 	void reload();
 

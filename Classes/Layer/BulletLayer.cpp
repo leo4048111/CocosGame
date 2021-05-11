@@ -58,6 +58,7 @@ void BulletLayer::update(float delta)
 					uiLayer->addScore(spriteLayer->getThisTargetScore(currentTarget));
 					tmpEraseTarget.pushBack(currentTarget);
 				}
+				if(currentBullet->getName()!="lazer")
 				tmpEraseBullet.pushBack(currentBullet);
 				break;
 			}
@@ -96,7 +97,7 @@ void BulletLayer::update(float delta)
 void BulletLayer::addBullet()
 {
 	//create bullet
-	auto bullet = Sprite::create("objects/ammo/ammo_rifle.png");
+	auto bullet = Sprite::create("objects/ammo/ammo_normal.png");
 	this->addChild(bullet);
 	m_allBullets.pushBack(bullet);
 
@@ -136,5 +137,34 @@ void BulletLayer::addBullet()
 	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
 	auto sequence = Sequence::create(action, callFunc, NULL);
 	bullet->runAction(Repeat::create(sequence, 1));
+	bullet->setName("bullet");
 
+}
+
+void BulletLayer::addLazer()
+{
+	//create bullet
+	auto lazer = Sprite::create("objects/ammo/ammo_lazer.png");
+	lazer->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+	this->addChild(lazer);
+	m_allBullets.pushBack(lazer);
+
+	//set bullet rotation
+	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
+	CrossHair* crossHair = dynamic_cast<CrossHair*>(this->getParent()->getParent()->getChildByName("UILayer")->getChildByName("CrossHair"));
+	Vec2 mousePosVec = this->convertToNodeSpace(crossHair->getCursorPos());
+	Vec2 weaponPosVec = mainCharacter->getPosition();
+	Vec2 dst = mousePosVec - weaponPosVec;
+	float radians = M_PI - atan2(dst.y, dst.x);
+	float degree = CC_RADIANS_TO_DEGREES(radians);
+	lazer->setRotation(degree);
+	lazer->setScale(0.5f);
+	lazer->setPosition(mainCharacter->getPosition());
+
+	auto action = FadeIn::create(0.2f);
+	auto action2 = FadeOut::create(0.5f);
+	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
+	auto sequence = Sequence::create(action, action2,callFunc, NULL);
+	lazer->runAction(Repeat::create(sequence, 1));
+	lazer->setName("lazer");
 }

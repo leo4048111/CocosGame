@@ -19,10 +19,9 @@ bool GameScene::init()
 	m_origin = Director::getInstance()->getVisibleOrigin();
 
 	//init map
-	TMXTiledMap* map = TMXTiledMap::create("map/issue_16512.tmx");
+	TMXTiledMap* map = TMXTiledMap::create("map/desert.tmx");
 	map->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
 	this->addChild(map, 0,"Map");
-	auto winSize = Director::getInstance()->getWinSize();
 	map->setPosition(Vec2(m_origin.x + m_visibleSize.width / 2, m_origin.y + m_visibleSize.height / 2));
 
 	//init sprite layer

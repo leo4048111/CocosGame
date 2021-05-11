@@ -51,7 +51,7 @@ void Weapon::setWeaponType(weaponType type)
 	case weaponType::pistol:
 		weaponName = "weapon_pistol";
 		break;
-	case weaponType::razor:
+	case weaponType::lazer:
 		weaponName = "weapon_razor";
 		break;
 	case weaponType::rifle:
@@ -106,7 +106,7 @@ void Weapon::onMouseMove(Event* event)
 	this->setRotation(degree);
 }
 
-void Weapon::fire()
+void Weapon::fireNormalBullet()
 {
 	if (m_ammoInCurrentMagazine)
 	{
@@ -138,3 +138,43 @@ void Weapon::getBackupMagazine()
 	m_backupAmmo += m_maxAmmoPerMagazine;
 }
 
+void Weapon::fireLazer()
+{
+	if (m_ammoInCurrentMagazine)
+	{
+		BulletLayer* bulletLayer = dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getParent()->getParent()->getChildByName("BulletLayer"));
+		//create fire anime
+		auto biu = Sprite::create("objects/UI/ui_wow.png");
+		biu->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+		biu->setPosition(Vec2(0, this->getParent()->getContentSize().height * 3 / 5));
+		biu->setScale(0.3f);
+		this->getParent()->addChild(biu, 0, "biu");
+
+		bulletLayer->addLazer();
+
+		m_ammoInCurrentMagazine--;
+	}
+}
+
+void Weapon::fire()
+{
+	switch (this->getWeaponType())
+	{
+	case weaponType::pistol:
+		fireNormalBullet();
+		break;
+	case weaponType::lazer:
+		fireLazer();
+		break;
+	case weaponType::sniperRifle:
+		fireNormalBullet();
+		break;
+	default:
+		break;
+	}
+}
+
+weaponType Weapon::getWeaponType()
+{
+	return m_type;
+}

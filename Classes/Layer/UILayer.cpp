@@ -58,6 +58,8 @@ void UILayer::update(float delta)
 	//update score board
 	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("Map")->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
 	m_labelScoreBoard->setString("Score:" + Value(this->getScore()).asString());
+	if (m_currentScore / SCORE_PER_ROUND >= m_currentRound)
+		m_currentRound++;
 
 	//update round count
 	if (m_currentRound != m_lastRound)
@@ -87,4 +89,9 @@ void UILayer::addScore(int score)
 int UILayer::getScore()
 {
 	return m_currentScore;
+}
+
+int UILayer::getCurrentRound()
+{
+	return m_currentRound;
 }

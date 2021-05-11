@@ -1,5 +1,6 @@
 #include "SpriteLayer.h"
 #include "Algorithm/msws.h"
+#include "UILayer.h"
 
 USING_NS_CC;
 
@@ -41,12 +42,12 @@ bool SpriteLayer::init()
 void SpriteLayer::update(float delta)
 {
 	int currentTargetCount = m_targets.size();
-
+	UILayer* uiLayer=dynamic_cast<UILayer*>(this->getParent()->getParent()->getChildByName("UILayer"));
 	//update target
-	if (currentTargetCount < MIN_TARGETS_COUNT)
+	if (currentTargetCount < MIN_TARGETS_COUNT+uiLayer->getCurrentRound())
 	{
 		msws_srand();
-		for (int c = m_targets.size(); c < MIN_TARGETS_COUNT; c++)
+		for (int c = m_targets.size(); c < MIN_TARGETS_COUNT + uiLayer->getCurrentRound(); c++)
 		{
 			auto target = Target::createTarget();
 			this->addChild(target, 20);
