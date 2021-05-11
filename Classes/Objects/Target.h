@@ -14,7 +14,7 @@ enum
 
 enum targetType
 {
-	ghost
+	ghost, jellyGhost, sadGhost, spirit
 };
 
 class Target :public Entity

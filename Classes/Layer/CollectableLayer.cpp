@@ -29,7 +29,7 @@ void CollectableLayer::addCollectable(Collectable* collectable,float x,float y)
 void CollectableLayer::update(float delta)
 {
 	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("MainCharacter"));
-	Rect mainCharacterRect = Rect(mainCharacter->getBoundingBox().origin, mainCharacter->m_sprite->getContentSize());
+	Rect mainCharacterRect = Rect(mainCharacter->getBoundingBox().origin, mainCharacter->m_sprite->getContentSize()/5);
 	Vector<Collectable*> tmpDeleteCollectable;
 	for (auto currentCollectable : m_allCollectables)
 	{

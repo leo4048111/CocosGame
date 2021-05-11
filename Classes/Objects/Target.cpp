@@ -35,8 +35,8 @@ bool Target::init()
 	m_lastUpdateTime = time(NULL);
 	m_currentDir = moveleft;
 
-	
-	Target::setTargetType(ghost);
+	srand((unsigned long long)time(NULL));
+	Target::setTargetType((targetType)(rand() % 4));
 	Target::showHealthBar();
 
 	return true;
@@ -90,7 +90,21 @@ void Target::setTargetType(targetType type)
 		targetLeftMoveFrameName = "target_ghost_leftMove";
 		targetRightMoveFrameName = "target_ghost_rightMove";
 		break;
-
+	case targetType::jellyGhost:
+		targetName = "target_jellyGhost";
+		targetLeftMoveFrameName = "target_jellyGhost_leftMove";
+		targetRightMoveFrameName = "target_jellyGhost_rightMove";
+		break;
+	case targetType::sadGhost:
+		targetName = "target_sadGhost";
+		targetLeftMoveFrameName = "target_sadGhost_leftMove";
+		targetRightMoveFrameName = "target_sadGhost_rightMove";
+		break;
+	case targetType::spirit:
+		targetName = "target_spirit";
+		targetLeftMoveFrameName = "target_spirit_leftMove";
+		targetRightMoveFrameName = "target_spirit_rightMove";
+		break;
 	default:
 		return;
 	}
@@ -127,6 +141,6 @@ void Target::dropSpecificCollectable(collectableType type)
 void Target::dropRandomCollectable()
 {
 	srand((unsigned long long)time(NULL));
-	collectableType type = (collectableType)(rand() % 1);
+	collectableType type = (collectableType)(rand() % 2);
 	dropSpecificCollectable(type);
 }

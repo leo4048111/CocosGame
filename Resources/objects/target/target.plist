@@ -15,7 +15,7 @@
                 <key>spriteSourceSize</key>
                 <string>{625,625}</string>
                 <key>textureRect</key>
-                <string>{{0,0},{625,625}}</string>
+                <string>{{0,261},{625,625}}</string>
                 <key>textureRotated</key>
                 <false/>
             </dict>
@@ -30,7 +30,7 @@
                 <key>spriteSourceSize</key>
                 <string>{625,625}</string>
                 <key>textureRect</key>
-                <string>{{625,0},{625,625}}</string>
+                <string>{{0,886},{625,625}}</string>
                 <key>textureRotated</key>
                 <false/>
             </dict>
@@ -45,7 +45,142 @@
                 <key>spriteSourceSize</key>
                 <string>{625,625}</string>
                 <key>textureRect</key>
-                <string>{{1250,0},{625,625}}</string>
+                <string>{{0,1511},{625,625}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
+            <key>target_jellyGhost</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{739,800}</string>
+                <key>spriteSourceSize</key>
+                <string>{739,800}</string>
+                <key>textureRect</key>
+                <string>{{0,4056},{739,800}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
+            <key>target_jellyGhost_leftMove</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{739,800}</string>
+                <key>spriteSourceSize</key>
+                <string>{739,800}</string>
+                <key>textureRect</key>
+                <string>{{0,4856},{739,800}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
+            <key>target_jellyGhost_rightMove</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{739,800}</string>
+                <key>spriteSourceSize</key>
+                <string>{739,800}</string>
+                <key>textureRect</key>
+                <string>{{0,5656},{739,800}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
+            <key>target_sadGhost</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{260,261}</string>
+                <key>spriteSourceSize</key>
+                <string>{260,261}</string>
+                <key>textureRect</key>
+                <string>{{0,0},{260,261}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
+            <key>target_sadGhost_leftMove</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{260,261}</string>
+                <key>spriteSourceSize</key>
+                <string>{260,261}</string>
+                <key>textureRect</key>
+                <string>{{260,0},{260,261}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
+            <key>target_sadGhost_rightMove</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{260,261}</string>
+                <key>spriteSourceSize</key>
+                <string>{260,261}</string>
+                <key>textureRect</key>
+                <string>{{520,0},{260,261}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
+            <key>target_spirit</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{640,640}</string>
+                <key>spriteSourceSize</key>
+                <string>{640,640}</string>
+                <key>textureRect</key>
+                <string>{{0,2136},{640,640}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
+            <key>target_spirit_leftMove</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{640,640}</string>
+                <key>spriteSourceSize</key>
+                <string>{640,640}</string>
+                <key>textureRect</key>
+                <string>{{0,2776},{640,640}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
+            <key>target_spirit_rightMove</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{640,640}</string>
+                <key>spriteSourceSize</key>
+                <string>{640,640}</string>
+                <key>textureRect</key>
+                <string>{{0,3416},{640,640}}</string>
                 <key>textureRotated</key>
                 <false/>
             </dict>
@@ -61,9 +196,9 @@
             <key>realTextureFileName</key>
             <string>target.png</string>
             <key>size</key>
-            <string>{1875,625}</string>
+            <string>{780,6456}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:5d57d8d051192ab65653ac985abeaf77:6bb9c0badd8e24f690f30639b2b95d1b:8842ea9559c6d52cdd5e97e4bff9126a$</string>
+            <string>$TexturePacker:SmartUpdate:0ac10bb63355a382f8c86cb5a3816a94:e885f4b8a21379cf2b809bf2b0e97edf:8842ea9559c6d52cdd5e97e4bff9126a$</string>
             <key>textureFileName</key>
             <string>target.png</string>
         </dict>

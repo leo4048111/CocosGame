@@ -18,6 +18,9 @@ bool SpriteLayer::init()
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	auto origin = Director::getInstance()->getVisibleOrigin();
 
+	//init target specs
+	this->initTargetSpecs();
+
 	//init main character
 	auto mainCharacter = MainCharacter::createMainCharacter();
 	this->addChild(mainCharacter, 20, "MainCharacter");
@@ -63,6 +66,10 @@ void SpriteLayer::initTargetSpecs()
 {
 	//init target score map
 	m_targetScoreMap.insert(std::make_pair(targetType::ghost, 10));
+	m_targetScoreMap.insert(std::make_pair(targetType::jellyGhost, 20));
+	m_targetScoreMap.insert(std::make_pair(targetType::sadGhost, 5));
+	m_targetScoreMap.insert(std::make_pair(targetType::spirit, 30));
+
 }
 
 int SpriteLayer::getThisTargetScore(Target* target)
