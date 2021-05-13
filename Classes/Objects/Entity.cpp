@@ -32,8 +32,11 @@ bool Entity::init()
 	{
 		return false;
 	}
-	m_maxHealth =100.0f;
+	m_maxHealth = 100.0f;
 	m_currentHealth = 100.0f;
+	m_maxStamina = 100;
+	m_currentStamina = 100;
+	m_currentSpeed = 0.25f;
 	return true;
 }
 
@@ -80,5 +83,60 @@ void Entity::runDeadAction()
 void Entity::healUp(int heal)
 {
 	m_currentHealth += heal;
+	if (m_currentHealth > m_maxHealth)
+		m_currentHealth = m_maxHealth;
+	if (m_currentHealth < 0)
+		m_currentHealth = 0;
 	this->resetHealthBar();
+}
+
+void Entity::addSpeed(double speed)
+{
+	m_currentSpeed += speed;
+}
+
+double Entity::getCurrentSpeed()
+{
+	return m_currentSpeed;
+}
+
+double Entity::getCurrentStamina()
+{
+	return m_currentStamina;
+}
+
+double Entity::getStaminaPercentage()
+{
+	return m_currentStamina / m_maxStamina * 100;
+}
+
+void Entity::resetStaminaBar()
+{
+	m_staminaBar->setPercentage(getStaminaPercentage());
+}
+
+void Entity::addStamina(double stamina)
+{
+	m_currentStamina += stamina;
+	if (m_currentStamina > m_maxStamina)
+		m_currentStamina = m_maxStamina;
+	if (m_currentStamina < 0)
+		m_currentStamina = 0;
+	this->resetStaminaBar();
+}
+
+void Entity::showStaminaBar()
+{
+	auto spriteSize = m_sprite->getContentSize();
+	auto StaminaBarBg = Sprite::create("objects/UI/ui_staminaBarBg.png");
+	StaminaBarBg->setPosition(Vec2(spriteSize.width+StaminaBarBg->getContentSize().width/2, spriteSize.height/2));
+	m_sprite->addChild(StaminaBarBg);
+	m_staminaBar = ProgressTimer::create(Sprite::create("objects/UI/ui_staminaBar.png"));
+	m_staminaBar->setType(ProgressTimer::Type::BAR);
+	m_staminaBar->setMidpoint(Vec2(1.0f, 0));
+	m_staminaBar->setPosition(Vec2(-2, StaminaBarBg->getContentSize().height));
+	m_staminaBar->setBarChangeRate(Vec2(0, 1.0f));
+	m_staminaBar->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
+	m_staminaBar->setPercentage(getStaminaPercentage());
+	StaminaBarBg->addChild(m_staminaBar);
 }

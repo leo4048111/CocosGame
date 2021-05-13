@@ -8,7 +8,7 @@
 #include <map>
 #include <ctime>
 
-#define MAX_WEAPON_CARRY 4
+#define MAX_WEAPON_CARRY 6
 #define SLIDE_COOLDOWN 2.5
 enum actions
 {
@@ -40,26 +40,19 @@ public:
 
 	void onMouseUp(cocos2d::Event* event);
 
-	void addSpeed(float speed);
-
-	time_t m_lastSlideTime;
-
 	//Weapon related
+	void initAllWeapon();
+
 	void addWeapon(Weapon* weapon);
 
 	void swapWeapon(int num);
 
 	void setControlOnListen();
 
-	bool canCarryMoreWeapons();
-
-	void dropWeapon();
-
-	void pickUpWeapon();
-
 	Weapon* getCurrentWeapon();
 	
 private:
+
 
 	//Anime frames
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_leftWalkAnime;
@@ -73,15 +66,13 @@ private:
 	//Control specs
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> m_keyMap;
 	std::map<cocos2d::EventMouse::MouseButton, bool> m_mouseButtonMap;
-	float m_currentSpeed;
 
 
 	//Weapon specs
-	std::map<int,Weapon*> m_weaponsMap;
-	std::vector<int> m_emptyWeaponSlots;
+	std::map<int,Weapon*> m_allWeaponsMap;
 	Weapon* m_currentWeapon;
 	int m_currentWeaponSlot;
-	int m_totalWeapons;
+
 	cocos2d::Label* m_magazineSpecLabel;
 	cocos2d::Menu* m_weaponSpecMenu;
 

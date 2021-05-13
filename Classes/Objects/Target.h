@@ -9,7 +9,7 @@
 
 enum
 {
-	moveleft,moveright
+	moveleft,moveright,attackleft,attackright
 };
 
 enum targetType
@@ -42,17 +42,26 @@ public:
 	void dropSpecificCollectable(collectableType type);
 
 	//attack funtions!
+	void attack();
+
+	void attackEnd(Node* sender);
+
 	void fireSpiritualPower();
 
 private:
 	//target anime update scheduler
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_leftWalkAnime;
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_rightWalkAnime;
+	cocos2d::Vector<cocos2d::SpriteFrame*>m_leftAttackAnime;
+	cocos2d::Vector<cocos2d::SpriteFrame*>m_rightAttackAnime;
 	int m_currentDir;
 	time_t m_lastUpdateTime;
 
 	//target specs
 	targetType m_type;
+
+	//attack features
+	bool m_isAttacking;
 	
 };
 

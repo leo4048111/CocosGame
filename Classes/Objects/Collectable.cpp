@@ -33,9 +33,12 @@ void Collectable::setCollectableType(collectableType type)
 	case collectableType::ammo:
 		collectableTypeName = "collectable_ammo";
 		break;
-	case collectableType::sipOfHealth:
-		collectableTypeName = "collectable_sipOfHealth";
+	case collectableType::health:
+		collectableTypeName = "collectable_health";
 		break;
+	case collectableType::speed:
+		collectableTypeName = "collectable_speed";
+		break; 
 	default:
 		return;
 	}
@@ -70,8 +73,11 @@ void Collectable::useCollectable()
 	case collectableType::ammo:
 		Collectable::addAmmo();
 		break;
-	case collectableType::sipOfHealth:
+	case collectableType::health:
 		Collectable::addHealth();
+		break;
+	case collectableType::speed:
+		Collectable::addSpeed();
 		break;
 	default:
 		return;
@@ -92,15 +98,14 @@ void Collectable::addAmmo()
 
 void Collectable::addHealth()
 {
-	//DEBUG 
-	std::string str1 = this->getParent()->getName()+"\n";
-	OutputDebugString(str1.c_str());
-	std::string str2 = this->getParent()->getParent()->getName() + "\n";
-	OutputDebugString(str2.c_str());
-
-	//DEBUG END
 	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getParent()->getChildByName("MainCharacter"));
 	mainCharacter->healUp(20);
+}
+
+void Collectable::addSpeed()
+{
+	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getParent()->getChildByName("MainCharacter"));
+	mainCharacter->addSpeed(0.1f);
 }
 
 bool Collectable::isStillValid()

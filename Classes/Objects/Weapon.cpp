@@ -34,9 +34,9 @@ bool Weapon::init()
 	}
 
 	Weapon::setWeaponType(pistol);
-	m_ammoInCurrentMagazine = 30;
-	m_maxAmmoPerMagazine = 30;
-	m_backupAmmo = 100;
+	m_ammoInCurrentMagazine = 12;
+	m_maxAmmoPerMagazine = 12;
+	m_backupAmmo = 200;
 	this->setScale(0.5f);
 	this->setName("weapon_pistol");
 	return true;
@@ -50,21 +50,45 @@ void Weapon::setWeaponType(weaponType type)
 	{
 	case weaponType::pistol:
 		weaponName = "weapon_pistol";
+		m_damage = 30;
+		m_ammoInCurrentMagazine = 12;
+		m_maxAmmoPerMagazine = 12;
+		m_backupAmmo = 200;
 		break;
 	case weaponType::lazer:
 		weaponName = "weapon_razor";
+		m_damage = 10;
+		m_ammoInCurrentMagazine = 100;
+		m_maxAmmoPerMagazine = 100;
+		m_backupAmmo = 300;
 		break;
 	case weaponType::rifle:
 		weaponName = "weapon_rifle";
+		m_damage = 20;
+		m_ammoInCurrentMagazine = 30;
+		m_maxAmmoPerMagazine = 30;
+		m_backupAmmo = 120;
 		break;
 	case weaponType::sniperRifle:
 		weaponName = "weapon_sniperRifle";
+		m_damage = 50;
+		m_ammoInCurrentMagazine = 8;
+		m_maxAmmoPerMagazine = 8;
+		m_backupAmmo = 24;
 		break;
 	case weaponType::toxicPistol:
 		weaponName = "weapon_toxicPistol";
+		m_damage = 5;
+		m_ammoInCurrentMagazine = 12;
+		m_maxAmmoPerMagazine = 12;
+		m_backupAmmo = 36;
 		break;
 	case weaponType::sawedOff:
 		weaponName = "weapon_sawedOff";
+		m_damage = 10;
+		m_ammoInCurrentMagazine = 5;
+		m_maxAmmoPerMagazine = 5;
+		m_backupAmmo = 20;
 		break;
 	default:
 		return ;
@@ -133,6 +157,11 @@ void Weapon::reload()
 	}
 }
 
+int Weapon::getWeaponDamage()
+{
+	return m_damage;
+}
+
 void Weapon::getBackupMagazine()
 {
 	m_backupAmmo += m_maxAmmoPerMagazine;
@@ -147,7 +176,7 @@ void Weapon::fireLazer()
 		auto biu = Sprite::create("objects/UI/ui_wow.png");
 		biu->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
 		biu->setPosition(Vec2(0, this->getParent()->getContentSize().height * 3 / 5));
-		biu->setScale(0.3f);
+		biu->setScale(1.0f);
 		this->getParent()->addChild(biu, 0, "biu");
 
 		bulletLayer->addLazer();
@@ -169,6 +198,9 @@ void Weapon::fire()
 	case weaponType::sniperRifle:
 		fireNormalBullet();
 		break;
+	case weaponType::sawedOff:
+		fireSprayAmmo();
+		break;
 	default:
 		break;
 	}
@@ -177,4 +209,22 @@ void Weapon::fire()
 weaponType Weapon::getWeaponType()
 {
 	return m_type;
+}
+
+void Weapon::fireSprayAmmo()
+{
+	if (m_ammoInCurrentMagazine)
+	{
+		BulletLayer* bulletLayer = dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getParent()->getParent()->getChildByName("BulletLayer"));
+		//create fire anime
+		auto biu = Sprite::create("objects/UI/ui_biu.png");
+		biu->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+		biu->setPosition(Vec2(0, this->getParent()->getContentSize().height * 3 / 5));
+		biu->setScale(0.2f);
+		this->getParent()->addChild(biu, 0, "biu");
+
+		bulletLayer->addSprayBullet();
+
+		m_ammoInCurrentMagazine--;
+	}
 }

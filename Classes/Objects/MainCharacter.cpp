@@ -8,6 +8,7 @@ MainCharacter* MainCharacter::createMainCharacter()
 }
 
 
+
 bool MainCharacter::init()
 {
 	if (!Entity::init())
@@ -23,6 +24,7 @@ bool MainCharacter::init()
 	mainCharacter->setScale(0.1f);
 	MainCharacter::bindSprite(mainCharacter);
 	MainCharacter::showHealthBar();
+	MainCharacter::showStaminaBar();
 
 	//Init specs
 	m_magazineSpecLabel = Label::create("0/0", "HeiTi", 20);
@@ -30,8 +32,6 @@ bool MainCharacter::init()
 	m_magazineSpecLabel->setPosition(Vec2(this->getContentSize().width / 2, -m_magazineSpecLabel->getContentSize().height));
 	m_magazineSpecLabel->setScale(0.3f);
 	this->addChild(m_magazineSpecLabel);
-	m_currentSpeed = 0;
-	m_lastSlideTime = time(NULL);
 	this->addSpeed(1.0f);
 
 	/*m_weaponSpecMenu = Menu::create();
@@ -39,26 +39,13 @@ bool MainCharacter::init()
 	m_weaponSpecMenu->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
 	m_weaponSpecMenu->alignItemsVerticallyWithPadding(10.0f);
 	this->addChild(m_weaponSpecMenu);*/
-
-	//Init weapon
-	for (int c = 1; c <= MAX_WEAPON_CARRY; c++)
-		m_emptyWeaponSlots.push_back(5-c);
-	m_totalWeapons = 0;
-	auto weapon = Weapon::createWeapon();
-	MainCharacter::addWeapon(weapon);
-	weapon->setWeaponType(weaponType::pistol);
-	MainCharacter::swapWeapon(1);
-	auto weapon2 = Weapon::createWeapon();
-	weapon2->setWeaponType(weaponType::lazer);
-	MainCharacter::addWeapon(weapon2);
-	auto weapon3 = Weapon::createWeapon();
-	weapon3->setWeaponType(weaponType::sniperRifle);
-	MainCharacter::addWeapon(weapon3);
+	
+	//init weapons
+	initAllWeapon();
 
 	this->setName("MainCharacter");
 	this->setControlOnListen(); 
 	return true;
-	
 }
 
 bool MainCharacter::loadGraphs()
@@ -121,11 +108,8 @@ void MainCharacter::runAction(int dir)
 		anime = Animation::createWithSpriteFrames(m_rightWalkAnime, 0.5f / 8);
 		break;
 	case standBack:
-		anime = Animation::createWithSpriteFrames(m_standBackAnime, 0.5f / 8);
+		anime = Animation::createWithSpriteFrames(m_standBackAnime, 0.5f / 2);
 		break;
-	case standForward:
-		break;
-
 	default:
 		break;
 	}
@@ -141,13 +125,19 @@ void MainCharacter::runAction(int dir)
 void MainCharacter::update(float delta)
 {
 	//Update anime
-	double offsetX = m_currentSpeed;
-	double offsetY = m_currentSpeed;
-	if (m_keyMap[EventKeyboard::KeyCode::KEY_SHIFT])
+	double offsetX = this->getCurrentSpeed();
+	double offsetY = this->getCurrentSpeed();
+	if (m_keyMap[EventKeyboard::KeyCode::KEY_SHIFT]&&this->getCurrentStamina())
 	{
-		offsetX *= 2;
-		offsetY *= 2;
+		offsetX *= 2.5f;
+		offsetY *= 2.5f;
+		this->addStamina(-2.0f);
 	}
+	else if(!m_keyMap[EventKeyboard::KeyCode::KEY_SHIFT])
+	{
+		this->addStamina(0.5f);
+	}
+
 	if (m_keyMap[EventKeyboard::KeyCode::KEY_W])
 	{
 		this->setPosition(this->getPosition() + Vec2(0, offsetY));
@@ -176,15 +166,19 @@ void MainCharacter::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2
 	switch (keycode)
 	{
 	case EventKeyboard::KeyCode::KEY_W:
+		m_sprite->stopActionByTag(standBack);
 		runAction(forward);
 		break;
 	case EventKeyboard::KeyCode::KEY_S:
+		m_sprite->stopActionByTag(standBack);
 		runAction(back);
 		break;
 	case EventKeyboard::KeyCode::KEY_A:
+		m_sprite->stopActionByTag(standBack);
 		runAction(left);
 		break;
 	case EventKeyboard::KeyCode::KEY_D:
+		m_sprite->stopActionByTag(standBack);
 		runAction(right);
 		break;
 	case EventKeyboard::KeyCode::KEY_1:
@@ -229,6 +223,8 @@ void MainCharacter::onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos
 	default:
 		break;
 	}
+	if (!(m_keyMap[EventKeyboard::KeyCode::KEY_W] || m_keyMap[EventKeyboard::KeyCode::KEY_S] || m_keyMap[EventKeyboard::KeyCode::KEY_A] || m_keyMap[EventKeyboard::KeyCode::KEY_D]))
+		runAction(standBack);
 }
 
 void MainCharacter::setControlOnListen()
@@ -268,79 +264,21 @@ void MainCharacter::onMouseUp(Event* event)
 	m_mouseButtonMap[mouseButton] = false;
 }
 
-void MainCharacter::addWeapon(Weapon* weapon)
-{
-	if (MainCharacter::canCarryMoreWeapons())
-	{
-		//Add sprite
-		m_totalWeapons++;
-		int slot = m_emptyWeaponSlots.back();
-		m_weaponsMap.insert(std::make_pair(slot, weapon));
-		m_emptyWeaponSlots.pop_back();
-		m_sprite->addChild(weapon);
-		weapon->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-		weapon->setPosition(Vec2(0, m_sprite->getContentSize().height / 3));
-		weapon->setVisible(false);
-		weapon->setControlOnListen();
-		
-		////Update Menu
-		//auto tmpFont = MenuItemFont::create(weapon->getName());
-		//tmpFont->setTag(slot);
-		//m_weaponSpecMenu->addChild(tmpFont); // Append the weapon to menu
-		//tmpFont->setColor(Color3B(255, 255, 255));
-	}
-}
-
 void MainCharacter::swapWeapon(int num)
 {
-	if (m_currentWeapon != m_weaponsMap[num] && num <= m_totalWeapons)
-	{
-		int previousSlot = m_currentWeaponSlot;
 		//Update sprite
 		if (m_currentWeapon != nullptr)
 		{
 			m_currentWeapon->setVisible(false);
 			m_currentWeapon->pauseControlListen();
 		}
-		m_currentWeapon = m_weaponsMap[num];
+		m_currentWeapon = m_allWeaponsMap[num];
 		m_currentWeapon->setVisible(true);
 		m_currentWeapon->resumeControlListen();
 		m_currentWeaponSlot = num;
 
-		//Update visual specs
-	/*	if (m_weaponSpecMenu->getChildByTag(previousSlot) != nullptr)
-		{
-			m_weaponSpecMenu->getChildByTag(previousSlot)->setColor(Color3B(255, 255, 255));
-			m_weaponSpecMenu->getChildByTag(m_currentWeaponSlot)->setColor(Color3B(255, 0, 0));
-		}*/
 		m_magazineSpecLabel->setString(Value(m_currentWeapon->m_ammoInCurrentMagazine).asString() + "/" + Value(m_currentWeapon->m_backupAmmo).asString());
-
-
-
-	}
-}
-
-bool MainCharacter::canCarryMoreWeapons()
-{
-	return m_emptyWeaponSlots.size() != 0;
-}
-
-void MainCharacter::dropWeapon()
-{
-	if (!canCarryMoreWeapons())
-	{
-		if (m_currentWeapon != nullptr)
-		{
-			//Update sprite
-			m_weaponsMap.erase(m_weaponsMap.find(m_currentWeaponSlot));
-			m_currentWeapon->removeFromParent();
-			this->getParent()->addChild(m_currentWeapon);
-			m_emptyWeaponSlots.push_back(m_currentWeaponSlot);
-
-			//Update spec menu
-			m_weaponSpecMenu->getChildByTag(m_currentWeaponSlot)->removeFromParentAndCleanup(true);
-		}
-	}
+	
 }
 
 Weapon* MainCharacter::getCurrentWeapon()
@@ -384,8 +322,39 @@ Weapon* MainCharacter::getCurrentWeapon()
 //	}
 //}
 
-void MainCharacter::addSpeed(float speed)
+
+
+void MainCharacter::addWeapon(Weapon* weapon)
 {
-	m_currentSpeed += speed;
+	m_allWeaponsMap.insert(std::make_pair(weapon->getWeaponType()+1, weapon));
+	m_sprite->addChild(weapon);
+	weapon->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+	weapon->setPosition(Vec2(0, m_sprite->getContentSize().height / 3));
+	weapon->setVisible(false);
+	weapon->setControlOnListen();
 }
 
+void MainCharacter::initAllWeapon()
+{
+	//Init pistol
+	auto wpistol = Weapon::createWeapon();
+	wpistol->setWeaponType(weaponType::pistol);
+	addWeapon(wpistol);
+	//Init lazer
+	auto wlazer = Weapon::createWeapon();
+	wlazer->setWeaponType(weaponType::lazer);
+	addWeapon(wlazer);
+
+	//Init sniperRifle
+	auto wsniperRifle = Weapon::createWeapon();
+	wsniperRifle->setWeaponType(weaponType::sniperRifle);
+	addWeapon(wsniperRifle);
+
+	//Init sawedOff
+	auto wsawedOff = Weapon::createWeapon();
+	wsawedOff->setWeaponType(weaponType::sawedOff);
+	addWeapon(wsawedOff);
+
+	MainCharacter::swapWeapon(1);
+
+}

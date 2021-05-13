@@ -50,6 +50,7 @@ void SpriteLayer::update(float delta)
 		for (int c = m_targets.size(); c < MIN_TARGETS_COUNT + uiLayer->getCurrentRound(); c++)
 		{
 			auto target = Target::createTarget();
+			target->showStaminaBar();
 			this->addChild(target, 20);
 			target->setPosition(Vec2(msws()%((int)Director::getInstance()->getVisibleSize().width), msws() % ((int)Director::getInstance()->getVisibleSize().height))); 
 			m_targets.pushBack(target);

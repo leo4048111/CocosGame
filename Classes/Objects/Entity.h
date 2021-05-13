@@ -3,19 +3,20 @@
 
 #include"cocos2d.h"
 
+#define ENTITY_MAX_STAMINA 100
+
 //The general features of an object
 class Entity :public cocos2d::Node
 {
 public:
 	cocos2d::Sprite* m_sprite;
-	
-	cocos2d::ProgressTimer* m_healthBar;
 
 public:
 	virtual bool init();
 
 	void bindSprite(cocos2d::Sprite* sprite);
 
+	//health related
 	double getHealthPercentage();
 
 	void resetHealthBar();
@@ -26,12 +27,39 @@ public:
 
 	void healUp(int heal);
 
+	//speed related
+	void addSpeed(double speed);
+
+	double getCurrentSpeed();
+
+	//stamina related
+	double getCurrentStamina();
+
+	void addStamina(double stamina);
+
+	double getStaminaPercentage();
+
+	void resetStaminaBar();
+
+	void showStaminaBar();
+
+	//cleanup methods
+	void runDeadAction();
+
 	void deadAndCleanUp(Node* node);
 
-	void runDeadAction();
 private:
 	double m_maxHealth;
 	double m_currentHealth;
+	cocos2d::ProgressTimer* m_healthBar;
+
+	double m_maxStamina;
+	double m_currentStamina;
+	cocos2d::ProgressTimer* m_staminaBar;
+
+	double m_currentSpeed;
+
+
 
 };
 

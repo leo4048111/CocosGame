@@ -15,11 +15,11 @@
                 <key>spriteSourceSize</key>
                 <string>{153,137}</string>
                 <key>textureRect</key>
-                <string>{{0,0},{153,137}}</string>
+                <string>{{0,108},{153,137}}</string>
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>collectable_sipOfHealth</key>
+            <key>collectable_health</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -30,7 +30,22 @@
                 <key>spriteSourceSize</key>
                 <string>{68,80}</string>
                 <key>textureRect</key>
-                <string>{{153,0},{68,80}}</string>
+                <string>{{47,0},{68,80}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
+            <key>collectable_speed</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{47,108}</string>
+                <key>spriteSourceSize</key>
+                <string>{47,108}</string>
+                <key>textureRect</key>
+                <string>{{0,0},{47,108}}</string>
                 <key>textureRotated</key>
                 <false/>
             </dict>
@@ -46,9 +61,9 @@
             <key>realTextureFileName</key>
             <string>collectable.png</string>
             <key>size</key>
-            <string>{221,137}</string>
+            <string>{153,245}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:f2ad3acbdadfb892c51e6f51015bdafd:f81951e46c80a5c6dca8abb8c5362d39:5500ae40e1873b2b4bdfdf5ef90eed4a$</string>
+            <string>$TexturePacker:SmartUpdate:db06cc7c6cca7e8efe31ace6d6a8c18e:b928674ac57a6965d7f9d4f2af8b2cb6:5500ae40e1873b2b4bdfdf5ef90eed4a$</string>
             <key>textureFileName</key>
             <string>collectable.png</string>
         </dict>

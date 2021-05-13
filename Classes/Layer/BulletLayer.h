@@ -3,6 +3,9 @@
 
 #include "cocos2d.h"
 
+
+#define TARGET_BULLET_SPEED 20.0f
+
 class BulletLayer :public cocos2d::Layer
 {
 public:
@@ -16,13 +19,19 @@ public:
 
 	virtual void update(float delta);
 
-	//Shooting specs
+	//friendly shooting specs
 	void addBullet();
 
 	void addLazer();
+
+	void addSprayBullet();
+
+	//hostile shooting specs
+	void addSpiritualShockWave(cocos2d::Node* sender);
 	
 private:
-	cocos2d::Vector<cocos2d::Sprite*> m_allBullets;
+	cocos2d::Vector<cocos2d::Sprite*> m_allFriendlyBullets;
+	cocos2d::Vector<cocos2d::Sprite*> m_allHostileBullets;
 };
 
 #endif // !_BULLET_LAYER_H

@@ -19,20 +19,22 @@ bool GameScene::init()
 	m_origin = Director::getInstance()->getVisibleOrigin();
 
 	//init map
-	TMXTiledMap* map = TMXTiledMap::create("map/desert.tmx");
+	TMXTiledMap* map = TMXTiledMap::create("map/testMap.tmx");
 	map->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
 	this->addChild(map, 0,"Map");
 	map->setPosition(Vec2(m_origin.x + m_visibleSize.width / 2, m_origin.y + m_visibleSize.height / 2));
+
+	//init bullet layer
+	BulletLayer* bulletLayer = BulletLayer::createBulletLayer();
+	bulletLayer->scheduleUpdate();
+	map->addChild(bulletLayer, 50, "BulletLayer");
 
 	//init sprite layer
 	SpriteLayer* spriteLayer = SpriteLayer::createSpriteLayer();
 	spriteLayer->scheduleUpdate();
 	map->addChild(spriteLayer, 50,"SpriteLayer");
 
-	//init bullet layer
-	BulletLayer* bulletLayer = BulletLayer::createBulletLayer();
-	bulletLayer->scheduleUpdate();
-	map->addChild(bulletLayer, 50, "BulletLayer");
+	
 
 	//init UI layer
 	UILayer* uiLayer = UILayer::createUILayer();
