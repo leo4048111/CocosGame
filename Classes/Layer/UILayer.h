@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "Objects/CrossHair.h"
+#include "Scene/GameoverScene.h"
 
 #define SCORE_PER_ROUND 200
 
@@ -23,21 +24,23 @@ public:
 
 	int getCurrentRound();
 
+	void goToGameoverScene();
+
+	void setWinOrLose(bool status);
+
+	bool isWin();
+
 private:
 	//Timer specs
 	cocos2d::Label* m_labelTimer;
-	time_t m_startTime;
-	time_t m_endTime;
 
-	//round status
-	int m_currentRound;
-	int m_lastRound;
+	//mainCharacter spec status
+	cocos2d::Label* m_currentSpeedLabel;
+	cocos2d::Label* m_currentResistanceLabel;
 
 	//score board
 	cocos2d::Label* m_labelScoreBoard;
 
-	//Score board specs
-	int m_currentScore;
 };
 
 #endif // !_UI_LAYER_H_

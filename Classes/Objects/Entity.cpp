@@ -36,7 +36,9 @@ bool Entity::init()
 	m_currentHealth = 100.0f;
 	m_maxStamina = 100;
 	m_currentStamina = 100;
+	m_currentStaminaRecovery = 0.5f;
 	m_currentSpeed = 0.25f;
+	m_currentResistance = 20.0f;
 	return true;
 }
 
@@ -50,9 +52,10 @@ void Entity::resetHealthBar()
 	m_healthBar->setPercentage(getHealthPercentage());
 }
 
-bool Entity::receiveDamage(int damage)
+bool Entity::receiveDamage(double damage)
 {
-	m_currentHealth -= damage;
+	double actualDamage = damage * (100 - m_currentResistance) / 100.0f;
+	m_currentHealth -= actualDamage;
 	resetHealthBar();
 	if (m_currentHealth > 0)
 	{
@@ -64,7 +67,7 @@ bool Entity::receiveDamage(int damage)
 
 void Entity::deadAndCleanUp(Node* node)
 {
-	this->removeFromParentAndCleanup(true);
+	node->removeFromParentAndCleanup(true);
 }
 
 void Entity::runDeadAction()
@@ -80,7 +83,7 @@ void Entity::runDeadAction()
 	}
 }
 
-void Entity::healUp(int heal)
+void Entity::healUp(double heal)
 {
 	m_currentHealth += heal;
 	if (m_currentHealth > m_maxHealth)
@@ -125,6 +128,16 @@ void Entity::addStamina(double stamina)
 	this->resetStaminaBar();
 }
 
+double Entity::getStaminaRecovery()
+{
+	return m_currentStaminaRecovery;
+}
+
+void Entity::addStaminaRecovery(double stamina)
+{
+	m_currentStaminaRecovery += stamina;
+}
+
 void Entity::showStaminaBar()
 {
 	auto spriteSize = m_sprite->getContentSize();
@@ -139,4 +152,18 @@ void Entity::showStaminaBar()
 	m_staminaBar->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
 	m_staminaBar->setPercentage(getStaminaPercentage());
 	StaminaBarBg->addChild(m_staminaBar);
+}
+
+void Entity::addResistance(double resistance)
+{
+	m_currentResistance += resistance;
+	if (m_currentResistance > 100)
+		m_currentResistance = 100;
+	if (m_currentResistance < 0)
+		m_currentResistance = 0;
+}
+
+double Entity::getCurrentResistance()
+{
+	return m_currentResistance;
 }

@@ -4,6 +4,21 @@
     <dict>
         <key>frames</key>
         <dict>
+            <key>weapon_flameThrower</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{296,102}</string>
+                <key>spriteSourceSize</key>
+                <string>{296,102}</string>
+                <key>textureRect</key>
+                <string>{{630,0},{296,102}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
             <key>weapon_pistol</key>
             <dict>
                 <key>aliases</key>
@@ -15,9 +30,9 @@
                 <key>spriteSourceSize</key>
                 <string>{178,113}</string>
                 <key>textureRect</key>
-                <string>{{322,1},{178,113}}</string>
+                <string>{{309,102},{178,113}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
             <key>weapon_razor</key>
             <dict>
@@ -30,7 +45,7 @@
                 <key>spriteSourceSize</key>
                 <string>{309,112}</string>
                 <key>textureRect</key>
-                <string>{{1,171},{309,112}}</string>
+                <string>{{0,102},{309,112}}</string>
                 <key>textureRotated</key>
                 <false/>
             </dict>
@@ -45,7 +60,7 @@
                 <key>spriteSourceSize</key>
                 <string>{311,78}</string>
                 <key>textureRect</key>
-                <string>{{1,1},{311,78}}</string>
+                <string>{{0,0},{311,78}}</string>
                 <key>textureRotated</key>
                 <false/>
             </dict>
@@ -60,7 +75,7 @@
                 <key>spriteSourceSize</key>
                 <string>{275,127}</string>
                 <key>textureRect</key>
-                <string>{{1,285},{275,127}}</string>
+                <string>{{487,102},{275,127}}</string>
                 <key>textureRotated</key>
                 <false/>
             </dict>
@@ -75,11 +90,11 @@
                 <key>spriteSourceSize</key>
                 <string>{319,88}</string>
                 <key>textureRect</key>
-                <string>{{1,81},{319,88}}</string>
+                <string>{{311,0},{319,88}}</string>
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>weapon_toxicPistol</key>
+            <key>weapon_plagueBringer</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -90,9 +105,9 @@
                 <key>spriteSourceSize</key>
                 <string>{247,128}</string>
                 <key>textureRect</key>
-                <string>{{312,181},{247,128}}</string>
+                <string>{{762,102},{247,128}}</string>
                 <key>textureRotated</key>
-                <true/>
+                <false/>
             </dict>
         </dict>
         <key>metadata</key>
@@ -106,9 +121,9 @@
             <key>realTextureFileName</key>
             <string>weapon.png</string>
             <key>size</key>
-            <string>{441,429}</string>
+            <string>{1009,230}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:cb9b2ffaec39e54b93fb9b680c8db8f2:a6ce9ab2757a73bf4f93afd71da304e1:f56027bfb88798a33d33ff61c031c331$</string>
+            <string>$TexturePacker:SmartUpdate:4a6e1906639c22fece35656f52d226e3:6209c9b7dcb610228808305757038e1b:f56027bfb88798a33d33ff61c031c331$</string>
             <key>textureFileName</key>
             <string>weapon.png</string>
         </dict>

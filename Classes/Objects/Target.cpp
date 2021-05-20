@@ -12,6 +12,7 @@ bool Target::loadGraphs()
 	try
 	{
 		SpriteFrameCache::getInstance()->addSpriteFramesWithFile("objects/target/target.plist");
+		return true;
 	}
 	catch (const std::exception& exp)
 	{
@@ -128,15 +129,15 @@ void Target::setTargetType(targetType type)
 		targetName = "target_jellyGhost";
 		targetLeftMoveFrameName = "target_jellyGhost_leftMove";
 		targetRightMoveFrameName = "target_jellyGhost_rightMove";
-		targetLeftAttackFrameName = "target_ghost_leftAttack";
-		targetRightAttackFrameName = "target_ghost_rightAttack";
+		targetLeftAttackFrameName = "target_jellyGhost_leftAttack";
+		targetRightAttackFrameName = "target_jellyGhost_rightAttack";
 		break;
 	case targetType::sadGhost:
 		targetName = "target_sadGhost";
 		targetLeftMoveFrameName = "target_sadGhost_leftMove";
 		targetRightMoveFrameName = "target_sadGhost_rightMove";
-		targetLeftAttackFrameName = "target_ghost_leftAttack";
-		targetRightAttackFrameName = "target_ghost_rightAttack";
+		targetLeftAttackFrameName = "target_sadGhost_leftAttack";
+		targetRightAttackFrameName = "target_sadGhost_rightAttack";
 		break;
 	case targetType::spirit:
 		targetName = "target_spirit";
@@ -183,18 +184,31 @@ void Target::dropSpecificCollectable(collectableType type)
 void Target::dropRandomCollectable()
 {
 	srand((unsigned long long)time(NULL));
-	collectableType type = (collectableType)(rand() % 3);
+	collectableType type = (collectableType)(rand() % 5);
 	dropSpecificCollectable(type);
 }
 
 void Target::attack()
 {
+	//clear stambar
 	this->addStamina(-this->getCurrentStamina());
 	m_isAttacking = true;
+
+	//run anime
+	auto testScaleBy1 = ScaleBy::create(0.5f, 2.0f);
+	auto testScaleBy2 = ScaleBy::create(0.5f, 0.5f);
+	CallFuncN* callfunc = CallFuncN::create(this, callfuncN_selector(Target::attackEnd));
+	auto sequence = Sequence::create(testScaleBy1, testScaleBy2, callfunc, NULL);
+	this->runAction(sequence);
+
+	//run function
 	switch (this->getTargetType())
 	{
-	case targetType::ghost:
+	case targetType::sadGhost:
 		fireSpiritualPower();
+		break;
+	case targetType::jellyGhost:
+		fireFlameCircle();
 		break;
 	default:
 		fireSpiritualPower();
@@ -211,12 +225,12 @@ void Target::attackEnd(Node* sender)
 void Target::fireSpiritualPower()
 {
 	BulletLayer* bulletLayer =dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getChildByName("BulletLayer"));
-	auto testScaleBy1 = ScaleBy::create(0.5f, 2.0f);
-	auto testScaleBy2 = ScaleBy::create(0.5f, 0.5f);
-	CallFuncN* callfunc = CallFuncN::create(this,callfuncN_selector(Target::attackEnd));
-	auto sequence = Sequence::create(testScaleBy1, testScaleBy2,callfunc, NULL);
-	this->runAction(sequence);
+	bulletLayer->addSpiritualPower(this);
+}
 
-	bulletLayer->addSpiritualShockWave(this);
+void Target::fireFlameCircle()
+{
+	BulletLayer* bulletLayer = dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getChildByName("BulletLayer"));
+	bulletLayer->addFlameCircle(this);
 }
 

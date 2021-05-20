@@ -34,8 +34,6 @@ bool GameScene::init()
 	spriteLayer->scheduleUpdate();
 	map->addChild(spriteLayer, 50,"SpriteLayer");
 
-	
-
 	//init UI layer
 	UILayer* uiLayer = UILayer::createUILayer();
 	uiLayer->scheduleUpdate();
@@ -80,6 +78,5 @@ void GameScene::update(float delta)
 	Vec2 mapPos = map->getContentSize() / 2;
 	Vec2 offsetPos = mainCharacterPos - mapPos;
 	map->setPosition(Vec2(m_origin.x + m_visibleSize.width / 2-offsetPos.x, m_origin.y + m_visibleSize.height / 2-offsetPos.y));
-
-	
 }
+

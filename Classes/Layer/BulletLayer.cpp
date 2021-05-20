@@ -2,6 +2,7 @@
 #include "SpriteLayer.h"
 #include "objects/CrossHair.h"
 #include "UILayer.h"
+#include "Controls/Specs.h"
 
 USING_NS_CC;
 
@@ -27,7 +28,8 @@ void BulletLayer::cleanBullet(Node* sender)
 	if (bullet != nullptr)
 	{
 		m_allFriendlyBullets.eraseObject(bullet);
-		bullet->removeFromParentAndCleanup(1);
+		m_allHostileBullets.eraseObject(bullet);
+		bullet->removeFromParentAndCleanup(true);
 	}
 	
 }
@@ -54,14 +56,16 @@ void BulletLayer::update(float delta)
 			if (bulletRect.intersectsRect(targetRect)) //Collision Detection
 			{
 				crossHair->showHitNotification(); //show hit anime on crosshair
-				if (!currentTarget->receiveDamage(mainCharacter->getCurrentWeapon()->getWeaponDamage()))
+			if (!currentTarget->receiveDamage(mainCharacter->getCurrentWeapon()->getWeaponDamage()))
 				{
-					uiLayer->addScore(spriteLayer->getThisTargetScore(currentTarget));
+					Specs::getInstance()->addScore(spriteLayer->getThisTargetScore(currentTarget));
 					tmpEraseTarget.pushBack(currentTarget);
 				}
-				if (currentBullet->getName() != "lazer")
+				if (currentBullet->getName() != "lazer" && currentBullet->getName() != "flame")
+				{
 					tmpEraseFriendlyBullet.pushBack(currentBullet);
-				break;
+					break;
+				}
 			}
 		}
 	}
@@ -73,7 +77,12 @@ void BulletLayer::update(float delta)
 		Rect mainCharacterRect = Rect(mainCharacter->getBoundingBox().origin, mainCharacter->m_sprite->getContentSize() / 10.0f);
 		if (bulletRect.intersectsRect(mainCharacterRect)) //Collision Detection
 		{
-			mainCharacter->receiveDamage(10); //has deprecated!
+
+			if(!mainCharacter->receiveDamage(1.0f))
+			{
+				Specs::getInstance()->setWinOrLose(false);
+			}
+			if(currentBullet->getName()!="hostileFlameCircle")
 			tmpEraseHostileBullet.pushBack(currentBullet);
 		}
 	}
@@ -84,10 +93,13 @@ void BulletLayer::update(float delta)
 		auto tmpBullet = tmpEraseFriendlyBullet.back();
 		try
 		{
-			tmpBullet->stopAllActions();
-			tmpEraseFriendlyBullet.popBack();
-			m_allFriendlyBullets.eraseObject(tmpBullet);
-			tmpBullet->removeFromParentAndCleanup(true);
+			if (tmpBullet != nullptr)
+			{
+				tmpBullet->stopAllActions();
+				tmpEraseFriendlyBullet.popBack();
+				m_allFriendlyBullets.eraseObject(tmpBullet);
+				tmpBullet->removeFromParentAndCleanup(true);
+			}
 		}
 		catch (const std::exception& exp)
 		{
@@ -100,10 +112,13 @@ void BulletLayer::update(float delta)
 		auto tmpBullet = tmpEraseHostileBullet.back();
 		try
 		{
-			tmpBullet->stopAllActions();
-			tmpEraseHostileBullet.popBack();
-			m_allHostileBullets.eraseObject(tmpBullet);
-			tmpBullet->removeFromParentAndCleanup(true);
+			if (tmpBullet != nullptr)
+			{
+				tmpBullet->stopAllActions();
+				tmpEraseHostileBullet.popBack();
+				m_allHostileBullets.eraseObject(tmpBullet);
+				tmpBullet->removeFromParentAndCleanup(true);
+			}
 		}
 		catch (const std::exception& exp)
 		{
@@ -191,7 +206,7 @@ void BulletLayer::addLazer()
 	auto action = FadeIn::create(0.2f);
 	auto action2 = FadeOut::create(0.5f);
 	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
-	auto sequence = Sequence::create(action, action2,callFunc, NULL);
+	auto sequence = Sequence::create(action, action2, callFunc,NULL);
 	lazer->runAction(Repeat::create(sequence, 1));
 	lazer->setName("lazer");
 }
@@ -253,11 +268,70 @@ void BulletLayer::addSprayBullet()
 
 }
 
-void BulletLayer::addSpiritualShockWave(Node* sender)
+void BulletLayer::addToxicBomb()
+{
+	//create bomb sprite
+	auto bomb = Sprite::create("objects/ammo/ammo_toxicBomb.png");
+	bomb->setScale(0.4f);
+	this->addChild(bomb);
+
+	//set bomb position and dst
+	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
+	CrossHair* crossHair = dynamic_cast<CrossHair*>(this->getParent()->getParent()->getChildByName("UILayer")->getChildByName("CrossHair"));
+	Vec2 dstPosVec = this->convertToNodeSpace(crossHair->getCursorPos());
+	Vec2 originPosVec = mainCharacter->getPosition();
+	Vec2 dst = dstPosVec - originPosVec;
+	float radians = M_PI - atan2(dst.y, dst.x);
+	float degree = CC_RADIANS_TO_DEGREES(radians);
+	bomb->setRotation(degree);
+	bomb->setPosition(mainCharacter->getPosition());
+
+	auto action1 = RepeatForever::create(RotateTo::create(0.5f, 90));
+	auto action2 = JumpTo::create(1.0f, dstPosVec, 3.0f, 2);
+	auto action3 = FadeOut::create(0.5f);
+	auto spawn = Spawn::create(action1, action2, NULL);
+	auto sequence = Sequence::create(spawn, action3, NULL);
+	bomb->runAction(sequence);
+	bomb->setName("toxicBomb");
+}
+
+void BulletLayer::addFlameThrower()
+{
+	const double c_flameSurvivalDuration= 0.2f;
+	auto flame = Sprite::create("objects/ammo/ammo_flame.png");
+	flame->setScale(0.3f);
+	flame->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+	this->addChild(flame);
+	m_allFriendlyBullets.pushBack(flame);
+
+	//set bomb position and dst
+	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
+	CrossHair* crossHair = dynamic_cast<CrossHair*>(this->getParent()->getParent()->getChildByName("UILayer")->getChildByName("CrossHair"));
+	Vec2 dstPosVec = this->convertToNodeSpace(crossHair->getCursorPos());
+	Vec2 originPosVec = mainCharacter->getPosition();
+	Vec2 dst = dstPosVec - originPosVec;
+	float radians = M_PI - atan2(dst.y, dst.x);
+	float degree = CC_RADIANS_TO_DEGREES(radians);
+
+	flame->setRotation(degree);
+	flame->setPosition(mainCharacter->getPosition());
+
+	//flame anime and auto cleanup
+	auto fadein = FadeIn::create(c_flameSurvivalDuration / 2);
+	auto fadeout = FadeOut::create(c_flameSurvivalDuration / 2);
+	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
+	auto sequence = Sequence::create(fadein, fadeout, callFunc,NULL);
+
+	flame->runAction(sequence);
+	flame->setName("flame");
+
+}
+
+void BulletLayer::addSpiritualPower(Node* sender)
 {
 	//create bullet sprite
-	auto bullet = Sprite::create("objects/ammo/ammo_normal.png");
-	bullet->setScale(2.0f);
+	auto bullet = Sprite::create("objects/ammo/ammo_spiritualPower.png");
+	bullet->setScale(0.1f);
 	this->addChild(bullet);
 	m_allHostileBullets.pushBack(bullet);
 
@@ -275,5 +349,34 @@ void BulletLayer::addSpiritualShockWave(Node* sender)
 	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
 	auto sequence = Sequence::create(action, callFunc, NULL);
 	bullet->runAction(Repeat::create(sequence, 1));
-	bullet->setName("hostilebBullet");
+	bullet->setName("hostileSpiritualPower");
 }
+
+void BulletLayer::addFlameCircle(Node* sender)
+{
+	const double c_totalExpessionPeriodLength = 1.5f;
+	//create bullet sprite
+	auto bullet = Sprite::create("objects/ammo/ammo_flameCircle.png");
+	bullet->setScale(0.2f);
+	this->addChild(bullet);
+	m_allHostileBullets.pushBack(bullet);
+
+	Vec2 targetPosVec = sender->getPosition();
+
+	bullet->setPosition(targetPosVec);
+
+	auto scaleby = ScaleBy::create(c_totalExpessionPeriodLength, 10.0f); //zoom out
+	auto rotateby = RotateBy::create(c_totalExpessionPeriodLength, 360 * 10); //rotate by
+	auto fadein = FadeIn::create(c_totalExpessionPeriodLength/2); //the initial half period
+	auto fadeout = FadeOut::create(c_totalExpessionPeriodLength/2); //Fade out
+	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet)); //cleanup
+
+	auto sequence = Sequence::create(fadein, fadeout,callFunc,NULL);
+	auto spawn = Spawn::create(scaleby, rotateby,sequence, NULL);
+
+
+
+	bullet->setName("hostileFlameCircle");
+	bullet->runAction(spawn);
+}
+

@@ -39,6 +39,12 @@ void Collectable::setCollectableType(collectableType type)
 	case collectableType::speed:
 		collectableTypeName = "collectable_speed";
 		break; 
+	case collectableType::stamina:
+		collectableTypeName = "collectable_stamina";
+		break;
+	case collectableType::resistance:
+		collectableTypeName = "collectable_resistance";
+		break;
 	default:
 		return;
 	}
@@ -68,20 +74,45 @@ bool Collectable::loadGraphs()
 
 void Collectable::useCollectable()
 {
+	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getParent()->getChildByName("MainCharacter"));
+	Label* notification = Label::createWithTTF("blank", "fonts/Notification Font.ttf", 20);
+	notification->enableBold();
 	switch (this->getCollectableType())
 	{
 	case collectableType::ammo:
+		notification->setString("Ammo++");
+		notification->setColor(Color3B(160, 82, 45));
 		Collectable::addAmmo();
 		break;
 	case collectableType::health:
+		notification->setString("Health++");
+		notification->setColor(Color3B(220, 20, 60));
 		Collectable::addHealth();
 		break;
 	case collectableType::speed:
+		notification->setString("Speed++");
+		notification->setColor(Color3B(106, 90, 205));
 		Collectable::addSpeed();
+		break;
+	case collectableType::stamina:
+		notification->setString("StaminaRegen++");
+		notification->setColor(Color3B(127, 255, 0));
+		Collectable::addStaminaRecovery();
+		break;
+	case collectableType::resistance:
+		notification->setString("Resistance++");
+		notification->setColor(Color3B(139, 0, 0));
+		Collectable::addResistance();
 		break;
 	default:
 		return;
 	}
+
+	mainCharacter->addChild(notification);
+	auto moveto = MoveTo::create(1.5f, Vec2(notification->getPosition().x, notification->getPosition().y + 50));
+	auto fadeout = FadeOut::create(1.5f);
+	auto spawn = Spawn::create(moveto, fadeout, NULL);
+	notification->runAction(spawn);
 }
 
 collectableType Collectable::getCollectableType()
@@ -108,8 +139,21 @@ void Collectable::addSpeed()
 	mainCharacter->addSpeed(0.1f);
 }
 
+void Collectable::addStaminaRecovery()
+{
+	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getParent()->getChildByName("MainCharacter"));
+	mainCharacter->addStaminaRecovery(0.1f);
+}
+
+void Collectable::addResistance()
+{
+	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getParent()->getChildByName("MainCharacter"));
+	mainCharacter->addResistance(1.0f);
+}
+
 bool Collectable::isStillValid()
 {
 	time_t currentTime = time(NULL);
 	return (currentTime - m_lastUpdateTime) < MAX_RETAIN_TIME;
 }
+

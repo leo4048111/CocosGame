@@ -1,6 +1,6 @@
 #include "MenuScene.h"
 #include "GameScene.h"
-
+#include "Controls/Specs.h"
 USING_NS_CC;
 
 MenuScene* MenuScene::createMenuScene()
@@ -18,13 +18,21 @@ bool MenuScene::init()
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	auto origin = Director::getInstance()->getVisibleOrigin();
 
+	Specs::getInstance()->refreshInstance();
 
-	auto startGame = MenuItemFont::create("Start Game", CC_CALLBACK_1(MenuScene::menuCallBack, this));
-	auto audioControl = MenuItemFont::create("Audio Off",CC_CALLBACK_1(MenuScene::menuCallBack,this));
-	auto quitGame = MenuItemFont::create("Quit", CC_CALLBACK_1(MenuScene::menuCallBack, this));
+	auto startGameLabel = Label::createWithTTF("Start Game", "fonts/HashedBrowns-WyJgn.ttf", 50);
+	auto startGame = MenuItemLabel::create(startGameLabel, CC_CALLBACK_1(MenuScene::menuCallBack, this));
+	auto audioControlLabel = Label::createWithTTF("Audio Off", "fonts/HashedBrowns-WyJgn.ttf", 50);
+	auto audioControl = MenuItemLabel::create(audioControlLabel, CC_CALLBACK_1(MenuScene::menuCallBack,this));
+	auto quitGameLabel = Label::createWithTTF("Quit", "fonts/HashedBrowns-WyJgn.ttf", 50);
+	auto quitGame = MenuItemLabel::create(quitGameLabel, CC_CALLBACK_1(MenuScene::menuCallBack, this));
 	startGame->setTag(0);
+	startGame->setColor(Color3B(220, 220, 220));
 	audioControl->setTag(1);
+	audioControl->setColor(Color3B(220, 220, 220));
 	quitGame->setTag(2);
+	quitGame->setColor(Color3B(220, 220, 220));
+
 	auto menu = Menu::create(startGame,audioControl,quitGame,NULL);
 	menu->alignItemsVerticallyWithPadding(30);
 	this->addChild(menu,20);
@@ -33,6 +41,7 @@ bool MenuScene::init()
 	/*auto backgroundImg = Sprite::create("background.png");
 	backgroundImg->setPosition(origin + visibleSize / 2);
 	this->addChild(backgroundImg,10);*/
+	return true;
 }
 
 enum menuItems
@@ -65,7 +74,7 @@ void MenuScene::startGame()
 
 void MenuScene::setBackgroundMusic()
 {
-	MenuItemFont* audioControl = dynamic_cast<MenuItemFont*>(this->getChildByName("menu")->getChildByTag(ac));
+	MenuItemLabel* audioControl = dynamic_cast<MenuItemLabel*>(this->getChildByName("menu")->getChildByTag(ac));
 	if (audioControl->getString()== "Audio Off")
 	{
 		CocosDenshion::SimpleAudioEngine::getInstance()->pauseBackgroundMusic();

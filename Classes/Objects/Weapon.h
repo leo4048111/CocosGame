@@ -7,7 +7,7 @@
 
 enum weaponType
 {
-	pistol, lazer, sniperRifle, sawedOff, rifle, toxicPistol
+	pistol, lazer, sniperRifle, sawedOff, rifle, plagueBringer,flameThrower
 };
 
 class Weapon :public Entity
@@ -28,7 +28,7 @@ public:
 
 	weaponType getWeaponType();
 
-	int getWeaponDamage();
+	double getWeaponDamage();
 
 	//Weapon movement related
 
@@ -50,6 +50,10 @@ public:
 
 	void fireSprayAmmo();
 
+	void fireToxicBomb();
+
+	void fireFlameThrower();
+
 	void reload();
 
 	void getBackupMagazine();
@@ -57,8 +61,8 @@ public:
 public:
 	//The weapon specs
 	weaponType m_type;
-	int m_damage;
-
+	double m_damage;
+	bool m_isAutoFire;
 
 	//Ammo related
 	int m_backupAmmo;

@@ -11,7 +11,7 @@
 
 enum collectableType
 {
-	ammo,health,speed
+	ammo,health,speed,stamina,resistance
 };
 
 class Collectable :public Entity
@@ -39,6 +39,11 @@ public:
 	void addHealth();
 
 	void addSpeed();
+
+	void addStaminaRecovery();
+
+	void addResistance();
+
 	//collectable survival period
 	bool isStillValid();
 private:

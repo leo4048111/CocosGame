@@ -19,15 +19,22 @@ public:
 
 	virtual void update(float delta);
 
-	//friendly shooting specs
+	/*friendly shooting specs
+	All PNG sources should be placed facing left*/
 	void addBullet();
 
 	void addLazer();
 
 	void addSprayBullet();
 
+	void addToxicBomb();
+
+	void addFlameThrower();
+
 	//hostile shooting specs
-	void addSpiritualShockWave(cocos2d::Node* sender);
+	void addSpiritualPower(cocos2d::Node* sender);
+
+	void addFlameCircle(cocos2d::Node* sender);
 	
 private:
 	cocos2d::Vector<cocos2d::Sprite*> m_allFriendlyBullets;

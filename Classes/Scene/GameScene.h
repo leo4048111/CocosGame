@@ -6,6 +6,7 @@
 #include "../Layer/UILayer.h"
 #include "../Layer/GameSettingsLayer.h"
 #include "../Layer//SpriteLayer.h"
+#include "GameoverScene.h"
 #include <ctime>
 
 class GameScene :public cocos2d::Scene
@@ -22,6 +23,8 @@ public:
 	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event);
 
 	void goToGameSettings();
+
+	void goToGameoverScene();
 
 	void update(float delta);
 

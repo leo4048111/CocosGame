@@ -20,12 +20,7 @@ bool CrossHair::init()
 	this->bindSprite(crossHair);
 
 	//Init hit notification icon
-	auto hitNotification = Sprite::create("objects/crossHair/crosshair_hit.png");
-	m_hitNotification = hitNotification;
-	//m_hitNotification->setVisible(false);
-	m_hitNotification->setName("HitNotification");
-	m_hitNotification->setScale(0.2f);
-	this->addChild(m_hitNotification);
+	
 
 	this->setName("CrossHair");
 	this->setControlOnListen();
@@ -56,7 +51,9 @@ Vec2 CrossHair::getCursorPos()
 
 void CrossHair::showHitNotification() //This method is deprecated!! needs improvement
 {
-	m_hitNotification->setVisible(true);
+	auto hitNotification = Sprite::create("objects/crossHair/crosshair_hit.png");
+	hitNotification->setScale(0.2f);
+	this->addChild(hitNotification);
 	auto fadeIn=FadeIn::create(0.2f);
 	auto fadeOut = FadeOut::create(0.1f);
 	auto scaleBy1 = ScaleBy::create(0.2f, 2.0f);
@@ -64,5 +61,5 @@ void CrossHair::showHitNotification() //This method is deprecated!! needs improv
 	auto spawn1 = Spawn::create(fadeIn, scaleBy1, NULL);
 	auto spawn2 = Spawn::create(fadeOut, scaleBy2, NULL);
 	auto sequence = Sequence::create(spawn1, spawn2, NULL);
-	m_hitNotification->runAction(sequence);
+	hitNotification->runAction(sequence);
 }

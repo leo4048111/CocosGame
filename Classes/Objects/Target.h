@@ -48,6 +48,8 @@ public:
 
 	void fireSpiritualPower();
 
+	void fireFlameCircle();
+
 private:
 	//target anime update scheduler
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_leftWalkAnime;

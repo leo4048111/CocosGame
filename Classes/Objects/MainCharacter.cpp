@@ -7,8 +7,6 @@ MainCharacter* MainCharacter::createMainCharacter()
 	return MainCharacter::create();
 }
 
-
-
 bool MainCharacter::init()
 {
 	if (!Entity::init())
@@ -135,7 +133,7 @@ void MainCharacter::update(float delta)
 	}
 	else if(!m_keyMap[EventKeyboard::KeyCode::KEY_SHIFT])
 	{
-		this->addStamina(0.5f);
+		this->addStamina(this->getStaminaRecovery());
 	}
 
 	if (m_keyMap[EventKeyboard::KeyCode::KEY_W])
@@ -158,6 +156,10 @@ void MainCharacter::update(float delta)
 	//update visual specs
 	if (m_currentWeapon != nullptr)
 		m_magazineSpecLabel->setString(Value(m_currentWeapon->m_ammoInCurrentMagazine).asString() + "/" + Value(m_currentWeapon->m_backupAmmo).asString());
+
+	//auto fire weapon
+	if (m_mouseButtonMap[EventMouse::MouseButton::BUTTON_LEFT] && m_currentWeapon->m_isAutoFire)
+		m_currentWeapon->fire();
 }
 
 void MainCharacter::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event)
@@ -192,6 +194,15 @@ void MainCharacter::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2
 		break;
 	case EventKeyboard::KeyCode::KEY_4:
 		swapWeapon(4);
+		break;
+	case EventKeyboard::KeyCode::KEY_5:
+		swapWeapon(5);
+		break;
+	case EventKeyboard::KeyCode::KEY_6:
+		swapWeapon(6);
+		break;
+	case EventKeyboard::KeyCode::KEY_7:
+		swapWeapon(7);
 		break;
 	case EventKeyboard::KeyCode::KEY_R:
 		m_currentWeapon->reload();
@@ -322,8 +333,6 @@ Weapon* MainCharacter::getCurrentWeapon()
 //	}
 //}
 
-
-
 void MainCharacter::addWeapon(Weapon* weapon)
 {
 	m_allWeaponsMap.insert(std::make_pair(weapon->getWeaponType()+1, weapon));
@@ -355,6 +364,20 @@ void MainCharacter::initAllWeapon()
 	wsawedOff->setWeaponType(weaponType::sawedOff);
 	addWeapon(wsawedOff);
 
+	//Init rifle
+	auto wrifle = Weapon::createWeapon();
+	wrifle->setWeaponType(weaponType::rifle);
+	addWeapon(wrifle);
+
+	//Init toxicPistol
+	auto wplagueBringer = Weapon::createWeapon();
+	wplagueBringer->setWeaponType(weaponType::plagueBringer);
+	addWeapon(wplagueBringer);
+
+	//Init flameThrower
+	auto wflameThrower = Weapon::createWeapon();
+	wflameThrower->setWeaponType(weaponType::flameThrower);
+	addWeapon(wflameThrower);
 	MainCharacter::swapWeapon(1);
 
 }

@@ -23,9 +23,9 @@ public:
 
 	void showHealthBar();
 
-	bool receiveDamage(int damage);
+	bool receiveDamage(double damage);
 
-	void healUp(int heal);
+	void healUp(double heal);
 
 	//speed related
 	void addSpeed(double speed);
@@ -37,11 +37,20 @@ public:
 
 	void addStamina(double stamina);
 
+	void addStaminaRecovery(double stamina);
+
+	double getStaminaRecovery();
+
 	double getStaminaPercentage();
 
 	void resetStaminaBar();
 
 	void showStaminaBar();
+
+	//resistance related
+	void addResistance(double resistance);
+
+	double getCurrentResistance();
 
 	//cleanup methods
 	void runDeadAction();
@@ -55,7 +64,10 @@ private:
 
 	double m_maxStamina;
 	double m_currentStamina;
+	double m_currentStaminaRecovery;
 	cocos2d::ProgressTimer* m_staminaBar;
+
+	double m_currentResistance;
 
 	double m_currentSpeed;
 

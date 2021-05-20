@@ -1,6 +1,7 @@
 #include "SpriteLayer.h"
 #include "Algorithm/msws.h"
 #include "UILayer.h"
+#include "Controls/Specs.h"
 
 USING_NS_CC;
 
@@ -44,10 +45,10 @@ void SpriteLayer::update(float delta)
 	int currentTargetCount = m_targets.size();
 	UILayer* uiLayer=dynamic_cast<UILayer*>(this->getParent()->getParent()->getChildByName("UILayer"));
 	//update target
-	if (currentTargetCount < MIN_TARGETS_COUNT+uiLayer->getCurrentRound())
+	if (currentTargetCount < MIN_TARGETS_COUNT+Specs::getInstance()->getCurrentRound())
 	{
 		msws_srand();
-		for (int c = m_targets.size(); c < MIN_TARGETS_COUNT + uiLayer->getCurrentRound(); c++)
+		for (int c = m_targets.size(); c < MIN_TARGETS_COUNT + Specs::getInstance()->getCurrentRound(); c++)
 		{
 			auto target = Target::createTarget();
 			target->showStaminaBar();

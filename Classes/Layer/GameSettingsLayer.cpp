@@ -16,10 +16,14 @@ bool GameSettingsLayer::init()
 		return false;
 	}
 
-	auto backToGame = MenuItemFont::create("Back To Game", CC_CALLBACK_1(GameSettingsLayer::gameSettingsCallBack, this));
+	auto backToGameLabel = Label::createWithTTF("Back To Game", "fonts/Notification Font.ttf", 20);
+	auto backToGame = MenuItemLabel::create(backToGameLabel, CC_CALLBACK_1(GameSettingsLayer::gameSettingsCallBack, this));
 	backToGame->setTag(0);
-	auto backToMenu = MenuItemFont::create("Back To Menu", CC_CALLBACK_1(GameSettingsLayer::gameSettingsCallBack, this));
+	backToGame->setColor(Color3B(220, 220, 220));
+	auto backToMenuLabel = Label::createWithTTF("Back To Menu", "fonts/Notification Font.ttf", 20);
+	auto backToMenu = MenuItemLabel::create(backToMenuLabel, CC_CALLBACK_1(GameSettingsLayer::gameSettingsCallBack, this));
 	backToMenu->setTag(1);
+	backToMenu->setColor(Color3B(220, 220, 220));
 	auto gameSettingsMenu = Menu::create(backToGame, backToMenu, NULL);
 	this->addChild(gameSettingsMenu);
 	gameSettingsMenu->alignItemsVerticallyWithPadding(50);

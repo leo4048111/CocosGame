@@ -1,6 +1,8 @@
 #include "UILayer.h"
 #include "../objects/MainCharacter.h"
 #include <ctime>
+#include "Controls/Specs.h"
+
 USING_NS_CC;
 
 UILayer* UILayer::createUILayer()
@@ -18,9 +20,7 @@ bool UILayer::init()
 	auto m_origin = Director::getInstance()->getVisibleOrigin();
 
 	//init timer
-	m_startTime = std::time(NULL);
-	m_endTime = std::time(NULL);
-	double runTime = static_cast<double>(m_endTime - m_startTime) / CLOCKS_PER_SEC;
+	double runTime = static_cast<int>(Specs::getInstance()->getCurrentTime() - Specs::getInstance()->getStartTime())*1000 / CLOCKS_PER_SEC;
 	m_labelTimer = Label::create(Value(runTime).asString() + "s", "HeiTi", 10);
 	m_labelTimer->setPosition(Vec2(m_origin.x + m_visibleSize.width / 2, m_origin.y + m_visibleSize.height));
 	m_labelTimer->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
@@ -32,14 +32,19 @@ bool UILayer::init()
 	crossHair->setPosition(m_origin + m_visibleSize / 2);
 
 	//init Score Board
-	m_currentScore = 0;
+	
 	m_labelScoreBoard = Label::createWithSystemFont("Score:0", "HeiTi", 10);
 	this->addChild(m_labelScoreBoard,30,"ScoreBoard");
 	m_labelScoreBoard->setPosition(Vec2(m_labelScoreBoard->getContentSize().width/2, m_visibleSize.height- m_labelScoreBoard->getContentSize().height));
 
-	//init round specs
-	m_currentRound = 1;
-	m_lastRound = 0;
+	//init current mainCharacter spec labels
+	m_currentSpeedLabel = Label::createWithTTF("Speed:0", "fonts/RetroNewVersion-v6Jy.ttf", 15);
+	m_currentSpeedLabel->setPosition(Vec2(m_visibleSize.width / 4, m_currentSpeedLabel->getContentSize().height));
+	this->addChild(m_currentSpeedLabel);
+
+	m_currentResistanceLabel = Label::createWithTTF("Resistance:0", "fonts/RetroNewVersion-v6Jy.ttf", 15);
+	m_currentResistanceLabel->setPosition(Vec2(m_visibleSize.width*3 / 4, m_currentSpeedLabel->getContentSize().height));
+	this->addChild(m_currentResistanceLabel);
 
 	this->setName("UILayer");
 	return true;
@@ -51,23 +56,20 @@ void UILayer::update(float delta)
 	auto m_origin = Director::getInstance()->getVisibleOrigin();
 
 	//update timer
-	m_endTime = std::time(NULL);
-	int runTime = static_cast<int>((m_endTime - m_startTime) * 1000 / CLOCKS_PER_SEC);
+	double runTime = static_cast<double>(Specs::getInstance()->getCurrentTime() - Specs::getInstance()->getStartTime())*1000 / CLOCKS_PER_SEC;
 	m_labelTimer->setString(Value(runTime).asString() + "s");
 
 	//update score board
 	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("Map")->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
-	m_labelScoreBoard->setString("Score:" + Value(this->getScore()).asString());
-	if (m_currentScore / SCORE_PER_ROUND >= m_currentRound)
-		m_currentRound++;
-
-	//update round count
-	if (m_currentRound != m_lastRound)
+	m_labelScoreBoard->setString("Score:" + Value(Specs::getInstance()->getScore()).asString());
+	if (Specs::getInstance()->getScore() / SCORE_PER_ROUND >= Specs::getInstance()->getCurrentRound())
 	{
+		Specs::getInstance()->goToNextRound();
 		//update specs on enter
-		auto currentRoundDisplay = Label::createWithSystemFont("Round " + Value(m_currentRound).asString(), "HeiTi",20);
+		auto currentRoundDisplay = Label::createWithTTF("Round " + Value(Specs::getInstance()->getCurrentRound()).asString(), "fonts/ElecstromRegular-w1y4P.ttf", 40);
+		currentRoundDisplay->setColor(Color3B(248,248,255));
 		this->addChild(currentRoundDisplay, 100, "CurrentRoundDisplay");
-		currentRoundDisplay->setPosition(Vec2(m_origin.x + m_visibleSize.width/2,m_origin.y+m_visibleSize.height*3/4));
+		currentRoundDisplay->setPosition(Vec2(m_origin.x + m_visibleSize.width / 2, m_origin.y + m_visibleSize.height * 3 / 4));
 
 		//run action, fade in, display once and fade out
 		auto fadeIn = FadeIn::create(4.0f);
@@ -77,21 +79,26 @@ void UILayer::update(float delta)
 		auto sequence = Sequence::createWithTwoActions(actionFadeIn, actionFadeOut);
 
 		currentRoundDisplay->runAction(sequence);
-		m_lastRound = m_currentRound;
+	}
+
+	if(Specs::getInstance()->getCurrentRound() == 20)
+		Specs::getInstance()->setWinOrLose(true);
+
+	//update mainCharacter specs
+	m_currentResistanceLabel->setString("Resistance:" + Value((int)mainCharacter->getCurrentResistance()).asString());
+	m_currentSpeedLabel->setString("Speed:" + Value((int)mainCharacter->getCurrentSpeed()*1000).asString());
+
+	//gameover
+	if (Specs::getInstance()->isEnd())
+	{
+		goToGameoverScene();
 	}
 }
 
-void UILayer::addScore(int score)
-{
-	m_currentScore += score;
-}
 
-int UILayer::getScore()
+void UILayer::goToGameoverScene()
 {
-	return m_currentScore;
-}
-
-int UILayer::getCurrentRound()
-{
-	return m_currentRound;
+	GameoverScene* gameoverScene = GameoverScene::createGameoverScene();
+	auto transition = TransitionFadeDown::create(1.0f, gameoverScene);
+	Director::getInstance()->replaceScene(transition);
 }
