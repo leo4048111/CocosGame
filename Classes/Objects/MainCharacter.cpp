@@ -1,4 +1,5 @@
 #include "MainCharacter.h"
+#include "Controls/Specs.h"
 
 USING_NS_CC;
 
@@ -17,6 +18,7 @@ bool MainCharacter::init()
 	{
 		return false;
 	}
+
 	//Init sprite
 	Sprite* mainCharacter = Sprite::createWithSpriteFrameName("character_maleAdventurer_backwalk0");
 	mainCharacter->setScale(0.1f);
@@ -31,15 +33,16 @@ bool MainCharacter::init()
 	m_magazineSpecLabel->setScale(0.3f);
 	this->addChild(m_magazineSpecLabel);
 	this->addSpeed(1.0f);
-
-	/*m_weaponSpecMenu = Menu::create();
-	m_weaponSpecMenu->setPosition(Vec2(this->getContentSize().width, 0));
-	m_weaponSpecMenu->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
-	m_weaponSpecMenu->alignItemsVerticallyWithPadding(10.0f);
-	this->addChild(m_weaponSpecMenu);*/
 	
 	//init weapons
 	initAllWeapon();
+
+	//init name
+	m_playerName = Specs::getInstance()->getPlayerName();
+	auto nameLabel = Label::create(m_playerName,"",7);
+	this->addChild(nameLabel);
+	nameLabel->setColor(Color3B(255, 255, 255));
+	nameLabel->setPosition(Vec2(this->getContentSize().width / 2, 20));
 
 	this->setName("MainCharacter");
 	this->setControlOnListen(); 
@@ -93,19 +96,19 @@ void MainCharacter::runAction(int dir)
 	Animation* anime=nullptr;
 	switch (dir)
 	{
-	case forward:
+	case actions::forward:
 		anime = Animation::createWithSpriteFrames(m_forwardWalkAnime, 0.3f / 4);
 		break;
-	case back:
+	case actions::back:
 		anime = Animation::createWithSpriteFrames(m_backWalkAnime, 0.3f / 3);
 		break;
-	case left:
+	case actions::left:
 		anime = Animation::createWithSpriteFrames(m_leftWalkAnime, 0.5f / 8);
 		break;
-	case right:
+	case actions::right:
 		anime = Animation::createWithSpriteFrames(m_rightWalkAnime, 0.5f / 8);
 		break;
-	case standBack:
+	case actions::standBack:
 		anime = Animation::createWithSpriteFrames(m_standBackAnime, 0.5f / 2);
 		break;
 	default:
@@ -169,19 +172,19 @@ void MainCharacter::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2
 	{
 	case EventKeyboard::KeyCode::KEY_W:
 		m_sprite->stopActionByTag(standBack);
-		runAction(forward);
+		runAction(actions::forward);
 		break;
 	case EventKeyboard::KeyCode::KEY_S:
 		m_sprite->stopActionByTag(standBack);
-		runAction(back);
+		runAction(actions::back);
 		break;
 	case EventKeyboard::KeyCode::KEY_A:
 		m_sprite->stopActionByTag(standBack);
-		runAction(left);
+		runAction(actions::left);
 		break;
 	case EventKeyboard::KeyCode::KEY_D:
 		m_sprite->stopActionByTag(standBack);
-		runAction(right);
+		runAction(actions::right);
 		break;
 	case EventKeyboard::KeyCode::KEY_1:
 		swapWeapon(1);
@@ -220,16 +223,16 @@ void MainCharacter::onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos
 	switch(keycode)
 	{
 	case EventKeyboard::KeyCode::KEY_W:
-		m_sprite->stopActionByTag(forward);
+		m_sprite->stopActionByTag(actions::forward);
 		break;
 	case EventKeyboard::KeyCode::KEY_S:
 		m_sprite->stopActionByTag(back);
 		break;
 	case EventKeyboard::KeyCode::KEY_A:
-		m_sprite->stopActionByTag(left);
+		m_sprite->stopActionByTag(actions::left);
 		break;
 	case EventKeyboard::KeyCode::KEY_D:
-		m_sprite->stopActionByTag(right);
+		m_sprite->stopActionByTag(actions::right);
 		break;
 	default:
 		break;

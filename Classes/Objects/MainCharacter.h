@@ -76,6 +76,7 @@ private:
 	cocos2d::Label* m_magazineSpecLabel;
 	cocos2d::Menu* m_weaponSpecMenu;
 
+	std::string m_playerName;
 };
 
 

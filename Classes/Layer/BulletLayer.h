@@ -4,7 +4,7 @@
 #include "cocos2d.h"
 
 
-#define TARGET_BULLET_SPEED 20.0f
+#define TARGET_BULLET_SPEED 10.0f
 
 class BulletLayer :public cocos2d::Layer
 {

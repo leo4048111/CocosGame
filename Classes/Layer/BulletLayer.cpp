@@ -55,6 +55,7 @@ void BulletLayer::update(float delta)
 			Rect targetRect = Rect(currentTarget->getBoundingBox().origin, currentTarget->m_sprite->getContentSize() / 5);
 			if (bulletRect.intersectsRect(targetRect)) //Collision Detection
 			{
+				currentTarget->setColor(Color3B(245, 2, 1));
 				crossHair->showHitNotification(); //show hit anime on crosshair
 			if (!currentTarget->receiveDamage(mainCharacter->getCurrentWeapon()->getWeaponDamage()))
 				{
@@ -77,10 +78,12 @@ void BulletLayer::update(float delta)
 		Rect mainCharacterRect = Rect(mainCharacter->getBoundingBox().origin, mainCharacter->m_sprite->getContentSize() / 10.0f);
 		if (bulletRect.intersectsRect(mainCharacterRect)) //Collision Detection
 		{
-
-			if(!mainCharacter->receiveDamage(1.0f))
+			if (!Specs::getInstance()->isInvincibleActivated())
 			{
-				Specs::getInstance()->setWinOrLose(false);
+				if (!mainCharacter->receiveDamage(1.0f))
+				{
+					Specs::getInstance()->setWinOrLose(false);
+				}
 			}
 			if(currentBullet->getName()!="hostileFlameCircle")
 			tmpEraseHostileBullet.pushBack(currentBullet);
@@ -149,7 +152,7 @@ void BulletLayer::addBullet()
 
 	//set bullet rotation
 	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
-	CrossHair* crossHair =dynamic_cast<CrossHair*>(this->getParent()->getParent()->getChildByName("UILayer")->getChildByName("CrossHair"));
+	CrossHair* crossHair = CrossHair::getInstance();
 	Vec2 mousePosVec = this->convertToNodeSpace(crossHair->getCursorPos());
 	Vec2 weaponPosVec = mainCharacter->getPosition();
 	Vec2 dst = mousePosVec - weaponPosVec;
@@ -193,7 +196,7 @@ void BulletLayer::addLazer()
 
 	//set bullet rotation
 	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
-	CrossHair* crossHair = dynamic_cast<CrossHair*>(this->getParent()->getParent()->getChildByName("UILayer")->getChildByName("CrossHair"));
+	CrossHair* crossHair = CrossHair::getInstance();
 	Vec2 mousePosVec = this->convertToNodeSpace(crossHair->getCursorPos());
 	Vec2 weaponPosVec = mainCharacter->getPosition();
 	Vec2 dst = mousePosVec - weaponPosVec;
@@ -217,7 +220,7 @@ void BulletLayer::addSprayBullet()
 
 	//set bullet rotation
 	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
-	CrossHair* crossHair = dynamic_cast<CrossHair*>(this->getParent()->getParent()->getChildByName("UILayer")->getChildByName("CrossHair"));
+	CrossHair* crossHair = CrossHair::getInstance();
 	Vec2 mousePosVec = this->convertToNodeSpace(crossHair->getCursorPos());
 	Vec2 weaponPosVec = mainCharacter->getPosition();
 	Vec2 dst = mousePosVec - weaponPosVec;
@@ -277,7 +280,7 @@ void BulletLayer::addToxicBomb()
 
 	//set bomb position and dst
 	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
-	CrossHair* crossHair = dynamic_cast<CrossHair*>(this->getParent()->getParent()->getChildByName("UILayer")->getChildByName("CrossHair"));
+	CrossHair* crossHair = CrossHair::getInstance();
 	Vec2 dstPosVec = this->convertToNodeSpace(crossHair->getCursorPos());
 	Vec2 originPosVec = mainCharacter->getPosition();
 	Vec2 dst = dstPosVec - originPosVec;
@@ -306,7 +309,7 @@ void BulletLayer::addFlameThrower()
 
 	//set bomb position and dst
 	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
-	CrossHair* crossHair = dynamic_cast<CrossHair*>(this->getParent()->getParent()->getChildByName("UILayer")->getChildByName("CrossHair"));
+	CrossHair* crossHair = CrossHair::getInstance();
 	Vec2 dstPosVec = this->convertToNodeSpace(crossHair->getCursorPos());
 	Vec2 originPosVec = mainCharacter->getPosition();
 	Vec2 dst = dstPosVec - originPosVec;

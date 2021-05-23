@@ -50,12 +50,12 @@ void Collectable::setCollectableType(collectableType type)
 	}
 
 	//reset target sprite display
-	auto target = Sprite::createWithSpriteFrameName(collectableTypeName.getCString());
+	auto collectable = Sprite::createWithSpriteFrameName(collectableTypeName.getCString());
 	if (m_sprite != nullptr)
 		m_sprite->removeFromParentAndCleanup(1);
 	this->setName(collectableTypeName.getCString());
-	target->setScale(0.2f);
-	Collectable::bindSprite(target);
+	collectable->setScale(0.15f);
+	Collectable::bindSprite(collectable);
 }
 
 bool Collectable::loadGraphs()

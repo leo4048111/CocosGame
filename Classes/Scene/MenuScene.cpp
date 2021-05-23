@@ -28,15 +28,35 @@ bool MenuScene::init()
 	auto quitGame = MenuItemLabel::create(quitGameLabel, CC_CALLBACK_1(MenuScene::menuCallBack, this));
 	startGame->setTag(0);
 	startGame->setColor(Color3B(220, 220, 220));
+	startGame->setScale(0.3f);
 	audioControl->setTag(1);
 	audioControl->setColor(Color3B(220, 220, 220));
+	audioControl->setScale(0.3f);
 	quitGame->setTag(2);
 	quitGame->setColor(Color3B(220, 220, 220));
+	quitGame->setScale(0.3f);
 
 	auto menu = Menu::create(startGame,audioControl,quitGame,NULL);
-	menu->alignItemsVerticallyWithPadding(30);
+	menu->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+	menu->alignItemsVerticallyWithPadding(15);
 	this->addChild(menu,20);
 	menu->setName("menu");
+	menu->setPositionY(menu->getPositionY() - 50);
+
+	auto logo = Label::createWithTTF("POBG", "fonts/Southampton-MRqp.ttf", 80);
+	this->addChild(logo);
+	logo->setPosition(Vec2(visibleSize.width / 2, visibleSize.height * 5 / 7));
+	logo->setColor(Color3B(218, 165, 32));
+	logo->enableGlow(Color4B(255, 215, 0, 50));
+	logo->enableOutline(Color4B(0,0,0,10));
+	logo->enableBold();
+	logo->enableShadow(Color4B(0, 0, 0, 10));
+	
+	auto info = Label::createWithTTF("made by 2050250", "fonts/Notification Font.ttf", 15);
+	info->enableBold();
+	this->addChild((info));
+	info->setPosition(Vec2(logo->getPosition().x + logo->getContentSize().width-20, logo->getPosition().y-logo->getContentSize().height/2));
+	info->setColor(Color3B(255, 255, 255));
 
 	/*auto backgroundImg = Sprite::create("background.png");
 	backgroundImg->setPosition(origin + visibleSize / 2);

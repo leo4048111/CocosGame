@@ -71,8 +71,6 @@ private:
 
 	double m_currentSpeed;
 
-
-
 };
 
 

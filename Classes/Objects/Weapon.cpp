@@ -1,4 +1,5 @@
 #include "Weapon.h"
+#include "Controls/Specs.h"
 
 USING_NS_CC;
 
@@ -50,23 +51,23 @@ void Weapon::setWeaponType(weaponType type)
 		m_damage = 30;
 		m_ammoInCurrentMagazine = 12;
 		m_maxAmmoPerMagazine = 12;
-		m_backupAmmo = 200;
+		m_backupAmmo = 24;
 		m_isAutoFire = false;
 		break;
 	case weaponType::lazer:
 		weaponName = "weapon_razor";
 		m_damage = 0.25f;
-		m_ammoInCurrentMagazine = 100;
-		m_maxAmmoPerMagazine = 100;
-		m_backupAmmo = 300;
+		m_ammoInCurrentMagazine = 5;
+		m_maxAmmoPerMagazine = 5;
+		m_backupAmmo = 20;
 		m_isAutoFire = false;
 		break;
 	case weaponType::rifle:
 		weaponName = "weapon_rifle";
 		m_damage = 5;
-		m_ammoInCurrentMagazine = 80;
-		m_maxAmmoPerMagazine = 80;
-		m_backupAmmo = 160;
+		m_ammoInCurrentMagazine = 60;
+		m_maxAmmoPerMagazine = 60;
+		m_backupAmmo = 120;
 		m_isAutoFire = true;
 		break;
 	case weaponType::sniperRifle:
@@ -96,9 +97,9 @@ void Weapon::setWeaponType(weaponType type)
 	case weaponType::flameThrower:
 		weaponName = "weapon_flameThrower";
 		m_damage = 0.25f;
-		m_ammoInCurrentMagazine = 500;
-		m_maxAmmoPerMagazine = 500;
-		m_backupAmmo = 500;
+		m_ammoInCurrentMagazine = 120;
+		m_maxAmmoPerMagazine = 120;
+		m_backupAmmo = 120;
 		m_isAutoFire = true;
 	default:
 		return ;
@@ -166,7 +167,7 @@ void Weapon::getBackupMagazine()
 
 void Weapon::fire()
 {
-	if (m_ammoInCurrentMagazine)
+	if (m_ammoInCurrentMagazine>0||Specs::getInstance()->isInfiniteAmmoActivated())
 	{
 		switch (this->getWeaponType())
 		{
@@ -194,9 +195,9 @@ void Weapon::fire()
 		default:
 			break;
 		}
+		if(!Specs::getInstance()->isInfiniteAmmoActivated())
+		m_ammoInCurrentMagazine--;
 	}
-	m_ammoInCurrentMagazine--;
-
 }
 
 void Weapon::fireNormalBullet()

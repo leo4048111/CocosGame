@@ -5,18 +5,21 @@ using namespace std;
 
 class Specs
 {
+public:
+	typedef void (_stdcall Specs::*CheatFp)();
+
 private: 
 
 Specs();
 
-static Specs* instance;
+static Specs* _instance;
 
 public:
     static Specs* getInstance() 
     { 
-        if (instance == NULL)
-            instance = new Specs();
-        return instance; 
+        if (_instance == NULL)
+            _instance = new Specs();
+        return _instance; 
     }
 
 	void refreshInstance();
@@ -42,9 +45,24 @@ public:
 
 	time_t getCurrentTime();
 
+	//cheat settings
+	void _stdcall toggleInvincible();
+	bool isInvincibleActivated();
+	void _stdcall toggleInfiniteAmmo();
+	bool isInfiniteAmmoActivated();
+	void _stdcall toggleAimbot();
+	bool isAimbotActivated();
+
+	//player name setting
+	void setPlayerName(std::string name);
+
+	std::string getPlayerName();
 private:
 	time_t m_startTime;
 	time_t m_currentTime;
+
+	//player name
+	std::string m_playerName;
 
 	//round status
 	int m_currentRound;
@@ -54,5 +72,10 @@ private:
 
 	//Score board specs
 	int m_currentScore;
+
+	//cheat specs
+	bool m_isInvincible;
+	bool m_isInfiniteAmmo;
+	bool m_isAimbot;
 };
 

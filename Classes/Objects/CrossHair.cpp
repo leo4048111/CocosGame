@@ -2,9 +2,13 @@
 
 USING_NS_CC;
 
+CrossHair* CrossHair::_instance = NULL;
+
 CrossHair* CrossHair::createCrossHair()
 {
-	return CrossHair::create();
+	if (_instance == NULL)
+		_instance = CrossHair::create();
+	return _instance;
 }
 
 bool CrossHair::init()

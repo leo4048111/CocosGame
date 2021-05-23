@@ -1,6 +1,6 @@
 #include "Specs.h"
 
-Specs* Specs::instance = NULL;
+Specs* Specs::_instance = NULL;
 
 Specs::Specs()
 {
@@ -12,10 +12,18 @@ Specs::Specs()
 	m_currentScore = 0;
 
 	//init round specs
-	m_currentRound = 1;
-	m_lastRound = 0;
+	m_currentRound = 0;
+	m_lastRound = -1;
 	m_isLost = false;
 	m_isWin = false;
+
+	//init cheats
+	m_isAimbot = false;
+	m_isInfiniteAmmo = false;
+	m_isInvincible = false;
+
+	//init player name
+	m_playerName = "Player Unknown";
 }
 
 void Specs::refreshInstance()
@@ -28,10 +36,15 @@ void Specs::refreshInstance()
 	m_currentScore = 0;
 
 	//init round specs
-	m_currentRound = 1;
-	m_lastRound = 0;
+	m_currentRound = 0;
+	m_lastRound = -1;
 	m_isLost = false;
 	m_isWin = false;
+
+	//init cheats
+	m_isAimbot = false;
+	m_isInfiniteAmmo = false;
+	m_isInvincible = false;
 }
 
 void Specs::addScore(int score)
@@ -82,4 +95,44 @@ time_t Specs::getCurrentTime()
 time_t Specs::getStartTime()
 {
 	return m_startTime;
+}
+
+void Specs::toggleInvincible()
+{
+	m_isInvincible = !m_isInvincible;
+}
+
+bool Specs::isInvincibleActivated()
+{
+	return m_isInvincible;
+}
+
+void Specs::toggleInfiniteAmmo()
+{
+	m_isInfiniteAmmo = !m_isInfiniteAmmo;
+}
+
+bool Specs::isInfiniteAmmoActivated()
+{
+	return m_isInfiniteAmmo;
+}
+
+void Specs::toggleAimbot()
+{
+	m_isAimbot = !m_isAimbot;
+}
+
+bool Specs::isAimbotActivated()
+{
+	return m_isAimbot;
+}
+
+void Specs::setPlayerName(std::string name)
+{
+	m_playerName = name;
+}
+
+std::string Specs::getPlayerName()
+{
+	return m_playerName;
 }

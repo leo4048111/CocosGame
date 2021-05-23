@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "Objects/CrossHair.h"
 #include "Scene/GameoverScene.h"
+#include "Objects//Chatbox.h"
 
 #define SCORE_PER_ROUND 200
 
@@ -40,6 +41,7 @@ private:
 
 	//score board
 	cocos2d::Label* m_labelScoreBoard;
+
 
 };
 
