@@ -1,10 +1,15 @@
 #include "CollectableLayer.h"
+#include "Controls/Specs.h"
 
 USING_NS_CC;
 
+CollectableLayer* CollectableLayer::_instance = NULL;
+
 CollectableLayer* CollectableLayer::createCollectableLayer()
 {
-	return CollectableLayer::create();
+	if (_instance == NULL)
+		_instance=CollectableLayer::create();
+	return _instance;
 }
 
 bool CollectableLayer::init()
@@ -13,7 +18,6 @@ bool CollectableLayer::init()
 	{
 		return false;
 	}
-
 
 	return true;
 }
@@ -28,8 +32,8 @@ void CollectableLayer::addCollectable(Collectable* collectable,float x,float y)
 
 void CollectableLayer::update(float delta)
 {
-	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("MainCharacter"));
-	Rect mainCharacterRect = Rect(mainCharacter->getBoundingBox().origin, mainCharacter->m_sprite->getContentSize()/5);
+	Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName(Specs::getInstance()->getPlayerName()));
+	Rect playerRect = Rect(player->getBoundingBox().origin, player->m_sprite->getContentSize()/5);
 	Vector<Collectable*> tmpDeleteCollectable;
 	for (auto currentCollectable : m_allCollectables)
 	{
@@ -39,7 +43,7 @@ void CollectableLayer::update(float delta)
 			currentCollectable->runDeadAction();
 			tmpDeleteCollectable.pushBack(currentCollectable);
 		}
-		else if (mainCharacterRect.intersectsRect(collectableRect))
+		else if (playerRect.intersectsRect(collectableRect))
 		{
 			currentCollectable->useCollectable();
 			tmpDeleteCollectable.pushBack(currentCollectable);

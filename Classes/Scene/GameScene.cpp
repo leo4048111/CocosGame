@@ -1,4 +1,5 @@
 #include "GameScene.h"
+#include "Controls/Specs.h"
 
 USING_NS_CC;
 
@@ -17,6 +18,9 @@ bool GameScene::init()
 	//init window
 	m_visibleSize = Director::getInstance()->getVisibleSize();
 	m_origin = Director::getInstance()->getVisibleOrigin();
+	
+	//init specs
+	auto specs = Specs::getInstance();
 
 	//init map
 	TMXTiledMap* map = TMXTiledMap::create("map/testMap.tmx");
@@ -25,17 +29,17 @@ bool GameScene::init()
 	map->setPosition(Vec2(m_origin.x + m_visibleSize.width / 2, m_origin.y + m_visibleSize.height / 2));
 
 	//init bullet layer
-	BulletLayer* bulletLayer = BulletLayer::createBulletLayer();
+	BulletLayer* bulletLayer = BulletLayer::getInstance();
 	bulletLayer->scheduleUpdate();
 	map->addChild(bulletLayer, 50, "BulletLayer");
 
 	//init sprite layer
-	SpriteLayer* spriteLayer = SpriteLayer::createSpriteLayer();
+	SpriteLayer* spriteLayer = SpriteLayer::getInstance();
 	spriteLayer->scheduleUpdate();
 	map->addChild(spriteLayer, 50,"SpriteLayer");
 
 	//init UI layer
-	UILayer* uiLayer = UILayer::createUILayer();
+	UILayer* uiLayer = UILayer::getInstance();
 	uiLayer->scheduleUpdate();
 	this->addChild(uiLayer, 100, "UILayer");
 
@@ -74,7 +78,7 @@ void GameScene::update(float delta)
 {
 	//update camera 
 	TMXTiledMap* map = dynamic_cast<TMXTiledMap*>(this->getChildByName("Map"));
-	Vec2 mainCharacterPos = map->getChildByName("SpriteLayer")->getChildByName("MainCharacter")->getPosition();
+	Vec2 mainCharacterPos = map->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName())->getPosition();
 	Vec2 mapPos = map->getContentSize() / 2;
 	Vec2 offsetPos = mainCharacterPos - mapPos;
 	map->setPosition(Vec2(m_origin.x + m_visibleSize.width / 2-offsetPos.x, m_origin.y + m_visibleSize.height / 2-offsetPos.y));

@@ -5,6 +5,7 @@
 
 class GameSettingsLayer :public cocos2d::Layer
 {
+
 public:
 	static GameSettingsLayer* createGameSettingsLayer();
 

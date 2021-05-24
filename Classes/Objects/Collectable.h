@@ -4,7 +4,7 @@
 #include "cocos2d.h"
 #include "Entity.h"
 #include <ctime>
-#include "MainCharacter.h"
+#include "Player.h"
 #include "Weapon.h"
 
 #define MAX_RETAIN_TIME 8

@@ -57,6 +57,9 @@ public:
 
 	void deadAndCleanUp(Node* node);
 
+	//chat method
+	void speak(std::string str);
+
 private:
 	double m_maxHealth;
 	double m_currentHealth;

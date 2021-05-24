@@ -1,13 +1,17 @@
 #include <ctime>
 #include "UILayer.h"
-#include "../objects/MainCharacter.h"
+#include "../objects/Player.h"
 #include "Controls/Specs.h"
 
 USING_NS_CC;
 
+UILayer* UILayer::_instance = NULL;
+
 UILayer* UILayer::createUILayer()
 {
-	return UILayer::create();
+	if (_instance == NULL)
+		_instance = UILayer::create();
+	return _instance;
 }
 
 bool UILayer::init()
@@ -71,7 +75,7 @@ void UILayer::update(float delta)
 	m_labelTimer->setString("Survived for: "+Value(runTime).asString() + "s");
 
 	//update score board
-	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("Map")->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
+	Player* mainCharacter = dynamic_cast<Player*>(this->getParent()->getChildByName("Map")->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
 	m_labelScoreBoard->setString("Score:" + Value(Specs::getInstance()->getScore()).asString());
 	if (Specs::getInstance()->getScore() / SCORE_PER_ROUND >= Specs::getInstance()->getCurrentRound())
 	{

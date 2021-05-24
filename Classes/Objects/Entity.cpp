@@ -167,3 +167,22 @@ double Entity::getCurrentResistance()
 {
 	return m_currentResistance;
 }
+
+void Entity::speak(std::string str)
+{
+	auto messageBubble = Sprite::create("objects/UI/ui_messageBubble.png");
+	this->addChild(messageBubble);
+	messageBubble->setPosition(Vec2(this->m_sprite->getContentSize().width, this->m_sprite->getContentSize().height));
+	
+	auto sentence = LabelTTF::create(str, "fonts/arial.ttf", 10);
+	sentence->setColor(Color3B(255, 255, 240));
+	messageBubble->addChild(sentence);
+	
+	auto fadein = FadeIn::create(0.5f);
+	auto fadeout = FadeOut::create(1.0f);
+
+	auto sequence = Sequence::create(fadein, fadeout, NULL);
+
+	messageBubble->runAction(sequence);
+
+}

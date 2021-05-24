@@ -5,9 +5,13 @@
 
 USING_NS_CC;
 
+SpriteLayer* SpriteLayer::_instance = NULL;
+
 SpriteLayer* SpriteLayer::createSpriteLayer()
 {
-	return SpriteLayer::create();
+	if (_instance == NULL)
+		_instance = SpriteLayer::create();
+	return _instance;
 }
 
 bool SpriteLayer::init()
@@ -24,15 +28,15 @@ bool SpriteLayer::init()
 	this->initTargetSpecs();
 
 	//init main character
-	auto mainCharacter = MainCharacter::createMainCharacter();
-	this->addChild(mainCharacter, 20, "MainCharacter");
+	auto mainCharacter = Player::createMainCharacter();
+	this->addChild(mainCharacter, 20, Specs::getInstance()->getPlayerName());
 	int mapWidth = this->getContentSize().width;
 	int mapHeight = this->getContentSize().height;
 	mainCharacter->setPosition(Vec2(origin.x+visibleSize.width / 2,origin.y+ visibleSize.height / 3));
 	mainCharacter->scheduleUpdate();
 
 	//init collectable layer
-	auto collectableLayer = CollectableLayer::createCollectableLayer();
+	auto collectableLayer = CollectableLayer::getInstance();
 	this->addChild(collectableLayer,20,"CollectableLayer");
 	collectableLayer->scheduleUpdate();
 
@@ -43,7 +47,7 @@ bool SpriteLayer::init()
 void SpriteLayer::update(float delta)
 {
 	int currentTargetCount = m_targets.size();
-	UILayer* uiLayer=dynamic_cast<UILayer*>(this->getParent()->getParent()->getChildByName("UILayer"));
+	UILayer* uiLayer=UILayer::getInstance();
 	//update target
 	if (currentTargetCount < MIN_TARGETS_COUNT+Specs::getInstance()->getCurrentRound())
 	{

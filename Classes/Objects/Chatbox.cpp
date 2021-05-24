@@ -62,11 +62,6 @@ void Chatbox::onKeyPressed(EventKeyboard::KeyCode keycode, Event* event)
 	}
 }
 
-void Chatbox::onKeyReleased(EventKeyboard::KeyCode keycode, Event* event)
-{
-
-}
-
 void Chatbox::setControlOnListen()
 {
 	auto* dispatcher = Director::getInstance()->getEventDispatcher();
@@ -110,6 +105,7 @@ void Chatbox::sendText()
 	auto fadeout = FadeOut::create(3.0f);
 	auto sequence = Sequence::create(fadein, fadeout, NULL);
 	m_messageBox->runAction(sequence);
+
 }
 
 void Chatbox::runCheat(std::string command)
@@ -119,6 +115,7 @@ void Chatbox::runCheat(std::string command)
 	{
 		(Specs::getInstance()->*fp)();
 		m_currentText = "";
+		m_inputBox->setString("");
 	}
 	else if (command == "/help")
 		showHelp();

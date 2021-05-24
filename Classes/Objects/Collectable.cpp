@@ -1,4 +1,5 @@
 #include "Collectable.h"
+#include "Controls/Specs.h"
 
 USING_NS_CC;
 
@@ -74,7 +75,7 @@ bool Collectable::loadGraphs()
 
 void Collectable::useCollectable()
 {
-	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getParent()->getChildByName("MainCharacter"));
+	Player* mainCharacter = dynamic_cast<Player*>(this->getParent()->getParent()->getChildByName(Specs::getInstance()->getPlayerName()));
 	Label* notification = Label::createWithTTF("blank", "fonts/Notification Font.ttf", 20);
 	notification->enableBold();
 	switch (this->getCollectableType())
@@ -122,32 +123,32 @@ collectableType Collectable::getCollectableType()
 
 void Collectable::addAmmo()
 {
-	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getParent()->getChildByName("MainCharacter"));
+	Player* mainCharacter = dynamic_cast<Player*>(this->getParent()->getParent()->getChildByName(Specs::getInstance()->getPlayerName()));
 	Weapon* weapon = mainCharacter->getCurrentWeapon();
 	weapon->getBackupMagazine();
 }
 
 void Collectable::addHealth()
 {
-	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getParent()->getChildByName("MainCharacter"));
+	Player* mainCharacter = dynamic_cast<Player*>(this->getParent()->getParent()->getChildByName(Specs::getInstance()->getPlayerName()));
 	mainCharacter->healUp(20);
 }
 
 void Collectable::addSpeed()
 {
-	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getParent()->getChildByName("MainCharacter"));
+	Player* mainCharacter = dynamic_cast<Player*>(this->getParent()->getParent()->getChildByName(Specs::getInstance()->getPlayerName()));
 	mainCharacter->addSpeed(0.1f);
 }
 
 void Collectable::addStaminaRecovery()
 {
-	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getParent()->getChildByName("MainCharacter"));
+	Player* mainCharacter = dynamic_cast<Player*>(this->getParent()->getParent()->getChildByName(Specs::getInstance()->getPlayerName()));
 	mainCharacter->addStaminaRecovery(0.1f);
 }
 
 void Collectable::addResistance()
 {
-	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getParent()->getChildByName("MainCharacter"));
+	Player* mainCharacter = dynamic_cast<Player*>(this->getParent()->getParent()->getChildByName(Specs::getInstance()->getPlayerName()));
 	mainCharacter->addResistance(1.0f);
 }
 

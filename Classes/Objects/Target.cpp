@@ -1,4 +1,5 @@
 #include "Target.h"
+#include "Controls/Specs.h"
 
 USING_NS_CC;
 
@@ -50,7 +51,7 @@ void Target::update(float delta)
 
 	//Target always moves towards main character
 	double offset = 50*this->getCurrentSpeed();
-	auto mainCharacter=this->getParent()->getChildByName("MainCharacter");
+	auto mainCharacter=this->getParent()->getChildByName(Specs::getInstance()->getPlayerName());
 	Vec2 mainCharacterPos = mainCharacter->getParent()->convertToWorldSpaceAR(mainCharacter->getPosition());
 	Vec2 targetPos = this->getParent()->convertToWorldSpaceAR(this->getPosition());
 	Vec2 dst = mainCharacterPos - targetPos;

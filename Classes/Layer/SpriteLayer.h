@@ -3,7 +3,7 @@
 
 #include "cocos2d.h"
 #include "Objects/Target.h"
-#include "Objects/MainCharacter.h"
+#include "Objects/Player.h"
 #include "CollectableLayer.h"
 #include <map>
 
@@ -12,11 +12,25 @@
 
 class SpriteLayer :public cocos2d::Layer
 {
-public:
+private:
+	SpriteLayer() {};
+
+	~SpriteLayer() { this->removeFromParentAndCleanup(1);  _instance = NULL; };
+
+	static SpriteLayer* _instance;
+
 	static SpriteLayer* createSpriteLayer();
 
 	virtual bool init();
 
+public:
+	static SpriteLayer* getInstance() {
+		if (_instance == NULL)
+			_instance = createSpriteLayer();
+		return _instance;
+	}
+
+public:
 	CREATE_FUNC(SpriteLayer);
 
 	virtual void update(float delta);

@@ -1,20 +1,20 @@
-#include "MainCharacter.h"
+#include "Player.h"
 #include "Controls/Specs.h"
 
 USING_NS_CC;
 
-MainCharacter* MainCharacter::createMainCharacter()
+Player* Player::createMainCharacter()
 {
-	return MainCharacter::create();
+	return Player::create();
 }
 
-bool MainCharacter::init()
+bool Player::init()
 {
 	if (!Entity::init())
 	{
 		return false;
 	}
-	if (!MainCharacter::loadGraphs())
+	if (!Player::loadGraphs())
 	{
 		return false;
 	}
@@ -22,9 +22,9 @@ bool MainCharacter::init()
 	//Init sprite
 	Sprite* mainCharacter = Sprite::createWithSpriteFrameName("character_maleAdventurer_backwalk0");
 	mainCharacter->setScale(0.1f);
-	MainCharacter::bindSprite(mainCharacter);
-	MainCharacter::showHealthBar();
-	MainCharacter::showStaminaBar();
+	Player::bindSprite(mainCharacter);
+	Player::showHealthBar();
+	Player::showStaminaBar();
 
 	//Init specs
 	m_magazineSpecLabel = Label::create("0/0", "HeiTi", 20);
@@ -44,12 +44,12 @@ bool MainCharacter::init()
 	nameLabel->setColor(Color3B(255, 255, 255));
 	nameLabel->setPosition(Vec2(this->getContentSize().width / 2, 20));
 
-	this->setName("MainCharacter");
+	this->setName(Specs::getInstance()->getPlayerName());
 	this->setControlOnListen(); 
 	return true;
 }
 
-bool MainCharacter::loadGraphs()
+bool Player::loadGraphs()
 {
 	try
 	{
@@ -91,7 +91,7 @@ bool MainCharacter::loadGraphs()
 	}
 }
 
-void MainCharacter::runAction(int dir)
+void Player::runAction(int dir)
 {
 	Animation* anime=nullptr;
 	switch (dir)
@@ -123,7 +123,7 @@ void MainCharacter::runAction(int dir)
 	}
 }
 
-void MainCharacter::update(float delta)
+void Player::update(float delta)
 {
 	//Update anime
 	double offsetX = this->getCurrentSpeed();
@@ -165,7 +165,7 @@ void MainCharacter::update(float delta)
 		m_currentWeapon->fire();
 }
 
-void MainCharacter::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event)
+void Player::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event)
 {
 	m_keyMap[keycode] = true; //set pressed status to true
 	switch (keycode)
@@ -217,7 +217,7 @@ void MainCharacter::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2
 	}
 }
 
-void MainCharacter::onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event)
+void Player::onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event)
 {
 	m_keyMap[keycode] = false; //set pressed status to false
 	switch(keycode)
@@ -241,20 +241,20 @@ void MainCharacter::onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos
 		runAction(standBack);
 }
 
-void MainCharacter::setControlOnListen()
+void Player::setControlOnListen()
 {
 	auto* dispatcher = Director::getInstance()->getEventDispatcher();
 	auto* mouseListener = EventListenerMouse::create();
-	mouseListener->onMouseDown = CC_CALLBACK_1(MainCharacter::onMouseDown, this);
-	mouseListener->onMouseUp = CC_CALLBACK_1(MainCharacter::onMouseUp, this);
+	mouseListener->onMouseDown = CC_CALLBACK_1(Player::onMouseDown, this);
+	mouseListener->onMouseUp = CC_CALLBACK_1(Player::onMouseUp, this);
 	dispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
 	auto* keyListener = EventListenerKeyboard::create();
-	keyListener->onKeyPressed = CC_CALLBACK_2(MainCharacter::onKeyPressed, this);
-	keyListener->onKeyReleased = CC_CALLBACK_2(MainCharacter::onKeyReleased, this);
+	keyListener->onKeyPressed = CC_CALLBACK_2(Player::onKeyPressed, this);
+	keyListener->onKeyReleased = CC_CALLBACK_2(Player::onKeyReleased, this);
 	dispatcher->addEventListenerWithSceneGraphPriority(keyListener, this);
 }
 
-void MainCharacter::onMouseDown(Event* event)
+void Player::onMouseDown(Event* event)
 {
 	EventMouse* mouseEvent = dynamic_cast<EventMouse*>(event);
 	EventMouse::MouseButton mouseButton = mouseEvent->getMouseButton();
@@ -271,14 +271,14 @@ void MainCharacter::onMouseDown(Event* event)
 	}
 }
 
-void MainCharacter::onMouseUp(Event* event)
+void Player::onMouseUp(Event* event)
 {
 	EventMouse* mouseEvent = dynamic_cast<EventMouse*>(event);
 	EventMouse::MouseButton mouseButton = mouseEvent->getMouseButton();
 	m_mouseButtonMap[mouseButton] = false;
 }
 
-void MainCharacter::swapWeapon(int num)
+void Player::swapWeapon(int num)
 {
 		//Update sprite
 		if (m_currentWeapon != nullptr)
@@ -295,7 +295,7 @@ void MainCharacter::swapWeapon(int num)
 	
 }
 
-Weapon* MainCharacter::getCurrentWeapon()
+Weapon* Player::getCurrentWeapon()
 {
 	return m_currentWeapon;
 }
@@ -336,7 +336,7 @@ Weapon* MainCharacter::getCurrentWeapon()
 //	}
 //}
 
-void MainCharacter::addWeapon(Weapon* weapon)
+void Player::addWeapon(Weapon* weapon)
 {
 	m_allWeaponsMap.insert(std::make_pair(weapon->getWeaponType()+1, weapon));
 	m_sprite->addChild(weapon);
@@ -346,7 +346,7 @@ void MainCharacter::addWeapon(Weapon* weapon)
 	weapon->setControlOnListen();
 }
 
-void MainCharacter::initAllWeapon()
+void Player::initAllWeapon()
 {
 	//Init pistol
 	auto wpistol = Weapon::createWeapon();
@@ -381,6 +381,6 @@ void MainCharacter::initAllWeapon()
 	auto wflameThrower = Weapon::createWeapon();
 	wflameThrower->setWeaponType(weaponType::flameThrower);
 	addWeapon(wflameThrower);
-	MainCharacter::swapWeapon(1);
+	Player::swapWeapon(1);
 
 }

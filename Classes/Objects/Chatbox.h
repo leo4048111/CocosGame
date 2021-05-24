@@ -34,8 +34,6 @@ public:
 	//control methods
 	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event);
 
-	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event);
-
 	void setControlOnListen();
 
 	//display methods

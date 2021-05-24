@@ -15,11 +15,11 @@ enum actions
 	forward,back,left,right,standBack,standForward
 };
 
-class MainCharacter : public Entity
+class Player : public Entity
 {
 public:
 	//Sprite related
-	static MainCharacter* createMainCharacter();
+	static Player* createMainCharacter();
 
 	virtual bool init();
 
@@ -27,7 +27,7 @@ public:
 
 	void runAction(int dir);
 
-	CREATE_FUNC(MainCharacter);
+	CREATE_FUNC(Player);
 
 	virtual void update(float delta);
 

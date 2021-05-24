@@ -6,9 +6,13 @@
 
 USING_NS_CC;
 
+BulletLayer* BulletLayer::_instance = NULL;
+
 BulletLayer* BulletLayer::createBulletLayer()
 {
-	return BulletLayer::create();
+	if(_instance == NULL)
+	_instance = BulletLayer::create();
+	return _instance;
 }
 
 bool BulletLayer::init()
@@ -17,7 +21,7 @@ bool BulletLayer::init()
 	{
 		return false;
 	}
-	
+
 	this->setName("BulletLayer");
 	return true;
 }
@@ -36,11 +40,11 @@ void BulletLayer::cleanBullet(Node* sender)
 
 void BulletLayer::update(float delta)
 {
-	SpriteLayer* spriteLayer = dynamic_cast<SpriteLayer*>(this->getParent()->getChildByName("SpriteLayer"));
+	SpriteLayer* spriteLayer = SpriteLayer::getInstance();
 	Vector<Target*>* allTargets = spriteLayer->getAllTargets();
-	UILayer* uiLayer = dynamic_cast<UILayer*>(this->getParent()->getParent()->getChildByName("UILayer"));
-	CrossHair* crossHair = dynamic_cast<CrossHair*>(uiLayer->getChildByName("CrossHair"));
-	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
+	UILayer* uiLayer = UILayer::getInstance();
+	CrossHair* crossHair = CrossHair::getInstance();
+	Player* mainCharacter = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
 	Vector<Sprite*> tmpEraseFriendlyBullet;
 	Vector<Sprite*> tmpEraseHostileBullet;
 	Vector<Target*> tmpEraseTarget;
@@ -151,7 +155,7 @@ void BulletLayer::addBullet()
 	m_allFriendlyBullets.pushBack(bullet);
 
 	//set bullet rotation
-	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
+	Player* mainCharacter = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
 	CrossHair* crossHair = CrossHair::getInstance();
 	Vec2 mousePosVec = this->convertToNodeSpace(crossHair->getCursorPos());
 	Vec2 weaponPosVec = mainCharacter->getPosition();
@@ -195,7 +199,7 @@ void BulletLayer::addLazer()
 	m_allFriendlyBullets.pushBack(lazer);
 
 	//set bullet rotation
-	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
+	Player* mainCharacter = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
 	CrossHair* crossHair = CrossHair::getInstance();
 	Vec2 mousePosVec = this->convertToNodeSpace(crossHair->getCursorPos());
 	Vec2 weaponPosVec = mainCharacter->getPosition();
@@ -219,55 +223,30 @@ void BulletLayer::addSprayBullet()
 	const double offsetAngle = 0.418;
 
 	//set bullet rotation
-	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
+	Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
 	CrossHair* crossHair = CrossHair::getInstance();
 	Vec2 mousePosVec = this->convertToNodeSpace(crossHair->getCursorPos());
-	Vec2 weaponPosVec = mainCharacter->getPosition();
+	Vec2 weaponPosVec = player->getPosition();
 	Vec2 dst = mousePosVec - weaponPosVec;
 	float radians = M_PI - atan2(dst.y, dst.x);
 	float degree = CC_RADIANS_TO_DEGREES(radians);
 
-	//create bullet
-	auto bullet = Sprite::create("objects/ammo/ammo_normal.png");
-	this->addChild(bullet);
-	m_allFriendlyBullets.pushBack(bullet);
-	bullet->setRotation(degree);
-	bullet->setScale(0.2f);
-	bullet->setPosition(mainCharacter->getPosition());
+	//create bullet X 3
+	for (int offset = -15; offset <= 15; offset += 15)
+	{
+		auto bullet = Sprite::create("objects/ammo/ammo_normal.png");
+		this->addChild(bullet);
+		m_allFriendlyBullets.pushBack(bullet);
+		bullet->setRotation(degree+ offset);
+		bullet->setScale(0.2f);
+		bullet->setPosition(weaponPosVec);
 
-	auto action = MoveTo::create(1.0f, 1024 * Vec2(cos(atan2(dst.y, dst.x)), sin(atan2(dst.y, dst.x))));
-	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
-	auto sequence = Sequence::create(action, callFunc, NULL);
-	bullet->runAction(Repeat::create(sequence, 1));
-	bullet->setName("sprayBullet");
-
-	//create bullet1
-	auto bullet1 = Sprite::create("objects/ammo/ammo_normal.png");
-	this->addChild(bullet1);
-	m_allFriendlyBullets.pushBack(bullet1);
-	bullet1->setRotation(degree+30);
-	bullet1->setScale(0.2f);
-	bullet1->setPosition(mainCharacter->getPosition());
-
-	auto action1 = MoveTo::create(1.0f, 1024 * Vec2(cos(atan2(dst.y, dst.x)+ offsetAngle), sin(atan2(dst.y, dst.x)+ offsetAngle)));
-	CallFuncN* callFunc1 = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
-	auto sequence1 = Sequence::create(action1, callFunc1, NULL);
-	bullet1->runAction(Repeat::create(sequence1, 1));
-	bullet1->setName("sprayBullet");
-
-	//create bullet2
-	auto bullet2 = Sprite::create("objects/ammo/ammo_normal.png");
-	this->addChild(bullet2);
-	m_allFriendlyBullets.pushBack(bullet2);
-	bullet2->setRotation(degree + 15);
-	bullet2->setScale(0.2f);
-	bullet2->setPosition(mainCharacter->getPosition());
-
-	auto action2 = MoveTo::create(1.0f, 1024 * Vec2(cos(atan2(dst.y, dst.x) - offsetAngle), sin(atan2(dst.y, dst.x) - offsetAngle)));
-	CallFuncN* callFunc2 = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
-	auto sequence2 = Sequence::create(action2, callFunc2, NULL);
-	bullet2->runAction(Repeat::create(sequence2, 1));
-	bullet2->setName("sprayBullet");
+		auto action = MoveTo::create(1.0f, 1024 * Vec2(cos(atan2(dst.y, dst.x)+offset/180.0*M_PI), sin(atan2(dst.y, dst.x)+offset / 180.0 * M_PI)));
+		CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
+		auto sequence = Sequence::create(action, callFunc, NULL);
+		bullet->runAction(Repeat::create(sequence, 1));
+		bullet->setName("sprayBullet");
+	}
 
 }
 
@@ -279,15 +258,15 @@ void BulletLayer::addToxicBomb()
 	this->addChild(bomb);
 
 	//set bomb position and dst
-	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
+	Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
 	CrossHair* crossHair = CrossHair::getInstance();
 	Vec2 dstPosVec = this->convertToNodeSpace(crossHair->getCursorPos());
-	Vec2 originPosVec = mainCharacter->getPosition();
+	Vec2 originPosVec = player->getPosition();
 	Vec2 dst = dstPosVec - originPosVec;
 	float radians = M_PI - atan2(dst.y, dst.x);
 	float degree = CC_RADIANS_TO_DEGREES(radians);
 	bomb->setRotation(degree);
-	bomb->setPosition(mainCharacter->getPosition());
+	bomb->setPosition(player->getPosition());
 
 	auto action1 = RepeatForever::create(RotateTo::create(0.5f, 90));
 	auto action2 = JumpTo::create(1.0f, dstPosVec, 3.0f, 2);
@@ -308,16 +287,16 @@ void BulletLayer::addFlameThrower()
 	m_allFriendlyBullets.pushBack(flame);
 
 	//set bomb position and dst
-	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
+	Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
 	CrossHair* crossHair = CrossHair::getInstance();
 	Vec2 dstPosVec = this->convertToNodeSpace(crossHair->getCursorPos());
-	Vec2 originPosVec = mainCharacter->getPosition();
+	Vec2 originPosVec = player->getPosition();
 	Vec2 dst = dstPosVec - originPosVec;
 	float radians = M_PI - atan2(dst.y, dst.x);
 	float degree = CC_RADIANS_TO_DEGREES(radians);
 
 	flame->setRotation(degree);
-	flame->setPosition(mainCharacter->getPosition());
+	flame->setPosition(player->getPosition());
 
 	//flame anime and auto cleanup
 	auto fadein = FadeIn::create(c_flameSurvivalDuration / 2);
@@ -338,10 +317,10 @@ void BulletLayer::addSpiritualPower(Node* sender)
 	this->addChild(bullet);
 	m_allHostileBullets.pushBack(bullet);
 
-	MainCharacter* mainCharacter = dynamic_cast<MainCharacter*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName("MainCharacter"));
+	Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
 	Vec2 targetPosVec = sender->getPosition();
-	Vec2 mainCharacterPosVec = mainCharacter->getPosition();
-	Vec2 dst = mainCharacterPosVec - targetPosVec;
+	Vec2 playerPosVec = player->getPosition();
+	Vec2 dst = playerPosVec - targetPosVec;
 	float radians = M_PI - atan2(dst.y, dst.x);
 	float degree = CC_RADIANS_TO_DEGREES(radians);
 

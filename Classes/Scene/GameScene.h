@@ -2,7 +2,7 @@
 #define _GAME_SCENE_H_
 
 #include "cocos2d.h"
-#include "../Objects/MainCharacter.h"
+#include "../Objects/Player.h"
 #include "../Layer/UILayer.h"
 #include "../Layer/GameSettingsLayer.h"
 #include "../Layer//SpriteLayer.h"

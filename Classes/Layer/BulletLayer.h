@@ -8,10 +8,25 @@
 
 class BulletLayer :public cocos2d::Layer
 {
-public:
+private:
+	BulletLayer() {};
+
+	~BulletLayer() { this->removeFromParentAndCleanup(1);  _instance = NULL; };
+
+	static BulletLayer* _instance;
+
 	static BulletLayer* createBulletLayer();
 
 	virtual bool init();
+
+public:
+	static BulletLayer* getInstance(){
+		if (_instance == NULL)
+			_instance = createBulletLayer();
+		return _instance;
+	}
+
+public:
 
 	CREATE_FUNC(BulletLayer);
 
@@ -39,6 +54,7 @@ public:
 private:
 	cocos2d::Vector<cocos2d::Sprite*> m_allFriendlyBullets;
 	cocos2d::Vector<cocos2d::Sprite*> m_allHostileBullets;
+
 };
 
 #endif // !_BULLET_LAYER_H
