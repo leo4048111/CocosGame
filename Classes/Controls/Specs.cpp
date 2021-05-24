@@ -24,6 +24,9 @@ Specs::Specs()
 
 	//init player name
 	m_playerName = "Player Unknown";
+
+	//init lines
+	initLines();
 }
 
 void Specs::refreshInstance()
@@ -135,4 +138,34 @@ void Specs::setPlayerName(std::string name)
 std::string Specs::getPlayerName()
 {
 	return m_playerName;
+}
+
+void Specs::initLines()
+{
+	m_targetLines.push_back("Rest in peace");
+	m_targetLines.push_back("Fresh flesh");
+	m_targetLines.push_back("I used to be an adventurer like you,\nthen I took an arrow to the knee");
+	m_targetLines.push_back("Fus Ro Dah");
+	m_targetLines.push_back("If these ruins frighten you,\n take comfort from the knowledge that I am here");
+	m_targetLines.push_back("I fight for the men I've held in my arms,\ndying on foreign soil.");
+	m_targetLines.push_back("I just wanted things... \nto stay the way they were. ");
+	m_targetLines.push_back("You must kill... me.......");
+	m_targetLines.push_back("I have my skill,\n not powers or magic.");
+	m_targetLines.push_back("Religion and thieves make odd bedfellows.");
+	m_targetLines.push_back("I stand witness for the courage of the soul before us.");
+	m_targetLines.push_back("We grieve.");
+	m_targetLines.push_back("We weep.");
+	m_targetLines.push_back("We take our leave.");
+
+}
+
+std::string Specs::speakRandom()
+{
+	srand((unsigned int)time(NULL));
+	return m_targetLines[rand() % m_targetLines.size()];
+}
+
+void Specs::setGamemodeAsSinglePlayer(bool value)
+{
+	m_isSinglePlayer = value;
 }

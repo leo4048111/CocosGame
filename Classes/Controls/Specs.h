@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <ctime>
+#include <vector>
 using namespace std;
 
 class Specs
@@ -45,6 +46,9 @@ public:
 
 	time_t getCurrentTime();
 
+	//gamemode setting
+	void setGamemodeAsSinglePlayer(bool value);
+
 	//cheat settings
 	void _stdcall toggleInvincible();
 	bool isInvincibleActivated();
@@ -57,9 +61,18 @@ public:
 	void setPlayerName(std::string name);
 
 	std::string getPlayerName();
+
+	//target and radio lines 
+	void initLines();
+
+	std::string speakRandom();
 private:
+	//time settings
 	time_t m_startTime;
 	time_t m_currentTime;
+
+	//gamemode settings
+	bool m_isSinglePlayer;
 
 	//player name
 	std::string m_playerName;
@@ -77,5 +90,10 @@ private:
 	bool m_isInvincible;
 	bool m_isInfiniteAmmo;
 	bool m_isAimbot;
+
+	//chatting and radio
+	std::vector<std::string> m_targetLines;
+	std::vector<std::string> m_radioLines;
+
 };
 

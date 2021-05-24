@@ -47,6 +47,8 @@ public:
 	void addFlameThrower();
 
 	//hostile shooting specs
+	void initHostileBulletDamageMap();
+
 	void addSpiritualPower(cocos2d::Node* sender);
 
 	void addFlameCircle(cocos2d::Node* sender);
@@ -55,6 +57,7 @@ private:
 	cocos2d::Vector<cocos2d::Sprite*> m_allFriendlyBullets;
 	cocos2d::Vector<cocos2d::Sprite*> m_allHostileBullets;
 
+	std::map < std::string, double > m_hostileBulletDamageMap;
 };
 
 #endif // !_BULLET_LAYER_H

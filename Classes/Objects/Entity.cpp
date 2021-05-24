@@ -35,7 +35,7 @@ bool Entity::init()
 	m_maxHealth = 100.0f;
 	m_currentHealth = 100.0f;
 	m_maxStamina = 100;
-	m_currentStamina = 100;
+	m_currentStamina = 0;
 	m_currentStaminaRecovery = 0.5f;
 	m_currentSpeed = 0.25f;
 	m_currentResistance = 20.0f;
@@ -67,7 +67,7 @@ bool Entity::receiveDamage(double damage)
 
 void Entity::deadAndCleanUp(Node* node)
 {
-	node->removeFromParentAndCleanup(true);
+	node->removeFromParent();
 }
 
 void Entity::runDeadAction()
@@ -170,19 +170,22 @@ double Entity::getCurrentResistance()
 
 void Entity::speak(std::string str)
 {
+	auto spriteSize = m_sprite->getContentSize();
+
 	auto messageBubble = Sprite::create("objects/UI/ui_messageBubble.png");
-	this->addChild(messageBubble);
-	messageBubble->setPosition(Vec2(this->m_sprite->getContentSize().width, this->m_sprite->getContentSize().height));
+	m_sprite->addChild(messageBubble);
+	messageBubble->setPosition(Vec2(spriteSize.width+200,spriteSize.height+200));
+	messageBubble->setScale(4.0f);
 	
-	auto sentence = LabelTTF::create(str, "fonts/arial.ttf", 10);
-	sentence->setColor(Color3B(255, 255, 240));
+	auto sentence = Label::create(str, "fonts/MomcakeThin-9Y6aZ.otf", 15);
+	sentence->setColor(Color3B(0,0,0));
+	sentence->setPosition(Vec2(messageBubble->getContentSize().width/2,messageBubble->getContentSize().height/2+15));
 	messageBubble->addChild(sentence);
 	
 	auto fadein = FadeIn::create(0.5f);
-	auto fadeout = FadeOut::create(1.0f);
-
-	auto sequence = Sequence::create(fadein, fadeout, NULL);
-
+	auto fadeout = FadeOut::create(4.0f);
+	auto callFunc = CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, messageBubble));
+	auto sequence = Sequence::create(fadein, fadeout, callFunc,NULL);
 	messageBubble->runAction(sequence);
-
+	sentence->runAction(sequence->clone());
 }

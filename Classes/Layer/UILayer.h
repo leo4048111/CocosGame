@@ -33,17 +33,8 @@ public:
 
 	virtual void update(float delta);
 
-	void addScore(int score);
-
-	int getScore();
-
-	int getCurrentRound();
-
 	void goToGameoverScene();
 
-	void setWinOrLose(bool status);
-
-	bool isWin();
 
 private:
 	//Timer specs

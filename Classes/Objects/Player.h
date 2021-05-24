@@ -25,7 +25,7 @@ public:
 
 	bool loadGraphs();
 
-	void runAction(int dir);
+	void runActionAnime(int dir);
 
 	CREATE_FUNC(Player);
 

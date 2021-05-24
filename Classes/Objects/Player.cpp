@@ -91,7 +91,7 @@ bool Player::loadGraphs()
 	}
 }
 
-void Player::runAction(int dir)
+void Player::runActionAnime(int dir)
 {
 	Animation* anime=nullptr;
 	switch (dir)
@@ -172,19 +172,19 @@ void Player::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Even
 	{
 	case EventKeyboard::KeyCode::KEY_W:
 		m_sprite->stopActionByTag(standBack);
-		runAction(actions::forward);
+		runActionAnime(actions::forward);
 		break;
 	case EventKeyboard::KeyCode::KEY_S:
 		m_sprite->stopActionByTag(standBack);
-		runAction(actions::back);
+		runActionAnime(actions::back);
 		break;
 	case EventKeyboard::KeyCode::KEY_A:
 		m_sprite->stopActionByTag(standBack);
-		runAction(actions::left);
+		runActionAnime(actions::left);
 		break;
 	case EventKeyboard::KeyCode::KEY_D:
 		m_sprite->stopActionByTag(standBack);
-		runAction(actions::right);
+		runActionAnime(actions::right);
 		break;
 	case EventKeyboard::KeyCode::KEY_1:
 		swapWeapon(1);
@@ -238,7 +238,7 @@ void Player::onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Eve
 		break;
 	}
 	if (!(m_keyMap[EventKeyboard::KeyCode::KEY_W] || m_keyMap[EventKeyboard::KeyCode::KEY_S] || m_keyMap[EventKeyboard::KeyCode::KEY_A] || m_keyMap[EventKeyboard::KeyCode::KEY_D]))
-		runAction(standBack);
+		runActionAnime(standBack);
 }
 
 void Player::setControlOnListen()

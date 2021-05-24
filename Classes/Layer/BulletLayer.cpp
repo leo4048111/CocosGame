@@ -22,6 +22,8 @@ bool BulletLayer::init()
 		return false;
 	}
 
+	initHostileBulletDamageMap();
+
 	this->setName("BulletLayer");
 	return true;
 }
@@ -44,10 +46,13 @@ void BulletLayer::update(float delta)
 	Vector<Target*>* allTargets = spriteLayer->getAllTargets();
 	UILayer* uiLayer = UILayer::getInstance();
 	CrossHair* crossHair = CrossHair::getInstance();
-	Player* mainCharacter = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
+	Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
 	Vector<Sprite*> tmpEraseFriendlyBullet;
 	Vector<Sprite*> tmpEraseHostileBullet;
 	Vector<Target*> tmpEraseTarget;
+
+	if (player == NULL)
+		return;
 
 	//update all friendly bullets and detect collision
 	for (auto currentBullet : m_allFriendlyBullets)
@@ -61,7 +66,7 @@ void BulletLayer::update(float delta)
 			{
 				currentTarget->setColor(Color3B(245, 2, 1));
 				crossHair->showHitNotification(); //show hit anime on crosshair
-			if (!currentTarget->receiveDamage(mainCharacter->getCurrentWeapon()->getWeaponDamage()))
+			if (!currentTarget->receiveDamage(player->getCurrentWeapon()->getWeaponDamage()))
 				{
 					Specs::getInstance()->addScore(spriteLayer->getThisTargetScore(currentTarget));
 					tmpEraseTarget.pushBack(currentTarget);
@@ -79,13 +84,17 @@ void BulletLayer::update(float delta)
 	for (auto currentBullet : m_allHostileBullets)
 	{
 		Rect bulletRect = currentBullet->getBoundingBox();
-		Rect mainCharacterRect = Rect(mainCharacter->getBoundingBox().origin, mainCharacter->m_sprite->getContentSize() / 10.0f);
+		Rect mainCharacterRect = Rect(player->getBoundingBox().origin, player->m_sprite->getContentSize() / 10.0f);
 		if (bulletRect.intersectsRect(mainCharacterRect)) //Collision Detection
 		{
 			if (!Specs::getInstance()->isInvincibleActivated())
 			{
-				if (!mainCharacter->receiveDamage(1.0f))
+				if (!player->receiveDamage(m_hostileBulletDamageMap[currentBullet->getName()]))
 				{
+					/*auto callFunc = CallFunc::create(CC_CALLBACK_0(Entity::runDeadAction, player));
+					auto callFunc2 = CallFuncN::create(CC_CALLBACK_0(Specs::setWinOrLose, Specs::getInstance(), false));
+					CCFiniteTimeAction* sequence = Sequence::create(callFunc,DelayTime::create(1.0f),callFunc2,NULL);
+					player->runAction(sequence);*/
 					Specs::getInstance()->setWinOrLose(false);
 				}
 			}
@@ -139,6 +148,9 @@ void BulletLayer::update(float delta)
 		auto tmpTarget = tmpEraseTarget.back();
 		if (tmpTarget != nullptr)
 		{
+			//speak some lines
+			tmpTarget->speak(Specs::getInstance()->speakRandom());
+
 			tmpTarget->dropRandomCollectable();
 			tmpEraseTarget.popBack();
 			allTargets->eraseObject(tmpTarget);
@@ -166,21 +178,21 @@ void BulletLayer::addBullet()
 	bullet->setScale(0.2f);
 	bullet->setPosition(mainCharacter->getPosition());
 
-	//DEBUG
-	std::string str1 = "ch:" + Value(mainCharacter->getPosition().x).asString() + "," + Value(mainCharacter->getPosition().y).asString() + "\n";
-	OutputDebugString(str1.c_str());
-	std::string str2 = "bullet:" + Value(bullet->getPosition().x).asString() + "," + Value(bullet->getPosition().y).asString() + "\n";
-	OutputDebugString(str2.c_str());
-	std::string str4 = "mouse:" + Value(mousePosVec.x).asString() + "," + Value(mousePosVec.y).asString() + "\n";
-	OutputDebugString(str4.c_str());
-	std::string str5 = "dst:" + Value(dst.x).asString() + "," + Value(dst.y).asString() + "\n";
-	OutputDebugString(str5.c_str());
-	std::string str3 = mainCharacter->getName() + "\n";
-	OutputDebugString(str3.c_str());
-	SpriteLayer* spriteLayer = dynamic_cast<SpriteLayer*>(this->getParent()->getChildByName("SpriteLayer"));
-	Vector<Target*>* allTargets = spriteLayer->getAllTargets();
+	////DEBUG
+	//std::string str1 = "ch:" + Value(mainCharacter->getPosition().x).asString() + "," + Value(mainCharacter->getPosition().y).asString() + "\n";
+	//OutputDebugString(str1.c_str());
+	//std::string str2 = "bullet:" + Value(bullet->getPosition().x).asString() + "," + Value(bullet->getPosition().y).asString() + "\n";
+	//OutputDebugString(str2.c_str());
+	//std::string str4 = "mouse:" + Value(mousePosVec.x).asString() + "," + Value(mousePosVec.y).asString() + "\n";
+	//OutputDebugString(str4.c_str());
+	//std::string str5 = "dst:" + Value(dst.x).asString() + "," + Value(dst.y).asString() + "\n";
+	//OutputDebugString(str5.c_str());
+	//std::string str3 = mainCharacter->getName() + "\n";
+	//OutputDebugString(str3.c_str());
+	//SpriteLayer* spriteLayer = dynamic_cast<SpriteLayer*>(this->getParent()->getChildByName("SpriteLayer"));
+	//Vector<Target*>* allTargets = spriteLayer->getAllTargets();
 
-	//DEBUG END
+	////DEBUG END
 
 	auto action = MoveTo::create(1.0f, 1024 * Vec2(cos(atan2(dst.y, dst.x)), sin(atan2(dst.y, dst.x))));
 	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
@@ -309,6 +321,12 @@ void BulletLayer::addFlameThrower()
 
 }
 
+void BulletLayer::initHostileBulletDamageMap()
+{
+	m_hostileBulletDamageMap.insert(std::make_pair("hostileSpiritualPower", 30));
+	m_hostileBulletDamageMap.insert(std::make_pair("hostileFlameCircle", 2.0f));
+}
+
 void BulletLayer::addSpiritualPower(Node* sender)
 {
 	//create bullet sprite
@@ -355,8 +373,6 @@ void BulletLayer::addFlameCircle(Node* sender)
 
 	auto sequence = Sequence::create(fadein, fadeout,callFunc,NULL);
 	auto spawn = Spawn::create(scaleby, rotateby,sequence, NULL);
-
-
 
 	bullet->setName("hostileFlameCircle");
 	bullet->runAction(spawn);

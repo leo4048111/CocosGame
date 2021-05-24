@@ -13,9 +13,9 @@ public:
 
 	void menuCallBack(Ref* ref);
 
-	void startGame();
-
 	void setBackgroundMusic();
+
+	void goToPreparationScene();
 
 	CREATE_FUNC(MenuScene);
 };

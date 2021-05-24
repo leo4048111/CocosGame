@@ -1,5 +1,5 @@
 #include "MenuScene.h"
-#include "GameScene.h"
+#include "PreparationScene.h"
 #include "Controls/Specs.h"
 USING_NS_CC;
 
@@ -75,7 +75,7 @@ void MenuScene::menuCallBack(Ref* sender)
 	switch (item->getTag())
 	{
 	case sg:
-		startGame();
+		goToPreparationScene();
 		break;
 	case ac:
 		setBackgroundMusic();
@@ -83,13 +83,6 @@ void MenuScene::menuCallBack(Ref* sender)
 	case qg:
 		exit(0);
 	}
-}
-
-void MenuScene::startGame()
-{
-	auto gameScene = GameScene::createGameScene();
-	auto transition = TransitionFlipX::create(1.0f, gameScene);
-	Director::getInstance()->replaceScene(transition);
 }
 
 void MenuScene::setBackgroundMusic()
@@ -105,4 +98,11 @@ void MenuScene::setBackgroundMusic()
 		CocosDenshion::SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
 		audioControl->setString("Audio Off");
 	}
+}
+
+void MenuScene::goToPreparationScene()
+{
+	PreparationScene* preparationScene = PreparationScene::create();
+	auto transition = TransitionFlipX::create(0.5f, preparationScene);
+	Director::getInstance()->replaceScene(transition);
 }

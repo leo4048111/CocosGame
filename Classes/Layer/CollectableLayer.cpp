@@ -33,6 +33,8 @@ void CollectableLayer::addCollectable(Collectable* collectable,float x,float y)
 void CollectableLayer::update(float delta)
 {
 	Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName(Specs::getInstance()->getPlayerName()));
+	if (player == NULL)
+		return;
 	Rect playerRect = Rect(player->getBoundingBox().origin, player->m_sprite->getContentSize()/5);
 	Vector<Collectable*> tmpDeleteCollectable;
 	for (auto currentCollectable : m_allCollectables)

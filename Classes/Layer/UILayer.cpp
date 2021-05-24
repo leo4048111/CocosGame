@@ -70,6 +70,12 @@ void UILayer::update(float delta)
 	auto m_visibleSize = Director::getInstance()->getVisibleSize();
 	auto m_origin = Director::getInstance()->getVisibleOrigin();
 
+	//gameover
+	if (Specs::getInstance()->isEnd())
+	{
+		goToGameoverScene();
+	}
+
 	//update timer
 	int runTime = static_cast<double>(Specs::getInstance()->getCurrentTime() - Specs::getInstance()->getStartTime())*1000 / CLOCKS_PER_SEC;
 	m_labelTimer->setString("Survived for: "+Value(runTime).asString() + "s");
@@ -103,16 +109,12 @@ void UILayer::update(float delta)
 	m_currentResistanceLabel->setString("Resistance:" + Value((int)mainCharacter->getCurrentResistance()).asString());
 	m_currentSpeedLabel->setString("Speed:" + Value((int)mainCharacter->getCurrentSpeed()*1000).asString());
 
-	//gameover
-	if (Specs::getInstance()->isEnd())
-	{
-		goToGameoverScene();
-	}
+
 }
 
 void UILayer::goToGameoverScene()
 {
 	GameoverScene* gameoverScene = GameoverScene::createGameoverScene();
-	auto transition = TransitionFadeDown::create(1.0f, gameoverScene);
+	auto transition = TransitionCrossFade::create(1.0f, gameoverScene);
 	Director::getInstance()->replaceScene(transition);
 }

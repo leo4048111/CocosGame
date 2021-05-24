@@ -1,4 +1,5 @@
 #include "Chatbox.h"
+#include "Objects/Player.h"
 
 USING_NS_CC;
 
@@ -85,7 +86,11 @@ void Chatbox::sendText()
 			return;
 	}
 	else
-		m_currentText = Specs::getInstance()->getPlayerName() + " says: "+m_currentText;
+	{
+		Player* player = dynamic_cast<Player*>(this->getParent()->getParent()->getChildByName("Map")->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
+		player->speak(m_currentText);
+		m_currentText = Specs::getInstance()->getPlayerName() + " says: " + m_currentText;
+	}
 
 	while (m_allMessages.size() >= MAX_MESSAGES_SHOW)
 		m_allMessages.pop_front();
@@ -100,7 +105,7 @@ void Chatbox::sendText()
 	m_messageBox->setString(showText);
 	m_inputBox->setString("");
 
-	//run some actions for fun
+	//run some actions 
 	auto fadein = FadeIn::create(0.3f);
 	auto fadeout = FadeOut::create(3.0f);
 	auto sequence = Sequence::create(fadein, fadeout, NULL);

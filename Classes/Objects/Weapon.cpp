@@ -143,7 +143,7 @@ void Weapon::onMouseMove(Event* event)
 
 void Weapon::reload()
 {
-	if (m_backupAmmo+m_ammoInCurrentMagazine>=m_maxAmmoPerMagazine)
+	if (m_backupAmmo)
 	{
 		m_backupAmmo -= m_maxAmmoPerMagazine - m_ammoInCurrentMagazine;
 		m_ammoInCurrentMagazine = m_maxAmmoPerMagazine;
@@ -198,6 +198,19 @@ void Weapon::fire()
 		if(!Specs::getInstance()->isInfiniteAmmoActivated())
 		m_ammoInCurrentMagazine--;
 	}
+	else
+	{
+		auto notification = Label::createWithTTF("Press R to reload", "fonts/Notification Font.ttf", 80);
+		notification->setColor(Color3B(255, 4, 56));
+		notification->setPosition(Vec2(this->getParent()->getContentSize().width / 2, -2));
+		this->getParent()->addChild(notification);
+		auto fadein = FadeIn::create(0.25f);
+		auto fadeout = FadeOut::create(0.25f);
+		auto fadeSequence = Sequence::create(fadein, fadeout, NULL);
+		auto repeat = Repeat::create(fadeSequence, 2);
+		auto sequence = Sequence::create(repeat, CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, notification)),NULL);
+		notification->runAction(sequence);
+	}
 }
 
 void Weapon::fireNormalBullet()
@@ -210,6 +223,12 @@ void Weapon::fireNormalBullet()
 	biu->setScale(0.2f);
 	this->getParent()->addChild(biu, 0, "biu");
 
+	auto fadein = FadeIn::create(0.2f);
+	auto fadeout = FadeOut::create(1.0f);
+	auto callFunc = CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, biu));
+	auto sequence = Sequence::create(fadein, fadeout, callFunc, NULL);
+	biu->runAction(sequence);
+
 	bulletLayer->addBullet();
 
 }
@@ -218,18 +237,23 @@ void Weapon::fireLazer()
 {
 	BulletLayer* bulletLayer = dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getParent()->getParent()->getChildByName("BulletLayer"));
 	//create fire anime
-	auto biu = Sprite::create("objects/UI/ui_wow.png");
-	biu->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-	biu->setPosition(Vec2(0, this->getParent()->getContentSize().height * 3 / 5));
-	biu->setScale(1.0f);
-	this->getParent()->addChild(biu, 0, "biu");
+	auto wow = Sprite::create("objects/UI/ui_wow.png");
+	wow->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+	wow->setPosition(Vec2(0, this->getParent()->getContentSize().height * 3 / 5));
+	wow->setScale(1.0f);
+	this->getParent()->addChild(wow, 0, "wow");
+
+	auto fadein = FadeIn::create(0.2f);
+	auto fadeout = FadeOut::create(1.0f);
+	auto callFunc = CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, wow));
+	auto sequence = Sequence::create(fadein, fadeout, callFunc, NULL);
+	wow->runAction(sequence);
 
 	bulletLayer->addLazer();
 }
 
 void Weapon::fireSprayAmmo()
 {
-
 	BulletLayer* bulletLayer = dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getParent()->getParent()->getChildByName("BulletLayer"));
 	//create fire anime
 	auto biu = Sprite::create("objects/UI/ui_biu.png");
@@ -237,6 +261,12 @@ void Weapon::fireSprayAmmo()
 	biu->setPosition(Vec2(0, this->getParent()->getContentSize().height * 3 / 5));
 	biu->setScale(0.2f);
 	this->getParent()->addChild(biu, 0, "biu");
+
+	auto fadein = FadeIn::create(0.2f);
+	auto fadeout = FadeOut::create(1.0f);
+	auto callFunc = CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, biu));
+	auto sequence = Sequence::create(fadein, fadeout, callFunc, NULL);
+	biu->runAction(sequence);
 
 	bulletLayer->addSprayBullet();
 }
