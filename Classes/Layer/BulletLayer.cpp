@@ -61,11 +61,11 @@ bool BulletLayer::loadGraphs()
 void BulletLayer::cleanBullet(Node* sender)
 {
 	Sprite* bullet = dynamic_cast<Sprite*>(sender);
-	if (bullet != nullptr)
+	if (bullet != NULL)
 	{
 		m_allFriendlyBullets.eraseObject(bullet);
 		m_allHostileBullets.eraseObject(bullet);
-		bullet->removeFromParentAndCleanup(true);
+		bullet->removeFromParent();
 	}
 	
 }
@@ -101,6 +101,7 @@ void BulletLayer::update(float delta)
 					Specs::getInstance()->addScore(spriteLayer->getThisTargetScore(currentTarget));
 					tmpEraseTarget.pushBack(currentTarget);
 				}
+
 				std::string str = currentBullet->getName();
 				if (str != "lazer" && str != "flame" && str != "meleeAttack")
 				{
@@ -122,10 +123,6 @@ void BulletLayer::update(float delta)
 			{
 				if (!player->receiveDamage(m_hostileBulletDamageMap[currentBullet->getName()]))
 				{
-					/*auto callFunc = CallFunc::create(CC_CALLBACK_0(Entity::runDeadAction, player));
-					auto callFunc2 = CallFuncN::create(CC_CALLBACK_0(Specs::setWinOrLose, Specs::getInstance(), false));
-					CCFiniteTimeAction* sequence = Sequence::create(callFunc,DelayTime::create(1.0f),callFunc2,NULL);
-					player->runAction(sequence);*/
 					Specs::getInstance()->setWinOrLose(false);
 				}
 			}
@@ -140,12 +137,12 @@ void BulletLayer::update(float delta)
 		auto tmpBullet = tmpEraseFriendlyBullet.back();
 		try
 		{
-			if (tmpBullet != nullptr)
+			if (tmpBullet != NULL)
 			{
 				tmpBullet->stopAllActions();
 				tmpEraseFriendlyBullet.popBack();
 				m_allFriendlyBullets.eraseObject(tmpBullet);
-				tmpBullet->removeFromParentAndCleanup(true);
+				tmpBullet->removeFromParent();
 			}
 		}
 		catch (const std::exception& exp)
@@ -159,12 +156,12 @@ void BulletLayer::update(float delta)
 		auto tmpBullet = tmpEraseHostileBullet.back();
 		try
 		{
-			if (tmpBullet != nullptr)
+			if (tmpBullet != NULL)
 			{
 				tmpBullet->stopAllActions();
 				tmpEraseHostileBullet.popBack();
 				m_allHostileBullets.eraseObject(tmpBullet);
-				tmpBullet->removeFromParentAndCleanup(true);
+				tmpBullet->removeFromParent();
 			}
 		}
 		catch (const std::exception& exp)
@@ -287,7 +284,7 @@ void BulletLayer::addSprayBullet()
 		auto action = MoveTo::create(1.0f, 1024 * Vec2(cos(atan2(dst.y, dst.x)+offset/180.0*M_PI), sin(atan2(dst.y, dst.x)+offset / 180.0 * M_PI)));
 		CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
 		auto sequence = Sequence::create(action, callFunc, NULL);
-		bullet->runAction(Repeat::create(sequence, 1));
+		bullet->runAction(sequence);
 		bullet->setName("sprayBullet");
 	}
 
@@ -315,7 +312,7 @@ void BulletLayer::addToxicBomb()
 	auto action1 = RepeatForever::create(RotateTo::create(0.5f, 1280));
 	auto action2 = JumpTo::create(1.0f, dstPosVec, 3.0f, 2);
 	auto action3 = FadeOut::create(0.5f);
-	auto callFunc = CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, bomb));
+	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
 	auto spawn = Spawn::create(action1, action2, NULL);
 	auto animation = Animation::createWithSpriteFrames(m_explodeAnime, 1.0f);
 	auto animate = Animate::create(animation);
@@ -427,9 +424,10 @@ void BulletLayer::addFlameCircle(Node* sender)
 
 void BulletLayer::addMeleeAttack()
 {
-	const double c_effectDuration = 4.0f;
-	auto effect = Sprite::create("objects/ammo/ammo_lazer.png");
+	const double c_effectDuration = 0.2f;
+	auto effect = Sprite::create("objects/ammo/ammo_slash.png");
 	effect->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+	effect->setScale(0.3f);
 	this->addChild(effect);
 	m_allFriendlyBullets.pushBack(effect);
 

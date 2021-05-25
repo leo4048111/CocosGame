@@ -1,5 +1,6 @@
 #include "Weapon.h"
 #include "Controls/Specs.h"
+#include "Layer/UILayer.h"
 
 USING_NS_CC;
 
@@ -48,18 +49,18 @@ void Weapon::setWeaponType(weaponType type)
 	{
 	case weaponType::bigKnife:
 		weaponName = "weapon_bigKnife";
-		m_damage = 10;
+		m_damage = 7;
 		m_ammoInCurrentMagazine = -1;
 		m_maxAmmoPerMagazine = -1;
 		m_backupAmmo = -1;
-		m_isAutoFire = true;
+		m_isAutoFire = false;
 		break;
 	case weaponType::pistol:
 		weaponName = "weapon_pistol";
 		m_damage = 30;
 		m_ammoInCurrentMagazine = 12;
 		m_maxAmmoPerMagazine = 12;
-		m_backupAmmo = 24;
+		m_backupAmmo = 12;
 		m_isAutoFire = false;
 		break;
 	case weaponType::lazer:
@@ -67,15 +68,15 @@ void Weapon::setWeaponType(weaponType type)
 		m_damage = 0.25f;
 		m_ammoInCurrentMagazine = 5;
 		m_maxAmmoPerMagazine = 5;
-		m_backupAmmo = 20;
+		m_backupAmmo = 5;
 		m_isAutoFire = false;
 		break;
 	case weaponType::rifle:
 		weaponName = "weapon_rifle";
 		m_damage = 5;
-		m_ammoInCurrentMagazine = 60;
-		m_maxAmmoPerMagazine = 60;
-		m_backupAmmo = 120;
+		m_ammoInCurrentMagazine = 25;
+		m_maxAmmoPerMagazine = 25;
+		m_backupAmmo = 25;
 		m_isAutoFire = true;
 		break;
 	case weaponType::sniperRifle:
@@ -83,7 +84,7 @@ void Weapon::setWeaponType(weaponType type)
 		m_damage = 40;
 		m_ammoInCurrentMagazine = 8;
 		m_maxAmmoPerMagazine = 8;
-		m_backupAmmo = 24;
+		m_backupAmmo = 8;
 		m_isAutoFire = false;
 		break;
 	case weaponType::plagueBringer:
@@ -91,7 +92,7 @@ void Weapon::setWeaponType(weaponType type)
 		m_damage = 5;
 		m_ammoInCurrentMagazine = 12;
 		m_maxAmmoPerMagazine = 12;
-		m_backupAmmo = 36;
+		m_backupAmmo = 12;
 		m_isAutoFire = false;
 		break;
 	case weaponType::sawedOff:
@@ -99,7 +100,7 @@ void Weapon::setWeaponType(weaponType type)
 		m_damage = 10;
 		m_ammoInCurrentMagazine = 5;
 		m_maxAmmoPerMagazine = 5;
-		m_backupAmmo = 20;
+		m_backupAmmo = 5;
 		m_isAutoFire = false;
 		break;
 	case weaponType::flameThrower:
@@ -129,8 +130,11 @@ bool Weapon::isLocked()
 
 void Weapon::unlock()
 {
-	if(m_isLocked = true)
-	m_isLocked = false;
+	if (m_isLocked = true)
+	{
+		m_isLocked = false;
+		UILayer::getInstance()->unlockSlot(this->getWeaponType());
+	}
 	else
 	{
 		auto notification = Label::createWithTTF("Converted to" +this->getName()+ " ammo", "fonts/Notification Font.ttf", 80);

@@ -4,7 +4,6 @@
 #include "cocos2d.h"
 #include "Entity.h"
 #include "Weapon.h"
-#include "ui/UIScrollView.h"
 #include <map>
 #include <ctime>
 
@@ -64,6 +63,8 @@ public:
 	void setControlOnListen();
 
 	Weapon* getCurrentWeapon();
+
+	std::map<int, Weapon*> getAllWeaponMap();
 	
 private:
 	bool m_isReady;

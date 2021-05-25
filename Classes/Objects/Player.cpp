@@ -339,7 +339,7 @@ void Player::swapWeapon(int num)
 {
 		if(m_allWeaponsMap[num]->isLocked()&&(!Specs::getInstance()->isAllWeaponActivated()))
 		{
-			auto notification = Label::createWithTTF("This weapon isn't unlocked yet", "fonts/Notification Font.ttf", 80);
+			auto notification = Label::createWithTTF("This weapon isn't unlocked yet", "fonts/Notification Font.ttf", 10);
 			notification->setColor(Color3B(255, 4, 56));
 			notification->setPosition(Vec2(this->getParent()->getContentSize().width / 2, -2));
 			this->getParent()->addChild(notification);
@@ -354,6 +354,7 @@ void Player::swapWeapon(int num)
 
 		if (m_currentWeaponSlot == num)
 			return;
+
 		//Update sprite
 		if (m_currentWeapon != nullptr)
 		{
@@ -377,6 +378,11 @@ void Player::unlockWeapon(int num)
 Weapon* Player::getCurrentWeapon()
 {
 	return m_currentWeapon;
+}
+
+std::map<int, Weapon*> Player::getAllWeaponMap()
+{
+	return m_allWeaponsMap;
 }
 
 void Player::addWeapon(Weapon* weapon)

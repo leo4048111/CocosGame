@@ -7,7 +7,7 @@
 
 enum weaponType
 {
-	bigKnife,pistol, lazer, sniperRifle, sawedOff, rifle, plagueBringer,flameThrower
+	bigKnife,pistol, lazer, sniperRifle, sawedOff, rifle, plagueBringer,flameThrower,totalWeapons
 };
 
 class Weapon :public Entity

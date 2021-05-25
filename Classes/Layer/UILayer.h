@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "Objects/CrossHair.h"
 #include "Objects/Chatbox.h"
+#include <vector>
 
 #define SCORE_PER_ROUND 200
 
@@ -32,7 +33,14 @@ public:
 
 	virtual void update(float delta);
 
+	//instructor emerges
 	void instructorGivesInstruction(std::string str);
+
+	//weapon slot demonstration features
+	void unlockSlot(int num);
+
+	void pointToThisSlot(int num);
+
 private:
 	//Timer specs
 	cocos2d::Label* m_labelTimer;
@@ -44,6 +52,10 @@ private:
 	//score board
 	cocos2d::Label* m_labelScoreBoard;
 
+	//weapon status label
+	cocos2d::Label* m_weaponLabel;
+	std::vector<cocos2d::Label*> m_weaponSlots;
+	cocos2d::Sprite* m_pointerArrow;
 
 };
 

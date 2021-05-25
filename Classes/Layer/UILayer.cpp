@@ -55,17 +55,51 @@ bool UILayer::init()
 	m_currentResistanceLabel->setColor(Color3B(178,34,34));
 	this->addChild(m_currentResistanceLabel);
 
+	//init weapon spec label
+	m_weaponLabel = Label::createWithTTF("Current Weapon Slots:","fonts/HashedBrowns-WyJgn.ttf",15);
+	this->addChild(m_weaponLabel);
+	m_weaponLabel->setPosition(Vec2(visibleSize.width - m_weaponLabel->getContentSize().width+25, visibleSize.height * 5 / 6));
+	m_weaponLabel->setColor(Color3B(210, 105, 30));
+	for (int c = 0; c < weaponType::totalWeapons; c++)
+	{
+		auto slot = Label::createWithTTF(Value(c).asString(), "fonts/HashedBrowns-WyJgn.ttf", 15);
+		slot->setPosition(Vec2(m_weaponLabel->getPosition().x, m_weaponLabel->getPosition().y - 15 * (c+1)));
+		this->addChild(slot);
+		m_weaponSlots.push_back(slot);
+		slot->setColor(Color3B(216, 191, 216));
+
+		auto unavailable = Sprite::create("objects/UI/ui_unavailable.png");
+		unavailable->setScale(0.1f);
+		slot->addChild(unavailable);
+		unavailable->setPosition(15, slot->getContentSize().height/2);
+		unavailable->setTag(1);
+	}
+	m_pointerArrow = Sprite::create("objects/UI/ui_pointerArrow.png");
+	m_pointerArrow->setScale(0.1f);
+	this->addChild(m_pointerArrow);
+
 	//init chat system
 	Chatbox* chatbox = Chatbox::getInstance();
 	this->addChild(chatbox);
 	chatbox->setPosition(Vec2(origin.x+100, origin.y + visibleSize.height * 1 / 5));
 	chatbox->setControlOnListen();
 
-
 	//init weapon labels
 
 	this->setName("UILayer");
 	return true;
+}
+
+void UILayer::unlockSlot(int num)
+{
+	m_weaponSlots[num]->setColor(Color3B(255, 215, 0));
+	m_weaponSlots[num]->enableBold();
+	m_weaponSlots[num]->removeChildByTag(1);
+}
+
+void UILayer::pointToThisSlot(int num)
+{
+	m_pointerArrow->setPosition(Vec2(m_weaponSlots[num]->getPosition().x - 15, m_weaponSlots[num]->getPosition().y));
 }
 
 void UILayer::update(float delta)
@@ -78,7 +112,7 @@ void UILayer::update(float delta)
 	m_labelTimer->setString("Survived for: "+Value(runTime).asString() + "s");
 
 	//update score board
-	Player* mainCharacter = dynamic_cast<Player*>(this->getParent()->getChildByName("Map")->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
+	Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName("Map")->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
 	m_labelScoreBoard->setString("Score:" + Value(Specs::getInstance()->getScore()).asString());
 	if (Specs::getInstance()->getScore() / SCORE_PER_ROUND >= Specs::getInstance()->getCurrentRound())
 	{
@@ -99,9 +133,12 @@ void UILayer::update(float delta)
 		currentRoundDisplay->runAction(sequence);
 	}
 
-	//update mainCharacter specs
-	m_currentResistanceLabel->setString("Resistance:" + Value((int)mainCharacter->getCurrentResistance()).asString());
-	m_currentSpeedLabel->setString("Speed:" + Value((int)mainCharacter->getCurrentSpeed()*1000).asString());
+	//update main player specs
+	m_currentResistanceLabel->setString("Resistance:" + Value((int)player->getCurrentResistance()).asString());
+	m_currentSpeedLabel->setString("Speed:" + Value((int)player->getCurrentSpeed()*1000).asString());
+
+	//update current weapon slot
+	pointToThisSlot(player->getCurrentWeapon()->getWeaponType());
 
 	//update game status
 	if (Specs::getInstance()->getCurrentRound() == 20)

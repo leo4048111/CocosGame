@@ -93,7 +93,7 @@ void GameScene::update(float delta)
 void GameScene::goToGameoverScene()
 {
 	GameoverScene* gameoverScene = GameoverScene::createGameoverScene();
-	auto transitionLost = TransitionCrossFade::create(5.0f, gameoverScene);
+	auto transitionLost = TransitionCrossFade::create(1.0f, gameoverScene);
 	auto transitionWin = TransitionShrinkGrow::create(1.0f, gameoverScene);
 
 	if (Specs::getInstance()->isWin())
