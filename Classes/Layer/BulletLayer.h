@@ -34,8 +34,12 @@ public:
 
 	virtual void update(float delta);
 
+	bool loadGraphs();
+
 	/*friendly shooting specs
 	All PNG sources should be placed facing left*/
+	void addMeleeAttack();
+
 	void addBullet();
 
 	void addLazer();
@@ -58,6 +62,12 @@ private:
 	cocos2d::Vector<cocos2d::Sprite*> m_allHostileBullets;
 
 	std::map < std::string, double > m_hostileBulletDamageMap;
+
+	//anime frames
+	cocos2d::Vector<cocos2d::SpriteFrame*> m_explodeAnime;
+	cocos2d::Vector<cocos2d::SpriteFrame*> m_chargeSpiritAnime;
+
+
 };
 
 #endif // !_BULLET_LAYER_H

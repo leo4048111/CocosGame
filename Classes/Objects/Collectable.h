@@ -11,8 +11,9 @@
 
 enum collectableType
 {
-	ammo,health,speed,stamina,resistance
+	ammo,health,speed,stamina,resistance, cpistol, clazer, csniperRifle, csawedOff, crifle, cplagueBringer, cflameThrower
 };
+
 
 class Collectable :public Entity
 {

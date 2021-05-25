@@ -21,11 +21,41 @@ bool BulletLayer::init()
 	{
 		return false;
 	}
+	if (!loadGraphs())
+	{
+		return false;
+	}
 
 	initHostileBulletDamageMap();
 
 	this->setName("BulletLayer");
 	return true;
+}
+
+bool BulletLayer::loadGraphs()
+{
+	try
+	{
+		auto cache = SpriteFrameCache::getInstance();
+
+		cache->addSpriteFramesWithFile("objects/effect/effect_explotion.plist");
+		/*for (int c = 1; c <= 64; c++)
+		{
+			m_explodeAnime.pushBack(cache->getSpriteFrameByName("effect_explotion_" + Value(c).asString()));
+		}*/
+		cache->addSpriteFramesWithFile("objects/effect/effect_chargeSpirit.plist");
+		for (int c = 0; c <= 28; c++)
+		{
+			m_chargeSpiritAnime.pushBack(cache->getSpriteFrameByName("effect_chargeSpirit" + Value(c).asString()));
+		}
+
+		return true;
+	}
+	catch (const std::exception& exp)
+	{
+		CCLOG("%s", exp.what());
+		return false;
+	}
 }
 
 void BulletLayer::cleanBullet(Node* sender)
@@ -66,12 +96,13 @@ void BulletLayer::update(float delta)
 			{
 				currentTarget->setColor(Color3B(245, 2, 1));
 				crossHair->showHitNotification(); //show hit anime on crosshair
-			if (!currentTarget->receiveDamage(player->getCurrentWeapon()->getWeaponDamage()))
+				if (!currentTarget->receiveDamage(player->getCurrentWeapon()->getWeaponDamage()))
 				{
 					Specs::getInstance()->addScore(spriteLayer->getThisTargetScore(currentTarget));
 					tmpEraseTarget.pushBack(currentTarget);
 				}
-				if (currentBullet->getName() != "lazer" && currentBullet->getName() != "flame")
+				std::string str = currentBullet->getName();
+				if (str != "lazer" && str != "flame" && str != "meleeAttack")
 				{
 					tmpEraseFriendlyBullet.pushBack(currentBullet);
 					break;
@@ -268,6 +299,7 @@ void BulletLayer::addToxicBomb()
 	auto bomb = Sprite::create("objects/ammo/ammo_toxicBomb.png");
 	bomb->setScale(0.4f);
 	this->addChild(bomb);
+	m_allFriendlyBullets.pushBack(bomb);
 
 	//set bomb position and dst
 	Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
@@ -280,11 +312,15 @@ void BulletLayer::addToxicBomb()
 	bomb->setRotation(degree);
 	bomb->setPosition(player->getPosition());
 
-	auto action1 = RepeatForever::create(RotateTo::create(0.5f, 90));
+	auto action1 = RepeatForever::create(RotateTo::create(0.5f, 1280));
 	auto action2 = JumpTo::create(1.0f, dstPosVec, 3.0f, 2);
 	auto action3 = FadeOut::create(0.5f);
+	auto callFunc = CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, bomb));
 	auto spawn = Spawn::create(action1, action2, NULL);
-	auto sequence = Sequence::create(spawn, action3, NULL);
+	auto animation = Animation::createWithSpriteFrames(m_explodeAnime, 1.0f);
+	auto animate = Animate::create(animation);
+	auto action4 = Repeat::create(animate, 10);
+	auto sequence = Sequence::create(spawn, action3, action4, callFunc, NULL);
 	bomb->runAction(sequence);
 	bomb->setName("toxicBomb");
 }
@@ -329,6 +365,17 @@ void BulletLayer::initHostileBulletDamageMap()
 
 void BulletLayer::addSpiritualPower(Node* sender)
 {
+	//create effect
+	auto effect = Sprite::createWithSpriteFrame(m_chargeSpiritAnime.front());
+	effect->setScale(0.5f);
+	auto animation = Animation::createWithSpriteFrames(m_chargeSpiritAnime,0.5f/29);
+	auto animate = Animate::create(animation);
+	auto effectAction = Repeat::create(animate, 1);
+	sender->addChild(effect,100);
+	auto effectCallFunc = CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, effect));
+	auto effectSequence = Sequence::create(effectAction, effectCallFunc, NULL);
+	effect->runAction(effectSequence);
+
 	//create bullet sprite
 	auto bullet = Sprite::create("objects/ammo/ammo_spiritualPower.png");
 	bullet->setScale(0.1f);
@@ -378,3 +425,32 @@ void BulletLayer::addFlameCircle(Node* sender)
 	bullet->runAction(spawn);
 }
 
+void BulletLayer::addMeleeAttack()
+{
+	const double c_effectDuration = 4.0f;
+	auto effect = Sprite::create("objects/ammo/ammo_lazer.png");
+	effect->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+	this->addChild(effect);
+	m_allFriendlyBullets.pushBack(effect);
+
+	//set bomb position and dst
+	Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
+	CrossHair* crossHair = CrossHair::getInstance();
+	Vec2 dstPosVec = this->convertToNodeSpace(crossHair->getCursorPos());
+	Vec2 originPosVec = player->getPosition();
+	Vec2 dst = dstPosVec - originPosVec;
+	float radians = M_PI - atan2(dst.y, dst.x);
+	float degree = CC_RADIANS_TO_DEGREES(radians);
+	effect->setRotation(degree);
+	effect->setPosition(player->getPosition());
+
+	//flame anime and auto cleanup
+	auto fadein = FadeIn::create(c_effectDuration / 2);
+	auto fadeout = FadeOut::create(c_effectDuration / 2);
+	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
+	auto sequence = Sequence::create(fadein, fadeout, callFunc, NULL);
+
+	effect->runAction(sequence);
+
+	effect->setName("meleeAttack");
+}

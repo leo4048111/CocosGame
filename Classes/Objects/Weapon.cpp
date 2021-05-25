@@ -46,6 +46,14 @@ void Weapon::setWeaponType(weaponType type)
 	String weaponName;
 	switch (m_type)
 	{
+	case weaponType::bigKnife:
+		weaponName = "weapon_bigKnife";
+		m_damage = 10;
+		m_ammoInCurrentMagazine = -1;
+		m_maxAmmoPerMagazine = -1;
+		m_backupAmmo = -1;
+		m_isAutoFire = true;
+		break;
 	case weaponType::pistol:
 		weaponName = "weapon_pistol";
 		m_damage = 30;
@@ -110,6 +118,33 @@ void Weapon::setWeaponType(weaponType type)
 	m_sprite->removeFromParentAndCleanup(1);
 	this->setName(weaponName.getCString());
 	Weapon::bindSprite(weapon);
+
+	m_isLocked = true;
+}
+
+bool Weapon::isLocked()
+{
+	return m_isLocked;
+}
+
+void Weapon::unlock()
+{
+	if(m_isLocked = true)
+	m_isLocked = false;
+	else
+	{
+		auto notification = Label::createWithTTF("Converted to" +this->getName()+ " ammo", "fonts/Notification Font.ttf", 80);
+		notification->setColor(Color3B(255, 4, 56));
+		notification->setPosition(Vec2(this->getParent()->getContentSize().width / 2, -2));
+		this->getParent()->addChild(notification);
+		auto fadein = FadeIn::create(0.25f);
+		auto fadeout = FadeOut::create(0.25f);
+		auto fadeSequence = Sequence::create(fadein, fadeout, NULL);
+		auto repeat = Repeat::create(fadeSequence, 2);
+		auto sequence = Sequence::create(repeat, CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, notification)), NULL);
+		notification->runAction(sequence);
+		getBackupMagazine();
+	}
 }
 
 void Weapon::setControlOnListen()
@@ -167,6 +202,12 @@ void Weapon::getBackupMagazine()
 
 void Weapon::fire()
 {
+	if (this->getWeaponType() == weaponType::bigKnife)
+	{
+		doMeleeAttack();
+		return;
+	}
+
 	if (m_ammoInCurrentMagazine>0||Specs::getInstance()->isInfiniteAmmoActivated())
 	{
 		switch (this->getWeaponType())
@@ -213,9 +254,10 @@ void Weapon::fire()
 	}
 }
 
+
 void Weapon::fireNormalBullet()
 {
-	BulletLayer* bulletLayer = dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getParent()->getParent()->getChildByName("BulletLayer"));
+	BulletLayer* bulletLayer = BulletLayer::getInstance();
 	//create fire anime
 	auto biu = Sprite::create("objects/UI/ui_biu.png");
 	biu->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
@@ -235,7 +277,7 @@ void Weapon::fireNormalBullet()
 
 void Weapon::fireLazer()
 {
-	BulletLayer* bulletLayer = dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getParent()->getParent()->getChildByName("BulletLayer"));
+	BulletLayer* bulletLayer = BulletLayer::getInstance();
 	//create fire anime
 	auto wow = Sprite::create("objects/UI/ui_wow.png");
 	wow->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
@@ -254,7 +296,7 @@ void Weapon::fireLazer()
 
 void Weapon::fireSprayAmmo()
 {
-	BulletLayer* bulletLayer = dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getParent()->getParent()->getChildByName("BulletLayer"));
+	BulletLayer* bulletLayer = BulletLayer::getInstance();
 	//create fire anime
 	auto biu = Sprite::create("objects/UI/ui_biu.png");
 	biu->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
@@ -273,14 +315,21 @@ void Weapon::fireSprayAmmo()
 
 void Weapon::fireToxicBomb()
 {
-	BulletLayer* bulletLayer = dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getParent()->getParent()->getChildByName("BulletLayer"));
+	BulletLayer* bulletLayer = BulletLayer::getInstance();
 
 	bulletLayer->addToxicBomb();
 }
 
 void Weapon::fireFlameThrower()
 {
-	BulletLayer* bulletLayer = dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getParent()->getParent()->getChildByName("BulletLayer"));
+	BulletLayer* bulletLayer =BulletLayer::getInstance();
 
 	bulletLayer->addFlameThrower();
+}
+
+void Weapon::doMeleeAttack()
+{
+	BulletLayer* bulletLayer = BulletLayer::getInstance();
+
+	bulletLayer->addMeleeAttack();
 }

@@ -72,6 +72,8 @@ void SetupAndGTGScene::menuCallBack(Ref* sender)
 {
 	MenuItem* item = dynamic_cast<MenuItem*>(sender);
 	std::string str = m_inputNameBox->getString();
+	auto callFunc = CallFunc::create(CC_CALLBACK_0(SetupAndGTGScene::startGame, this));
+	FiniteTimeAction* action = Sequence::create(DelayTime::create(1.5f), callFunc, NULL);
 	switch (item->getTag())
 	{
 	case 0:
@@ -81,12 +83,14 @@ void SetupAndGTGScene::menuCallBack(Ref* sender)
 			return;
 		}
 		Specs::getInstance()->setPlayerName(str);
-		startGame();
+		m_word->setString(str + "\nLet's see what you got.");
+		this->runAction(action);
 		break;
 	case 1:
-		break;
-	case 2:
 		backToPreparationScene();
+		break;
+	default:
+		break;
 	}
 }
 

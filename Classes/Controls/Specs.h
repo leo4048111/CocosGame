@@ -49,6 +49,10 @@ public:
 	//gamemode setting
 	void setGamemodeAsSinglePlayer(bool value);
 
+	void setMaxPlayer(int num);
+
+	int getMaxPlayer();
+
 	//cheat settings
 	void _stdcall toggleInvincible();
 	bool isInvincibleActivated();
@@ -56,6 +60,8 @@ public:
 	bool isInfiniteAmmoActivated();
 	void _stdcall toggleAimbot();
 	bool isAimbotActivated();
+	void _stdcall toggleAllWeapon();
+	bool isAllWeaponActivated();
 
 	//player name setting
 	void setPlayerName(std::string name);
@@ -73,6 +79,7 @@ private:
 
 	//gamemode settings
 	bool m_isSinglePlayer;
+	int m_maxPlayer;
 
 	//player name
 	std::string m_playerName;
@@ -90,6 +97,7 @@ private:
 	bool m_isInvincible;
 	bool m_isInfiniteAmmo;
 	bool m_isAimbot;
+	bool m_isAllWeapon;
 
 	//chatting and radio
 	std::vector<std::string> m_targetLines;

@@ -4,6 +4,21 @@
     <dict>
         <key>frames</key>
         <dict>
+            <key>weapon_bigKnife</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{84,17}</string>
+                <key>spriteSourceSize</key>
+                <string>{84,17}</string>
+                <key>textureRect</key>
+                <string>{{0,0},{84,17}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
             <key>weapon_flameThrower</key>
             <dict>
                 <key>aliases</key>
@@ -15,7 +30,7 @@
                 <key>spriteSourceSize</key>
                 <string>{296,102}</string>
                 <key>textureRect</key>
-                <string>{{630,0},{296,102}}</string>
+                <string>{{0,240},{296,102}}</string>
                 <key>textureRotated</key>
                 <false/>
             </dict>
@@ -30,7 +45,22 @@
                 <key>spriteSourceSize</key>
                 <string>{178,113}</string>
                 <key>textureRect</key>
-                <string>{{309,102},{178,113}}</string>
+                <string>{{84,0},{178,113}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
+            <key>weapon_plagueBringer</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{319,83}</string>
+                <key>spriteSourceSize</key>
+                <string>{319,83}</string>
+                <key>textureRect</key>
+                <string>{{0,532},{319,83}}</string>
                 <key>textureRotated</key>
                 <false/>
             </dict>
@@ -45,7 +75,7 @@
                 <key>spriteSourceSize</key>
                 <string>{309,112}</string>
                 <key>textureRect</key>
-                <string>{{0,102},{309,112}}</string>
+                <string>{{0,342},{309,112}}</string>
                 <key>textureRotated</key>
                 <false/>
             </dict>
@@ -60,7 +90,7 @@
                 <key>spriteSourceSize</key>
                 <string>{311,78}</string>
                 <key>textureRect</key>
-                <string>{{0,0},{311,78}}</string>
+                <string>{{0,454},{311,78}}</string>
                 <key>textureRotated</key>
                 <false/>
             </dict>
@@ -75,7 +105,7 @@
                 <key>spriteSourceSize</key>
                 <string>{275,127}</string>
                 <key>textureRect</key>
-                <string>{{487,102},{275,127}}</string>
+                <string>{{0,113},{275,127}}</string>
                 <key>textureRotated</key>
                 <false/>
             </dict>
@@ -90,22 +120,7 @@
                 <key>spriteSourceSize</key>
                 <string>{319,88}</string>
                 <key>textureRect</key>
-                <string>{{311,0},{319,88}}</string>
-                <key>textureRotated</key>
-                <false/>
-            </dict>
-            <key>weapon_plagueBringer</key>
-            <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
-                <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{247,128}</string>
-                <key>spriteSourceSize</key>
-                <string>{247,128}</string>
-                <key>textureRect</key>
-                <string>{{762,102},{247,128}}</string>
+                <string>{{0,615},{319,88}}</string>
                 <key>textureRotated</key>
                 <false/>
             </dict>
@@ -121,9 +136,9 @@
             <key>realTextureFileName</key>
             <string>weapon.png</string>
             <key>size</key>
-            <string>{1009,230}</string>
+            <string>{319,703}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:4a6e1906639c22fece35656f52d226e3:6209c9b7dcb610228808305757038e1b:f56027bfb88798a33d33ff61c031c331$</string>
+            <string>$TexturePacker:SmartUpdate:a72f408302e5163fa8ba344961044482:da339a08352aba60a68fdf65d88814c4:f56027bfb88798a33d33ff61c031c331$</string>
             <key>textureFileName</key>
             <string>weapon.png</string>
         </dict>

@@ -133,10 +133,12 @@ void Chatbox::mapAllCheats()
 	m_cheatFunctionMap.insert(std::make_pair("/invincible", &Specs::toggleInvincible));
 	m_cheatFunctionMap.insert(std::make_pair("/infiniteAmmo", &Specs::toggleInfiniteAmmo));
 	m_cheatFunctionMap.insert(std::make_pair("/aimbot", &Specs::toggleAimbot));
+	m_cheatFunctionMap.insert(std::make_pair("/allWeapons", &Specs::toggleAllWeapon));
+
 
 }
 
 void Chatbox::showHelp()
 {
-	m_currentText = "available cheats:/invincible /infiniteAmmo /aimbot";
+	m_currentText = "available cheats:/invincible /infiniteAmmo\n/aimbot /allWeapons";
 }

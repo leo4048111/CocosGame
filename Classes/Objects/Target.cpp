@@ -1,5 +1,6 @@
 #include "Target.h"
 #include "Controls/Specs.h"
+#include "Layer/UILayer.h"
 
 USING_NS_CC;
 
@@ -185,7 +186,7 @@ void Target::dropSpecificCollectable(collectableType type)
 void Target::dropRandomCollectable()
 {
 	srand((unsigned long long)time(NULL));
-	collectableType type = (collectableType)(rand() % 5);
+	collectableType type = (collectableType)(rand() % collectableType::cflameThrower);
 	dropSpecificCollectable(type);
 }
 
@@ -226,12 +227,14 @@ void Target::attackEnd(Node* sender)
 void Target::fireSpiritualPower()
 {
 	BulletLayer* bulletLayer =dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getChildByName("BulletLayer"));
+	UILayer::getInstance()->instructorGivesInstruction("Spiritual power incoming!");
 	bulletLayer->addSpiritualPower(this);
 }
 
 void Target::fireFlameCircle()
 {
 	BulletLayer* bulletLayer = dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getChildByName("BulletLayer"));
+	UILayer::getInstance()->instructorGivesInstruction("Watch out\nthat flame circle burns");
 	bulletLayer->addFlameCircle(this);
 }
 

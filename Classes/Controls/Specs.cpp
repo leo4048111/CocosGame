@@ -21,6 +21,7 @@ Specs::Specs()
 	m_isAimbot = false;
 	m_isInfiniteAmmo = false;
 	m_isInvincible = false;
+	m_isAllWeapon = false;
 
 	//init player name
 	m_playerName = "Player Unknown";
@@ -48,6 +49,8 @@ void Specs::refreshInstance()
 	m_isAimbot = false;
 	m_isInfiniteAmmo = false;
 	m_isInvincible = false;
+	m_isAllWeapon = false;
+
 }
 
 void Specs::addScore(int score)
@@ -130,6 +133,16 @@ bool Specs::isAimbotActivated()
 	return m_isAimbot;
 }
 
+void Specs::toggleAllWeapon()
+{
+	m_isAllWeapon = !m_isAllWeapon;
+}
+
+bool Specs::isAllWeaponActivated()
+{
+	return m_isAllWeapon;
+}
+
 void Specs::setPlayerName(std::string name)
 {
 	m_playerName = name;
@@ -167,5 +180,16 @@ std::string Specs::speakRandom()
 
 void Specs::setGamemodeAsSinglePlayer(bool value)
 {
+	setMaxPlayer(1);
 	m_isSinglePlayer = value;
+}
+
+void Specs::setMaxPlayer(int num)
+{
+	m_maxPlayer = num;
+}
+
+int Specs::getMaxPlayer()
+{
+	return m_maxPlayer;
 }

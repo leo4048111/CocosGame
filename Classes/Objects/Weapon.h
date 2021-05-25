@@ -7,7 +7,7 @@
 
 enum weaponType
 {
-	pistol, lazer, sniperRifle, sawedOff, rifle, plagueBringer,flameThrower
+	bigKnife,pistol, lazer, sniperRifle, sawedOff, rifle, plagueBringer,flameThrower
 };
 
 class Weapon :public Entity
@@ -58,6 +58,13 @@ public:
 
 	void getBackupMagazine();
 
+	void doMeleeAttack();
+
+	//weapon status control
+	bool isLocked();
+
+	void unlock();
+
 public:
 	//The weapon specs
 	weaponType m_type;
@@ -68,6 +75,9 @@ public:
 	int m_backupAmmo;
 	int m_maxAmmoPerMagazine;
 	int m_ammoInCurrentMagazine;
+
+	//weapon status control
+	bool m_isLocked;
 };
 
 

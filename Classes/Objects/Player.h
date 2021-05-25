@@ -12,14 +12,14 @@
 #define SLIDE_COOLDOWN 2.5
 enum actions
 {
-	forward,back,left,right,standBack,standForward
+	forward,back,left,right,stand,leftSlide,rightSlide
 };
 
 class Player : public Entity
 {
 public:
 	//Sprite related
-	static Player* createMainCharacter();
+	static Player* createPlayer();
 
 	virtual bool init();
 
@@ -40,6 +40,16 @@ public:
 
 	void onMouseUp(cocos2d::Event* event);
 
+	bool isReady();
+
+	void setReady();
+
+	void deployTo(cocos2d::Vec2 pos);
+
+	bool isAi();
+	
+	void setAiControl(bool value);
+
 	//Weapon related
 	void initAllWeapon();
 
@@ -47,12 +57,16 @@ public:
 
 	void swapWeapon(int num);
 
+	void unlockWeapon(int num);
+
+	void fastMeleeAttack();
+
 	void setControlOnListen();
 
 	Weapon* getCurrentWeapon();
 	
 private:
-
+	bool m_isReady;
 
 	//Anime frames
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_leftWalkAnime;
@@ -62,11 +76,12 @@ private:
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_standBackAnime;
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_leftSlideAnime;
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_rightSlideAnime;
+	cocos2d::Vector<cocos2d::SpriteFrame*> m_parachuteAnime;
 
 	//Control specs
+	bool m_isAi;
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> m_keyMap;
 	std::map<cocos2d::EventMouse::MouseButton, bool> m_mouseButtonMap;
-
 
 	//Weapon specs
 	std::map<int,Weapon*> m_allWeaponsMap;

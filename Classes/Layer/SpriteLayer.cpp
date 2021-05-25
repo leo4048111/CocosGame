@@ -27,41 +27,74 @@ bool SpriteLayer::init()
 	//init target specs
 	this->initTargetSpecs();
 
-	//init main character
-	auto mainCharacter = Player::createMainCharacter();
-	this->addChild(mainCharacter, 20, Specs::getInstance()->getPlayerName());
-	int mapWidth = this->getContentSize().width;
-	int mapHeight = this->getContentSize().height;
-	mainCharacter->setPosition(Vec2(origin.x+visibleSize.width / 2,origin.y+ visibleSize.height / 3));
-	mainCharacter->scheduleUpdate();
-
 	//init collectable layer
 	auto collectableLayer = CollectableLayer::getInstance();
 	this->addChild(collectableLayer,20,"CollectableLayer");
 	collectableLayer->scheduleUpdate();
 
+	m_aiCount = 0;
 	this->setName("SpriteLayer");
 	return true;
 }
 
 void SpriteLayer::update(float delta)
 {
-	int currentTargetCount = m_targets.size();
-	UILayer* uiLayer=UILayer::getInstance();
+	m_playerCount = m_players.size();
+	m_targetCount = m_targets.size();
+	int maxPlayerCount = Specs::getInstance()->getMaxPlayer();
+
+	//update player
+	if(maxPlayerCount == 1&& m_playerCount < maxPlayerCount)
+	{
+		addPlayer(false);
+	}
+
 	//update target
-	if (currentTargetCount < MIN_TARGETS_COUNT+Specs::getInstance()->getCurrentRound())
+	if (m_targetCount < MIN_TARGETS_COUNT+Specs::getInstance()->getCurrentRound())
 	{
 		msws_srand();
-		for (int c = m_targets.size(); c < MIN_TARGETS_COUNT + Specs::getInstance()->getCurrentRound(); c++)
-		{
-			auto target = Target::createTarget();
-			target->showStaminaBar();
-			this->addChild(target, 20);
-			target->setPosition(Vec2(msws()%((int)Director::getInstance()->getVisibleSize().width), msws() % ((int)Director::getInstance()->getVisibleSize().height))); 
-			m_targets.pushBack(target);
-			target->scheduleUpdate();
-		}
+		addTarget();
 	}
+}
+
+void SpriteLayer::addPlayer(bool isAi)
+{
+	auto visibleSize = Director::getInstance()->getVisibleSize();
+	auto origin = Director::getInstance()->getVisibleOrigin();
+	Vec2 dst = Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 3);
+
+	//init player
+	auto player = Player::createPlayer();
+	this->addChild(player, 20, Specs::getInstance()->getPlayerName());
+	int mapWidth = this->getContentSize().width;
+	int mapHeight = this->getContentSize().height;
+	player->setPosition(dst);
+	player->setAiControl(isAi);
+	if (!isAi)
+	{
+	/*	player->deployTo(dst);*/
+		player->setReady();
+		player->setControlOnListen();
+	}
+	else
+	{
+		m_aiCount++;
+		player->deployTo(dst);
+		player->setName("AI" +Value(m_aiCount).asString());
+	}
+
+	m_players.pushBack(player);
+	player->scheduleUpdate();
+}
+
+void SpriteLayer::addTarget()
+{
+	auto target = Target::createTarget();
+	target->showStaminaBar();
+	this->addChild(target, 20);
+	target->setPosition(Vec2(msws() % ((int)Director::getInstance()->getVisibleSize().width), msws() % ((int)Director::getInstance()->getVisibleSize().height)));
+	m_targets.pushBack(target);
+	target->scheduleUpdate();
 }
 
 Vector<Target*>* SpriteLayer::getAllTargets()
@@ -82,4 +115,14 @@ void SpriteLayer::initTargetSpecs()
 int SpriteLayer::getThisTargetScore(Target* target)
 {
 	return m_targetScoreMap[target->getTargetType()];
+}
+
+int SpriteLayer::getPlayerCount()
+{
+	return m_playerCount;
+}
+
+int SpriteLayer::getAiCount()
+{
+	return m_aiCount;
 }

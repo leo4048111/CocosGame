@@ -18,4 +18,7 @@ public:
 
 	void goToSetupAndGTGScene();
 
+private:
+	cocos2d::Label* m_word;
+
 };

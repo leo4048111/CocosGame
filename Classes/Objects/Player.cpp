@@ -3,7 +3,7 @@
 
 USING_NS_CC;
 
-Player* Player::createMainCharacter()
+Player* Player::createPlayer()
 {
 	return Player::create();
 }
@@ -27,7 +27,7 @@ bool Player::init()
 	Player::showStaminaBar();
 
 	//Init specs
-	m_magazineSpecLabel = Label::create("0/0", "HeiTi", 20);
+	m_magazineSpecLabel = Label::createWithTTF("0/0", "fonts/Arial.ttf", 20);
 	m_magazineSpecLabel->setAnchorPoint(Vec2::ANCHOR_MIDDLE_BOTTOM);
 	m_magazineSpecLabel->setPosition(Vec2(this->getContentSize().width / 2, -m_magazineSpecLabel->getContentSize().height));
 	m_magazineSpecLabel->setScale(0.3f);
@@ -44,16 +44,47 @@ bool Player::init()
 	nameLabel->setColor(Color3B(255, 255, 255));
 	nameLabel->setPosition(Vec2(this->getContentSize().width / 2, 20));
 
+	m_isReady = false;
 	this->setName(Specs::getInstance()->getPlayerName());
-	this->setControlOnListen(); 
 	return true;
+}
+
+bool Player::isReady()
+{
+	return m_isReady;
+}
+
+void Player::setReady()
+{
+	m_isReady = true;
+}
+
+bool Player::isAi()
+{
+	return m_isAi;
+}
+
+void Player::setAiControl(bool value)
+{
+	m_isAi = value;
+}
+
+void Player::deployTo(Vec2 pos)
+{
+	auto moveto = MoveTo::create(2.0f, pos);
+	auto animation = Animation::createWithSpriteFrames(m_parachuteAnime, 2.0f);
+	auto animate = Animate::create(animation);
+	auto spawn = Spawn::create(moveto, animate, NULL);
+	auto callFunc = CallFunc::create(CC_CALLBACK_0(Player::setReady, this));
+	auto sequence = Sequence::create(spawn, callFunc,NULL);
+	this->runAction(sequence);
 }
 
 bool Player::loadGraphs()
 {
 	try
 	{
-		SpriteFrameCache::getInstance()->addSpriteFramesWithFile("objects/mainCharacter/mainCharacter.plist");
+		SpriteFrameCache::getInstance()->addSpriteFramesWithFile("objects/player/mainCharacter.plist");
 		auto cache = SpriteFrameCache::getInstance();
 		for (int c = 0; c <= 7; c++)
 		{
@@ -81,6 +112,7 @@ bool Player::loadGraphs()
 		}
 		m_leftSlideAnime.pushBack(cache->getSpriteFrameByName("character_maleAdventurer_leftslide"));
 		m_rightSlideAnime.pushBack(cache->getSpriteFrameByName("character_maleAdventurer_rightslide"));
+		m_parachuteAnime.pushBack(cache->getSpriteFrameByName("character_maleAdventurer_parachute"));
 
 		return true;
 	}
@@ -93,6 +125,9 @@ bool Player::loadGraphs()
 
 void Player::runActionAnime(int dir)
 {
+	if (!m_isReady)
+		return;
+
 	Animation* anime=nullptr;
 	switch (dir)
 	{
@@ -108,8 +143,14 @@ void Player::runActionAnime(int dir)
 	case actions::right:
 		anime = Animation::createWithSpriteFrames(m_rightWalkAnime, 0.5f / 8);
 		break;
-	case actions::standBack:
+	case actions::stand:
 		anime = Animation::createWithSpriteFrames(m_standBackAnime, 0.5f / 2);
+		break;
+	case actions::leftSlide:
+		anime = Animation::createWithSpriteFrames(m_leftSlideAnime, 0.5f / 2);
+		break;
+	case actions::rightSlide:
+		anime = Animation::createWithSpriteFrames(m_leftSlideAnime, 0.5f / 2);
 		break;
 	default:
 		break;
@@ -125,6 +166,9 @@ void Player::runActionAnime(int dir)
 
 void Player::update(float delta)
 {
+	if (!m_isReady)
+		return;
+
 	//Update anime
 	double offsetX = this->getCurrentSpeed();
 	double offsetY = this->getCurrentSpeed();
@@ -158,8 +202,10 @@ void Player::update(float delta)
 
 	//update visual specs
 	if (m_currentWeapon != nullptr)
+		if(m_currentWeapon->m_ammoInCurrentMagazine>=0)
 		m_magazineSpecLabel->setString(Value(m_currentWeapon->m_ammoInCurrentMagazine).asString() + "/" + Value(m_currentWeapon->m_backupAmmo).asString());
-
+		else
+			m_magazineSpecLabel->setString("inf/inf");
 	//auto fire weapon
 	if (m_mouseButtonMap[EventMouse::MouseButton::BUTTON_LEFT] && m_currentWeapon->m_isAutoFire)
 		m_currentWeapon->fire();
@@ -171,20 +217,30 @@ void Player::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Even
 	switch (keycode)
 	{
 	case EventKeyboard::KeyCode::KEY_W:
-		m_sprite->stopActionByTag(standBack);
+		m_sprite->stopActionByTag(stand);
 		runActionAnime(actions::forward);
 		break;
 	case EventKeyboard::KeyCode::KEY_S:
-		m_sprite->stopActionByTag(standBack);
+		m_sprite->stopActionByTag(stand);
 		runActionAnime(actions::back);
 		break;
 	case EventKeyboard::KeyCode::KEY_A:
-		m_sprite->stopActionByTag(standBack);
+		m_sprite->stopActionByTag(stand);
 		runActionAnime(actions::left);
 		break;
 	case EventKeyboard::KeyCode::KEY_D:
-		m_sprite->stopActionByTag(standBack);
+		m_sprite->stopActionByTag(stand);
 		runActionAnime(actions::right);
+		break;
+	case EventKeyboard::KeyCode::KEY_SHIFT:
+		m_sprite->stopActionByTag(stand);
+		if (m_keyMap[EventKeyboard::KeyCode::KEY_A])
+			runActionAnime(actions::leftSlide);
+		else
+			runActionAnime(actions::rightSlide);
+		break;
+	case EventKeyboard::KeyCode::KEY_F:
+		fastMeleeAttack();
 		break;
 	case EventKeyboard::KeyCode::KEY_1:
 		swapWeapon(1);
@@ -210,8 +266,6 @@ void Player::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Even
 	case EventKeyboard::KeyCode::KEY_R:
 		m_currentWeapon->reload();
 		break;
-	case EventKeyboard::KeyCode::KEY_SPACE:
-		break;
 	default:
 		break;
 	}
@@ -226,7 +280,7 @@ void Player::onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Eve
 		m_sprite->stopActionByTag(actions::forward);
 		break;
 	case EventKeyboard::KeyCode::KEY_S:
-		m_sprite->stopActionByTag(back);
+		m_sprite->stopActionByTag(actions::back);
 		break;
 	case EventKeyboard::KeyCode::KEY_A:
 		m_sprite->stopActionByTag(actions::left);
@@ -234,11 +288,15 @@ void Player::onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Eve
 	case EventKeyboard::KeyCode::KEY_D:
 		m_sprite->stopActionByTag(actions::right);
 		break;
+	case EventKeyboard::KeyCode::KEY_SHIFT:
+		m_sprite->stopActionByTag(actions::leftSlide);
+		m_sprite->stopActionByTag(actions::rightSlide);
+		break;
 	default:
 		break;
 	}
 	if (!(m_keyMap[EventKeyboard::KeyCode::KEY_W] || m_keyMap[EventKeyboard::KeyCode::KEY_S] || m_keyMap[EventKeyboard::KeyCode::KEY_A] || m_keyMap[EventKeyboard::KeyCode::KEY_D]))
-		runActionAnime(standBack);
+		runActionAnime(stand);
 }
 
 void Player::setControlOnListen()
@@ -267,7 +325,6 @@ void Player::onMouseDown(Event* event)
 		break;
 	default:
 		break;
-
 	}
 }
 
@@ -280,6 +337,23 @@ void Player::onMouseUp(Event* event)
 
 void Player::swapWeapon(int num)
 {
+		if(m_allWeaponsMap[num]->isLocked()&&(!Specs::getInstance()->isAllWeaponActivated()))
+		{
+			auto notification = Label::createWithTTF("This weapon isn't unlocked yet", "fonts/Notification Font.ttf", 80);
+			notification->setColor(Color3B(255, 4, 56));
+			notification->setPosition(Vec2(this->getParent()->getContentSize().width / 2, -2));
+			this->getParent()->addChild(notification);
+			auto fadein = FadeIn::create(0.25f);
+			auto fadeout = FadeOut::create(0.25f);
+			auto fadeSequence = Sequence::create(fadein, fadeout, NULL);
+			auto repeat = Repeat::create(fadeSequence, 2);
+			auto sequence = Sequence::create(repeat, CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, notification)), NULL);
+			notification->runAction(sequence);
+			return;
+		}
+
+		if (m_currentWeaponSlot == num)
+			return;
 		//Update sprite
 		if (m_currentWeapon != nullptr)
 		{
@@ -295,50 +369,19 @@ void Player::swapWeapon(int num)
 	
 }
 
+void Player::unlockWeapon(int num)
+{
+	m_allWeaponsMap[num]->unlock();
+}
+
 Weapon* Player::getCurrentWeapon()
 {
 	return m_currentWeapon;
 }
 
-//void MainCharacter::slide()  //deprecated!!
-//{
-//	time_t currentTime = time(NULL);
-//	if (currentTime - m_lastSlideTime >= SLIDE_COOLDOWN)
-//	{
-//		m_sprite->pauseSchedulerAndActions();
-//		Animate* animate = nullptr;
-//		Vec2 dst = this->getPosition();
-//		if (m_keyMap[EventKeyboard::KeyCode::KEY_A])
-//		{
-//			animate = Animate::create(Animation::createWithSpriteFrames(m_leftSlideAnime, 0.5f));
-//			dst = Vec2(dst.x-m_currentSpeed * 3,dst.y);
-//		}
-//		else if (m_keyMap[EventKeyboard::KeyCode::KEY_D])
-//		{
-//			animate = Animate::create(Animation::createWithSpriteFrames(m_rightSlideAnime, 0.5f));
-//			dst = Vec2(dst.x + m_currentSpeed * 3, dst.y);
-//
-//		}
-//		else
-//		{
-//			animate = Animate::create(Animation::createWithSpriteFrames(m_leftSlideAnime, 0.5f));
-//			dst = Vec2(dst.x - m_currentSpeed * 3, dst.y);
-//		}
-//		
-//		Action* actionSlide = Repeat::create(animate, 1);
-//		auto action = MoveTo::create(0.5f, dst);
-//		CallFuncN* callFunc = CallFuncN::create(this,callfuncN_selector(MainCharacter::slideEnd));
-//		auto sequence = Sequence::create(action, callFunc, NULL);
-//
-//		m_sprite->runAction(actionSlide);
-//		m_sprite->runAction(sequence);
-//		m_lastSlideTime = currentTime;
-//	}
-//}
-
 void Player::addWeapon(Weapon* weapon)
 {
-	m_allWeaponsMap.insert(std::make_pair(weapon->getWeaponType()+1, weapon));
+	m_allWeaponsMap.insert(std::make_pair(weapon->getWeaponType(), weapon));
 	m_sprite->addChild(weapon);
 	weapon->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
 	weapon->setPosition(Vec2(0, m_sprite->getContentSize().height / 3));
@@ -348,6 +391,12 @@ void Player::addWeapon(Weapon* weapon)
 
 void Player::initAllWeapon()
 {
+	m_currentWeaponSlot = 1;
+
+	auto wbigKnife = Weapon::createWeapon();
+	wbigKnife->setWeaponType(weaponType::bigKnife);
+	addWeapon(wbigKnife);
+
 	//Init pistol
 	auto wpistol = Weapon::createWeapon();
 	wpistol->setWeaponType(weaponType::pistol);
@@ -381,6 +430,13 @@ void Player::initAllWeapon()
 	auto wflameThrower = Weapon::createWeapon();
 	wflameThrower->setWeaponType(weaponType::flameThrower);
 	addWeapon(wflameThrower);
-	Player::swapWeapon(1);
 
+	wbigKnife->unlock();
+	Player::swapWeapon(0);
+}
+
+void Player::fastMeleeAttack()
+{
+	swapWeapon(0);
+	m_currentWeapon->fire();
 }

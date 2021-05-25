@@ -42,6 +42,14 @@ public:
 
 	int getThisTargetScore(Target* target);
 
+	void addPlayer(bool isAi);
+
+	void addTarget();
+
+	int getPlayerCount();
+
+	int getAiCount();
+
 private:
 
 	//Target specs
@@ -49,6 +57,10 @@ private:
 	int m_targetCount;
 	std::map<targetType, int> m_targetScoreMap;
 
+	//Player specs
+	cocos2d::Vector<Player*> m_players;
+	int m_playerCount;
+	int m_aiCount;
 };
 
 #endif // !_TARGET_LAYER_H_

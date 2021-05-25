@@ -46,6 +46,27 @@ void Collectable::setCollectableType(collectableType type)
 	case collectableType::resistance:
 		collectableTypeName = "collectable_resistance";
 		break;
+	case collectableType::cpistol:
+		collectableTypeName = "collectable_pistol";
+		break;
+	case collectableType::crifle:
+		collectableTypeName = "collectable_rifle";
+		break;
+	case collectableType::cflameThrower:
+		collectableTypeName = "collectable_flameThrower";
+		break;
+	case collectableType::csniperRifle:
+		collectableTypeName = "collectable_sniperRifle";
+		break;
+	case collectableType::cplagueBringer:
+		collectableTypeName = "collectable_plagueBringer";
+		break;
+	case collectableType::csawedOff:
+		collectableTypeName = "collectable_sawedOff";
+		break;
+	case collectableType::clazer:
+		collectableTypeName = "collectable_razor";
+		break;
 	default:
 		return;
 	}
@@ -75,8 +96,8 @@ bool Collectable::loadGraphs()
 
 void Collectable::useCollectable()
 {
-	Player* mainCharacter = dynamic_cast<Player*>(this->getParent()->getParent()->getChildByName(Specs::getInstance()->getPlayerName()));
-	Label* notification = Label::createWithTTF("blank", "fonts/Notification Font.ttf", 20);
+	Player* player = dynamic_cast<Player*>(this->getParent()->getParent()->getChildByName(Specs::getInstance()->getPlayerName()));
+	Label* notification = Label::createWithTTF("=w=", "fonts/Notification Font.ttf", 20);
 	notification->enableBold();
 	switch (this->getCollectableType())
 	{
@@ -105,11 +126,29 @@ void Collectable::useCollectable()
 		notification->setColor(Color3B(139, 0, 0));
 		Collectable::addResistance();
 		break;
+	case collectableType::cpistol:
+		player->unlockWeapon(weaponType::pistol);
+		break;
+	case collectableType::csniperRifle:
+		player->unlockWeapon(weaponType::sniperRifle);
+		break;
+	case collectableType::cflameThrower:
+		player->unlockWeapon(weaponType::flameThrower);
+		break;
+	case collectableType::clazer:
+		player->unlockWeapon(weaponType::lazer);
+		break;
+	case collectableType::csawedOff:
+		player->unlockWeapon(weaponType::sawedOff);
+		break;
+	case collectableType::cplagueBringer:
+		player->unlockWeapon(weaponType::plagueBringer);
+		break;
 	default:
 		return;
 	}
 
-	mainCharacter->addChild(notification);
+	player->addChild(notification);
 	auto moveto = MoveTo::create(1.5f, Vec2(notification->getPosition().x, notification->getPosition().y + 50));
 	auto fadeout = FadeOut::create(1.5f);
 	auto spawn = Spawn::create(moveto, fadeout, NULL);

@@ -82,5 +82,29 @@ void GameScene::update(float delta)
 	Vec2 mapPos = map->getContentSize() / 2;
 	Vec2 offsetPos = mainCharacterPos - mapPos;
 	map->setPosition(Vec2(m_origin.x + m_visibleSize.width / 2-offsetPos.x, m_origin.y + m_visibleSize.height / 2-offsetPos.y));
+
+	//gameover
+	if (Specs::getInstance()->isEnd())
+	{
+		goToGameoverScene();
+	}
 }
 
+void GameScene::goToGameoverScene()
+{
+	GameoverScene* gameoverScene = GameoverScene::createGameoverScene();
+	auto transitionLost = TransitionCrossFade::create(5.0f, gameoverScene);
+	auto transitionWin = TransitionShrinkGrow::create(1.0f, gameoverScene);
+
+	if (Specs::getInstance()->isWin())
+	{
+		Director::getInstance()->replaceScene(transitionWin);
+	}
+	else
+	{
+		Director::getInstance()->replaceScene(transitionLost);
+	}
+
+	this->cleanup();
+
+}

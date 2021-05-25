@@ -45,21 +45,40 @@ bool PreparationScene::init()
 	menu->setName("menu");
 	menu->setPositionY(menu->getPositionY() - 50);
 
+	auto instructor = Sprite::create("objects/UI/ui_instructor.png");
+	instructor->setPosition(Vec2(visibleSize.width / 4, visibleSize.height * 3 / 5));
+	this->addChild(instructor);
+	instructor->setScale(0.7f);
+
+	auto messageBubble = Sprite::create("objects/UI/ui_messageBubble.png");
+	instructor->addChild(messageBubble);
+	messageBubble->setPosition(Vec2(instructor->getContentSize().width + 80, instructor->getContentSize().height));
+
+	m_word = Label::create("So, which one do you fancy?", "fonts/HashedBrowns-WyJgn.ttf", 20);
+	m_word->setColor(Color3B(0, 0, 0));
+	m_word->setPosition(Vec2(messageBubble->getContentSize().width / 2, messageBubble->getContentSize().height / 2 + 15));
+	messageBubble->addChild(m_word);
+
 	return true;
 }
 
 void PreparationScene::menuCallBack(Ref* sender)
 {
 	MenuItem* item = dynamic_cast<MenuItem*>(sender);
+	auto callFunc = CallFunc::create(CC_CALLBACK_0(PreparationScene::goToSetupAndGTGScene, this));
+	FiniteTimeAction* action = Sequence::create(DelayTime::create(1.5f), callFunc, NULL);
+
 	switch (item->getTag())
 	{
 	case 0:
 		Specs::getInstance()->setGamemodeAsSinglePlayer(true);
-		goToSetupAndGTGScene();
+		m_word->setString("Well well, a lone wolf..");
+		this->runAction(action);
 		break;
 	case 1:
 		Specs::getInstance()->setGamemodeAsSinglePlayer(false);
-		goToSetupAndGTGScene();
+		m_word->setString("Of course..\nMany hands make light work..");
+		this->runAction(action);
 		break;
 	case 2:
 		backToMenuScene();

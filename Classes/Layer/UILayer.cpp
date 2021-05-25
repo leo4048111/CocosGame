@@ -61,6 +61,9 @@ bool UILayer::init()
 	chatbox->setPosition(Vec2(origin.x+100, origin.y + visibleSize.height * 1 / 5));
 	chatbox->setControlOnListen();
 
+
+	//init weapon labels
+
 	this->setName("UILayer");
 	return true;
 }
@@ -69,12 +72,6 @@ void UILayer::update(float delta)
 {
 	auto m_visibleSize = Director::getInstance()->getVisibleSize();
 	auto m_origin = Director::getInstance()->getVisibleOrigin();
-
-	//gameover
-	if (Specs::getInstance()->isEnd())
-	{
-		goToGameoverScene();
-	}
 
 	//update timer
 	int runTime = static_cast<double>(Specs::getInstance()->getCurrentTime() - Specs::getInstance()->getStartTime())*1000 / CLOCKS_PER_SEC;
@@ -102,19 +99,38 @@ void UILayer::update(float delta)
 		currentRoundDisplay->runAction(sequence);
 	}
 
-	if(Specs::getInstance()->getCurrentRound() == 20)
-		Specs::getInstance()->setWinOrLose(true);
-
 	//update mainCharacter specs
 	m_currentResistanceLabel->setString("Resistance:" + Value((int)mainCharacter->getCurrentResistance()).asString());
 	m_currentSpeedLabel->setString("Speed:" + Value((int)mainCharacter->getCurrentSpeed()*1000).asString());
 
-
+	//update game status
+	if (Specs::getInstance()->getCurrentRound() == 20)
+		Specs::getInstance()->setWinOrLose(true);
 }
 
-void UILayer::goToGameoverScene()
+void UILayer::instructorGivesInstruction(std::string str)
 {
-	GameoverScene* gameoverScene = GameoverScene::createGameoverScene();
-	auto transition = TransitionCrossFade::create(1.0f, gameoverScene);
-	Director::getInstance()->replaceScene(transition);
+	auto visibleSize = Director::getInstance()->getVisibleSize();
+	auto origin = Director::getInstance()->getVisibleOrigin();
+
+	auto instructor = Sprite::create("objects/UI/ui_instructor.png");
+	instructor->setPosition(Vec2(0, visibleSize.height * 3 / 5));
+	this->addChild(instructor);
+	instructor->setScale(0.5f);
+
+	auto messageBubble = Sprite::create("objects/UI/ui_messageBubble.png");
+	instructor->addChild(messageBubble);
+	messageBubble->setPosition(Vec2(instructor->getContentSize().width + 80, instructor->getContentSize().height));
+
+	auto word = Label::create(str, "fonts/HashedBrowns-WyJgn.ttf", 20);
+	word->setColor(Color3B(0, 0, 0));
+	word->setPosition(Vec2(messageBubble->getContentSize().width / 2, messageBubble->getContentSize().height / 2 + 15));
+	messageBubble->addChild(word);
+
+	auto moveto = MoveTo::create(0.5f, Vec2(visibleSize.width / 6, instructor->getPosition().y));
+	auto fadeout = FadeOut::create(1.0f);
+	auto callFunc = CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, instructor));
+	auto sequence = Sequence::create(moveto, DelayTime::create(0.5f), fadeout, callFunc, NULL);
+
+	instructor->runAction(sequence);
 }
