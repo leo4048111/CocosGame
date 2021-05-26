@@ -20,8 +20,6 @@ bool SetupAndGTGScene::init()
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	auto origin = Director::getInstance()->getVisibleOrigin();
 
-	Specs::getInstance()->refreshInstance();
-
 	/*auto enterNameNotificationLabel = Label::createWithTTF("Enter your name below", "fonts/HashedBrowns-WyJgn.ttf", 50);
 	auto enterNameNotification = MenuItemLabel::create(enterNameNotificationLabel);*/
 	auto gtgLabel = Label::createWithTTF("Let's Roll", "fonts/HashedBrowns-WyJgn.ttf", 50);

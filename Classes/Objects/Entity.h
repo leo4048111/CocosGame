@@ -32,6 +32,8 @@ public:
 
 	double getCurrentSpeed();
 
+	double getSpeedPercentage();
+
 	//stamina related
 	double getCurrentStamina();
 

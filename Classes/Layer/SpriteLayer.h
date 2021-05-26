@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "Objects/Target.h"
 #include "Objects/Player.h"
+#include "Objects/AiPlayer.h"
 #include "CollectableLayer.h"
 #include <map>
 
@@ -42,7 +43,9 @@ public:
 
 	int getThisTargetScore(Target* target);
 
-	void addPlayer(bool isAi);
+	void addPlayer();
+
+	void addAiPlayer();
 
 	void addTarget();
 
@@ -58,9 +61,8 @@ private:
 	std::map<targetType, int> m_targetScoreMap;
 
 	//Player specs
-	cocos2d::Vector<Player*> m_players;
-	int m_playerCount;
-	int m_aiCount;
+	Player* m_mainPlayer;
+	cocos2d::Vector<AiPlayer*> m_aiplayers;
 };
 
 #endif // !_TARGET_LAYER_H_

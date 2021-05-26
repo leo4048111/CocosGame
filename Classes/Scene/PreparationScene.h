@@ -18,6 +18,8 @@ public:
 
 	void goToSetupAndGTGScene();
 
+	void goToCreateRoomScene();
+
 private:
 	cocos2d::Label* m_word;
 

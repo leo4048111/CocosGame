@@ -1,24 +1,20 @@
-#ifndef _MAIN_CHARACTER_H_
-#define _MAIN_CHARACTER_H_
+#pragma once
 
 #include "cocos2d.h"
 #include "Entity.h"
 #include "Weapon.h"
+#include "Player.h"
 #include <map>
 #include <ctime>
 
 #define MAX_WEAPON_CARRY 6
 #define SLIDE_COOLDOWN 2.5
-enum actions
-{
-	forward,back,left,right,stand,leftSlide,rightSlide
-};
 
-class Player : public Entity
+class AiPlayer : public Entity
 {
 public:
 	//Sprite related
-	static Player* createPlayer();
+	static AiPlayer* createPlayer();
 
 	virtual bool init();
 
@@ -26,40 +22,22 @@ public:
 
 	void runActionAnime(int dir);
 
-	CREATE_FUNC(Player);
+	CREATE_FUNC(AiPlayer);
 
 	virtual void update(float delta);
 
-	//Control related
-	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event);
-
-	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event);
-
-	void onMouseDown(cocos2d::Event* event);
-
-	void onMouseUp(cocos2d::Event* event);
+	void deployTo(cocos2d::Vec2 pos);
 
 	//Weapon related
-	void initAllWeapon();
-
-	void addWeapon(Weapon* weapon);
-
-	void swapWeapon(int num);
-
-	void unlockWeapon(int num);
-
-	void fastMeleeAttack();
-
-	void setControlOnListen();
-
-	void setControlOffListen();
+	void initRandomWeapon();
 
 	Weapon* getCurrentWeapon();
 
-	std::map<int, Weapon*> getAllWeaponMap();
-	
+	//ai control features
+	void AiControlAutoUpdate();
+
+
 private:
-	bool m_isReady;
 
 	//Anime frames
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_leftWalkAnime;
@@ -76,19 +54,10 @@ private:
 	std::map<cocos2d::EventMouse::MouseButton, bool> m_mouseButtonMap;
 
 	//Weapon specs
-	std::map<int,Weapon*> m_allWeaponsMap;
 	Weapon* m_currentWeapon;
-	int m_currentWeaponSlot;
-
-	cocos2d::Label* m_magazineSpecLabel;
-	cocos2d::Menu* m_weaponSpecMenu;
 
 	std::string m_playerName;
+
+	//update specs
+	time_t m_lastUpdate;
 };
-
-
-
-
-
-
-#endif // !_MAIN_CHARACTER_H_

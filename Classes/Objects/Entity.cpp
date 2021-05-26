@@ -103,6 +103,11 @@ double Entity::getCurrentSpeed()
 	return m_currentSpeed;
 }
 
+double Entity::getSpeedPercentage()
+{
+	return m_currentSpeed * 100.0f;
+}
+
 double Entity::getCurrentStamina()
 {
 	return m_currentStamina;

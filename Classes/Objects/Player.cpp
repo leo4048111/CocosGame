@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "Controls/Specs.h"
 #include "Objects/CrossHair.h"
+#include "Layer/SpriteLayer.h"
 
 USING_NS_CC;
 
@@ -40,48 +41,27 @@ bool Player::init()
 
 	//init name
 	m_playerName = Specs::getInstance()->getPlayerName();
-	auto nameLabel = Label::create(m_playerName,"",7);
+	auto nameLabel = Label::create(m_playerName,"fonts/HashedBrowns-WyJgn.ttf",7);
 	this->addChild(nameLabel);
 	nameLabel->setColor(Color3B(255, 255, 255));
 	nameLabel->setPosition(Vec2(this->getContentSize().width / 2, 20));
 
-	m_isReady = false;
 	this->setName(Specs::getInstance()->getPlayerName());
 	return true;
 }
 
-bool Player::isReady()
-{
-	return m_isReady;
-}
-
-void Player::setReady()
-{
-	m_isReady = true;
-}
-
-bool Player::isAi()
-{
-	return m_isAi;
-}
-
-void Player::setAiControl(bool value)
-{
-	m_isAi = value;
-	if (m_isAi)
-		this->setControlOffListen();
-}
-
-void Player::deployTo(Vec2 pos)
-{
-	auto moveto = MoveTo::create(2.0f, pos);
-	auto animation = Animation::createWithSpriteFrames(m_parachuteAnime, 2.0f);
-	auto animate = Animate::create(animation);
-	auto spawn = Spawn::create(moveto, animate, NULL);
-	auto callFunc = CallFunc::create(CC_CALLBACK_0(Player::setReady, this));
-	auto sequence = Sequence::create(spawn, callFunc,NULL);
-	this->runAction(sequence);
-}
+//
+//
+//void Player::deployTo(Vec2 pos)
+//{
+//	auto moveto = MoveTo::create(2.0f, pos);
+//	auto animation = Animation::createWithSpriteFrames(m_parachuteAnime, 2.0f);
+//	auto animate = Animate::create(animation);
+//	auto spawn = Spawn::create(moveto, animate, NULL);
+//	auto callFunc = CallFunc::create(CC_CALLBACK_0(Player::setReady, this));
+//	auto sequence = Sequence::create(spawn, callFunc,NULL);
+//	this->runAction(sequence);
+//}
 
 bool Player::loadGraphs()
 {
@@ -128,9 +108,6 @@ bool Player::loadGraphs()
 
 void Player::runActionAnime(int dir)
 {
-	if (!m_isReady)
-		return;
-
 	Animation* anime=nullptr;
 	switch (dir)
 	{
@@ -169,9 +146,6 @@ void Player::runActionAnime(int dir)
 
 void Player::update(float delta)
 {
-	if (!m_isReady)
-		return;
-
 	//Update anime
 	double offsetX = this->getCurrentSpeed();
 	double offsetY = this->getCurrentSpeed();
@@ -190,6 +164,7 @@ void Player::update(float delta)
 	{
 		this->setPosition(this->getPosition() + Vec2(0, offsetY));
 	}
+
 	if (m_keyMap[EventKeyboard::KeyCode::KEY_S])
 	{
 		this->setPosition(this->getPosition() - Vec2(0, offsetY));
@@ -212,7 +187,17 @@ void Player::update(float delta)
 
 	//auto fire weapon
 	if (m_mouseButtonMap[EventMouse::MouseButton::BUTTON_LEFT] && m_currentWeapon->m_isAutoFire)
-		m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()), CrossHair::getInstance()->getCursorPos());
+	{
+		if (Specs::getInstance()->isAimbotActivated())
+		{
+			auto allTargets = SpriteLayer::getInstance()->getAllTargets();
+			m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()), allTargets->front()->getParent()->convertToWorldSpace(allTargets->front()->getPosition()));
+		}
+		else
+		{
+			m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()), CrossHair::getInstance()->getCursorPos());
+		}
+	}
 }
 
 void Player::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event)
@@ -331,7 +316,15 @@ void Player::onMouseDown(Event* event)
 	{
 	case EventMouse::MouseButton::BUTTON_LEFT:
 		if (m_currentWeapon != nullptr)
-			m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()), CrossHair::getInstance()->getCursorPos());
+			if (Specs::getInstance()->isAimbotActivated())
+			{	
+				auto allTargets = SpriteLayer::getInstance()->getAllTargets();
+				m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()),allTargets->front()->getParent()->convertToWorldSpace(allTargets->front()->getPosition()));
+			}
+			else
+			{
+				m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()), CrossHair::getInstance()->getCursorPos());
+			}
 		break;
 	default:
 		break;

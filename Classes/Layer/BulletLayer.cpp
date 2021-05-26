@@ -107,7 +107,6 @@ void BulletLayer::update(float delta)
 			Rect targetRect = Rect(currentTarget->getBoundingBox().origin, currentTarget->m_sprite->getContentSize() / 5);
 			if (bulletRect.intersectsRect(targetRect)) //Collision Detection
 			{
-				currentTarget->setColor(Color3B(245, 2, 1));
 				crossHair->showHitNotification(); //show hit anime on crosshair
 				if (!currentTarget->receiveDamage(player->getCurrentWeapon()->getWeaponDamage()))
 				{

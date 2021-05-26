@@ -45,9 +45,13 @@ private:
 	//Timer specs
 	cocos2d::Label* m_labelTimer;
 
-	//mainCharacter spec status
+	//main player spec status
 	cocos2d::Label* m_currentSpeedLabel;
 	cocos2d::Label* m_currentResistanceLabel;
+	cocos2d::Sprite* m_statusWindowBg;
+	cocos2d::ProgressTimer* m_playerHp;
+	cocos2d::ProgressTimer* m_playerSpeed;
+	cocos2d::ProgressTimer* m_playerArmor;
 
 	//score board
 	cocos2d::Label* m_labelScoreBoard;

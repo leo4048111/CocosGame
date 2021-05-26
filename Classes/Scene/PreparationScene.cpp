@@ -1,5 +1,6 @@
 #include "PreparationScene.h"
 #include "SetupAndGTGScene.h"
+#include "CreateRoomScene.h"
 #include "Controls/Specs.h"
 #include "Scene/MenuScene.h"
 
@@ -67,7 +68,8 @@ void PreparationScene::menuCallBack(Ref* sender)
 	MenuItem* item = dynamic_cast<MenuItem*>(sender);
 	auto callFunc = CallFunc::create(CC_CALLBACK_0(PreparationScene::goToSetupAndGTGScene, this));
 	FiniteTimeAction* action = Sequence::create(DelayTime::create(1.5f), callFunc, NULL);
-
+	auto callFunc2 = CallFunc::create(CC_CALLBACK_0(PreparationScene::goToCreateRoomScene, this));
+	FiniteTimeAction* action2 = Sequence::create(DelayTime::create(1.5f), callFunc2, NULL);
 	switch (item->getTag())
 	{
 	case 0:
@@ -78,7 +80,7 @@ void PreparationScene::menuCallBack(Ref* sender)
 	case 1:
 		Specs::getInstance()->setGamemodeAsSinglePlayer(false);
 		m_word->setString("Of course..\nMany hands make light work..");
-		this->runAction(action);
+		this->runAction(action2);
 		break;
 	case 2:
 		backToMenuScene();
@@ -94,7 +96,14 @@ void PreparationScene::backToMenuScene()
 
 void PreparationScene::goToSetupAndGTGScene()
 {
-	SetupAndGTGScene* setupAndGTGScene = SetupAndGTGScene::create();
+	SetupAndGTGScene* setupAndGTGScene = SetupAndGTGScene::createSetupAndGTGScene();
 	auto transition = TransitionFlipX::create(0.5f, setupAndGTGScene);
+	Director::getInstance()->replaceScene(transition);
+}
+
+void PreparationScene::goToCreateRoomScene()
+{
+	CreateRoomScene* createRoomScene = CreateRoomScene::createCreateRoomScene();
+	auto transition = TransitionFlipX::create(0.5f, createRoomScene);
 	Director::getInstance()->replaceScene(transition);
 }
