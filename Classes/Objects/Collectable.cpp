@@ -85,6 +85,7 @@ bool Collectable::loadGraphs()
 	try
 	{
 		SpriteFrameCache::getInstance()->addSpriteFramesWithFile("objects/collectable/collectable.plist");
+		return true;
 	}
 	catch (const std::exception& exp)
 	{

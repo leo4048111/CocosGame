@@ -34,28 +34,33 @@ public:
 
 	virtual void update(float delta);
 
+	//anime features
 	bool loadGraphs();
+
+	void runEffect(cocos2d::Node* sender,cocos2d::Vector<cocos2d::SpriteFrame*> effectFrame);
+
+	void pointBulletTo(cocos2d::Node* obj,cocos2d::Vec2 route, double offset);
 
 	/*friendly shooting specs
 	All PNG sources should be placed facing left*/
-	void addMeleeAttack();
+	void addMeleeAttack(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 
-	void addBullet();
+	void addBullet(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 
-	void addLazer();
+	void addLazer(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 
-	void addSprayBullet();
+	void addSprayBullet(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 
-	void addToxicBomb();
+	void addToxicBomb(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 
-	void addFlameThrower();
+	void addFlameThrower(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 
 	//hostile shooting specs
 	void initHostileBulletDamageMap();
 
-	void addSpiritualPower(cocos2d::Node* sender);
+	void addSpiritualPower(cocos2d::Node* sender, cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 
-	void addFlameCircle(cocos2d::Node* sender);
+	void addFlameCircle(cocos2d::Node* sender, cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 	
 private:
 	cocos2d::Vector<cocos2d::Sprite*> m_allFriendlyBullets;

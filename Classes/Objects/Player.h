@@ -62,6 +62,8 @@ public:
 
 	void setControlOnListen();
 
+	void setControlOffListen();
+
 	Weapon* getCurrentWeapon();
 
 	std::map<int, Weapon*> getAllWeaponMap();

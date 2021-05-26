@@ -203,17 +203,22 @@ void Target::attack()
 	auto sequence = Sequence::create(testScaleBy1, testScaleBy2, callfunc, NULL);
 	this->runAction(sequence);
 
+	//init route
+	Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName(Specs::getInstance()->getPlayerName()));
+	Vec2 startPos = this->getParent()->convertToWorldSpace(this->getPosition());
+	Vec2 terminalPos =player->getParent()->convertToWorldSpace(player->getPosition());
+
 	//run function
 	switch (this->getTargetType())
 	{
 	case targetType::sadGhost:
-		fireSpiritualPower();
+		fireSpiritualPower(startPos,terminalPos);
 		break;
 	case targetType::jellyGhost:
-		fireFlameCircle();
+		fireFlameCircle(startPos, terminalPos);
 		break;
 	default:
-		fireSpiritualPower();
+		fireSpiritualPower(startPos, terminalPos);
 		break;
 	}
 }
@@ -224,17 +229,16 @@ void Target::attackEnd(Node* sender)
 	m_isAttacking = false;
 }
 
-void Target::fireSpiritualPower()
+void Target::fireSpiritualPower(Vec2 startPos,Vec2 terminalPos)
 {
 	BulletLayer* bulletLayer =dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getChildByName("BulletLayer"));
 	UILayer::getInstance()->instructorGivesInstruction("Spiritual power incoming!");
-	bulletLayer->addSpiritualPower(this);
+	bulletLayer->addSpiritualPower(this,startPos,terminalPos);
 }
 
-void Target::fireFlameCircle()
+void Target::fireFlameCircle(Vec2 startPos, Vec2 terminalPos)
 {
 	BulletLayer* bulletLayer = dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getChildByName("BulletLayer"));
 	UILayer::getInstance()->instructorGivesInstruction("Watch out\nthat flame circle burns");
-	bulletLayer->addFlameCircle(this);
+	bulletLayer->addFlameCircle(this, startPos, terminalPos);
 }
-

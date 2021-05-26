@@ -46,9 +46,9 @@ public:
 
 	void attackEnd(Node* sender);
 
-	void fireSpiritualPower();
+	void fireSpiritualPower(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 
-	void fireFlameCircle();
+	void fireFlameCircle(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 
 private:
 	//target anime update scheduler

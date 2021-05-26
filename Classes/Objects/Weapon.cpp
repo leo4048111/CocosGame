@@ -204,11 +204,11 @@ void Weapon::getBackupMagazine()
 	m_backupAmmo += m_maxAmmoPerMagazine;
 }
 
-void Weapon::fire()
+void Weapon::fire(Vec2 startPos,Vec2 terminalPos)
 {
 	if (this->getWeaponType() == weaponType::bigKnife)
 	{
-		doMeleeAttack();
+		doMeleeAttack(startPos, terminalPos);
 		return;
 	}
 
@@ -217,25 +217,25 @@ void Weapon::fire()
 		switch (this->getWeaponType())
 		{
 		case weaponType::pistol:
-			fireNormalBullet();
+			fireNormalBullet(startPos, terminalPos);
 			break;
 		case weaponType::lazer:
-			fireLazer();
+			fireLazer(startPos, terminalPos);
 			break;
 		case weaponType::sniperRifle:
-			fireNormalBullet();
+			fireNormalBullet(startPos, terminalPos);
 			break;
 		case weaponType::sawedOff:
-			fireSprayAmmo();
+			fireSprayAmmo(startPos, terminalPos);
 			break;
 		case weaponType::rifle:
-			fireNormalBullet();
+			fireNormalBullet(startPos, terminalPos);
 			break;
 		case weaponType::plagueBringer:
-			fireToxicBomb();
+			fireToxicBomb(startPos, terminalPos);
 			break;
 		case weaponType::flameThrower:
-			fireFlameThrower();
+			fireFlameThrower(startPos, terminalPos);
 			break;
 		default:
 			break;
@@ -258,82 +258,59 @@ void Weapon::fire()
 	}
 }
 
-
-void Weapon::fireNormalBullet()
+void Weapon::runFireEffect(std::string filePath)
 {
-	BulletLayer* bulletLayer = BulletLayer::getInstance();
 	//create fire anime
-	auto biu = Sprite::create("objects/UI/ui_biu.png");
-	biu->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-	biu->setPosition(Vec2(0, this->getParent()->getContentSize().height * 3 / 5));
-	biu->setScale(0.2f);
-	this->getParent()->addChild(biu, 0, "biu");
+	auto effect = Sprite::create(filePath);
+	effect->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+	effect->setPosition(Vec2(0, this->getParent()->getContentSize().height * 3 / 5));
+	effect->setScale(0.2f);
+	this->getParent()->addChild(effect, 0, "biu");
 
 	auto fadein = FadeIn::create(0.2f);
 	auto fadeout = FadeOut::create(1.0f);
-	auto callFunc = CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, biu));
+	auto callFunc = CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, effect));
 	auto sequence = Sequence::create(fadein, fadeout, callFunc, NULL);
-	biu->runAction(sequence);
-
-	bulletLayer->addBullet();
-
+	effect->runAction(sequence);
 }
 
-void Weapon::fireLazer()
+void Weapon::fireNormalBullet(Vec2 startPos,Vec2 terminalPos)
 {
 	BulletLayer* bulletLayer = BulletLayer::getInstance();
-	//create fire anime
-	auto wow = Sprite::create("objects/UI/ui_wow.png");
-	wow->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-	wow->setPosition(Vec2(0, this->getParent()->getContentSize().height * 3 / 5));
-	wow->setScale(1.0f);
-	this->getParent()->addChild(wow, 0, "wow");
+	bulletLayer->addBullet(startPos, terminalPos);
 
-	auto fadein = FadeIn::create(0.2f);
-	auto fadeout = FadeOut::create(1.0f);
-	auto callFunc = CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, wow));
-	auto sequence = Sequence::create(fadein, fadeout, callFunc, NULL);
-	wow->runAction(sequence);
-
-	bulletLayer->addLazer();
+	runFireEffect("objects/UI/ui_biu.png");
 }
 
-void Weapon::fireSprayAmmo()
+void Weapon::fireLazer(Vec2 startPos, Vec2 terminalPos)
 {
 	BulletLayer* bulletLayer = BulletLayer::getInstance();
-	//create fire anime
-	auto biu = Sprite::create("objects/UI/ui_biu.png");
-	biu->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-	biu->setPosition(Vec2(0, this->getParent()->getContentSize().height * 3 / 5));
-	biu->setScale(0.2f);
-	this->getParent()->addChild(biu, 0, "biu");
-
-	auto fadein = FadeIn::create(0.2f);
-	auto fadeout = FadeOut::create(1.0f);
-	auto callFunc = CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, biu));
-	auto sequence = Sequence::create(fadein, fadeout, callFunc, NULL);
-	biu->runAction(sequence);
-
-	bulletLayer->addSprayBullet();
+	bulletLayer->addLazer(startPos, terminalPos);
+	runFireEffect("objects/UI/ui_wow.png");
 }
 
-void Weapon::fireToxicBomb()
+void Weapon::fireSprayAmmo(Vec2 startPos, Vec2 terminalPos)
 {
 	BulletLayer* bulletLayer = BulletLayer::getInstance();
+	bulletLayer->addSprayBullet(startPos, terminalPos);
+	runFireEffect("objects/UI/ui_biu.png");
 
-	bulletLayer->addToxicBomb();
 }
 
-void Weapon::fireFlameThrower()
+void Weapon::fireToxicBomb(Vec2 startPos, Vec2 terminalPos)
+{
+	BulletLayer* bulletLayer = BulletLayer::getInstance();
+	bulletLayer->addToxicBomb(startPos, terminalPos);
+}
+
+void Weapon::fireFlameThrower(Vec2 startPos, Vec2 terminalPos)
 {
 	BulletLayer* bulletLayer =BulletLayer::getInstance();
-
-	bulletLayer->addFlameThrower();
+	bulletLayer->addFlameThrower(startPos, terminalPos);
 }
 
-void Weapon::doMeleeAttack()
+void Weapon::doMeleeAttack(Vec2 startPos, Vec2 terminalPos)
 {
 	BulletLayer* bulletLayer = BulletLayer::getInstance();
-
-	bulletLayer->addMeleeAttack();
+	bulletLayer->addMeleeAttack(startPos, terminalPos);
 }

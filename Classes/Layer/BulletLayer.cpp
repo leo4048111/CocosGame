@@ -58,6 +58,19 @@ bool BulletLayer::loadGraphs()
 	}
 }
 
+void BulletLayer::runEffect(Node* sender,Vector<SpriteFrame*> effectFrame)
+{
+	auto effect = Sprite::createWithSpriteFrame(effectFrame.front());
+	effect->setScale(0.5f);
+	auto animation = Animation::createWithSpriteFrames(effectFrame, 0.5f / effectFrame.size());
+	auto animate = Animate::create(animation);
+	auto effectAction = Repeat::create(animate, 1);
+	sender->addChild(effect, 100);
+	auto effectCallFunc = CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, effect));
+	auto effectSequence = Sequence::create(effectAction, effectCallFunc, NULL);
+	effect->runAction(effectSequence);
+}
+
 void BulletLayer::cleanBullet(Node* sender)
 {
 	Sprite* bullet = dynamic_cast<Sprite*>(sender);
@@ -187,24 +200,29 @@ void BulletLayer::update(float delta)
 	}
 }
 
-void BulletLayer::addBullet()
+void BulletLayer::pointBulletTo(Node* obj, Vec2 route,double offset)
+{
+	float radians = M_PI - atan2(route.y, route.x);
+	float degree = CC_RADIANS_TO_DEGREES(radians);
+	obj->setRotation(degree+offset);
+}
+
+void BulletLayer::addBullet(Vec2 startPos,Vec2 terminalPos)
 {
 	//create bullet
 	auto bullet = Sprite::create("objects/ammo/ammo_normal.png");
 	this->addChild(bullet);
 	m_allFriendlyBullets.pushBack(bullet);
+	
+	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
+	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
+	Vec2 route = thisTerminalPos - thisStartPos;
 
 	//set bullet rotation
-	Player* mainCharacter = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
-	CrossHair* crossHair = CrossHair::getInstance();
-	Vec2 mousePosVec = this->convertToNodeSpace(crossHair->getCursorPos());
-	Vec2 weaponPosVec = mainCharacter->getPosition();
-	Vec2 dst = mousePosVec - weaponPosVec;
-	float radians = M_PI - atan2(dst.y, dst.x);
-	float degree = CC_RADIANS_TO_DEGREES(radians);
-	bullet->setRotation(degree);
+	pointBulletTo(bullet, route,0);
+
 	bullet->setScale(0.2f);
-	bullet->setPosition(mainCharacter->getPosition());
+	bullet->setPosition(thisStartPos);
 
 	////DEBUG
 	//std::string str1 = "ch:" + Value(mainCharacter->getPosition().x).asString() + "," + Value(mainCharacter->getPosition().y).asString() + "\n";
@@ -220,9 +238,8 @@ void BulletLayer::addBullet()
 	//SpriteLayer* spriteLayer = dynamic_cast<SpriteLayer*>(this->getParent()->getChildByName("SpriteLayer"));
 	//Vector<Target*>* allTargets = spriteLayer->getAllTargets();
 
-	////DEBUG END
 
-	auto action = MoveTo::create(1.0f, 1024 * Vec2(cos(atan2(dst.y, dst.x)), sin(atan2(dst.y, dst.x))));
+	auto action = MoveTo::create(1.0f, thisStartPos+ 1024 * Vec2(cos(atan2(route.y, route.x)), sin(atan2(route.y, route.x))));
 	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
 	auto sequence = Sequence::create(action, callFunc, NULL);
 	bullet->runAction(Repeat::create(sequence, 1));
@@ -230,7 +247,7 @@ void BulletLayer::addBullet()
 
 }
 
-void BulletLayer::addLazer()
+void BulletLayer::addLazer(Vec2 startPos, Vec2 terminalPos)
 {
 	//create bullet
 	auto lazer = Sprite::create("objects/ammo/ammo_lazer.png");
@@ -238,17 +255,15 @@ void BulletLayer::addLazer()
 	this->addChild(lazer);
 	m_allFriendlyBullets.pushBack(lazer);
 
+	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
+	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
+	Vec2 route = thisTerminalPos - thisStartPos;
+
 	//set bullet rotation
-	Player* mainCharacter = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
-	CrossHair* crossHair = CrossHair::getInstance();
-	Vec2 mousePosVec = this->convertToNodeSpace(crossHair->getCursorPos());
-	Vec2 weaponPosVec = mainCharacter->getPosition();
-	Vec2 dst = mousePosVec - weaponPosVec;
-	float radians = M_PI - atan2(dst.y, dst.x);
-	float degree = CC_RADIANS_TO_DEGREES(radians);
-	lazer->setRotation(degree);
+	pointBulletTo(lazer, route,0);
+
 	lazer->setScale(0.5f);
-	lazer->setPosition(mainCharacter->getPosition());
+	lazer->setPosition(thisStartPos);
 
 	auto action = FadeIn::create(0.2f);
 	auto action2 = FadeOut::create(0.5f);
@@ -258,18 +273,13 @@ void BulletLayer::addLazer()
 	lazer->setName("lazer");
 }
 
-void BulletLayer::addSprayBullet()
+void BulletLayer::addSprayBullet(Vec2 startPos, Vec2 terminalPos)
 {
 	const double offsetAngle = 0.418;
 
-	//set bullet rotation
-	Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
-	CrossHair* crossHair = CrossHair::getInstance();
-	Vec2 mousePosVec = this->convertToNodeSpace(crossHair->getCursorPos());
-	Vec2 weaponPosVec = player->getPosition();
-	Vec2 dst = mousePosVec - weaponPosVec;
-	float radians = M_PI - atan2(dst.y, dst.x);
-	float degree = CC_RADIANS_TO_DEGREES(radians);
+	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
+	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
+	Vec2 route = thisTerminalPos - thisStartPos;
 
 	//create bullet X 3
 	for (int offset = -15; offset <= 15; offset += 15)
@@ -277,11 +287,14 @@ void BulletLayer::addSprayBullet()
 		auto bullet = Sprite::create("objects/ammo/ammo_normal.png");
 		this->addChild(bullet);
 		m_allFriendlyBullets.pushBack(bullet);
-		bullet->setRotation(degree+ offset);
-		bullet->setScale(0.2f);
-		bullet->setPosition(weaponPosVec);
+		
+		//set bullet rotation
+		pointBulletTo(bullet, route, offset);
 
-		auto action = MoveTo::create(1.0f, 1024 * Vec2(cos(atan2(dst.y, dst.x)+offset/180.0*M_PI), sin(atan2(dst.y, dst.x)+offset / 180.0 * M_PI)));
+		bullet->setScale(0.2f);
+		bullet->setPosition(thisStartPos);
+
+		auto action = MoveTo::create(1.0f, thisStartPos+ 1024 * Vec2(cos(atan2(route.y, route.x)+offset/180.0*M_PI), sin(atan2(route.y, route.x)+offset / 180.0 * M_PI)));
 		CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
 		auto sequence = Sequence::create(action, callFunc, NULL);
 		bullet->runAction(sequence);
@@ -290,7 +303,7 @@ void BulletLayer::addSprayBullet()
 
 }
 
-void BulletLayer::addToxicBomb()
+void BulletLayer::addToxicBomb(Vec2 startPos, Vec2 terminalPos)
 {
 	//create bomb sprite
 	auto bomb = Sprite::create("objects/ammo/ammo_toxicBomb.png");
@@ -298,19 +311,18 @@ void BulletLayer::addToxicBomb()
 	this->addChild(bomb);
 	m_allFriendlyBullets.pushBack(bomb);
 
-	//set bomb position and dst
-	Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
-	CrossHair* crossHair = CrossHair::getInstance();
-	Vec2 dstPosVec = this->convertToNodeSpace(crossHair->getCursorPos());
-	Vec2 originPosVec = player->getPosition();
-	Vec2 dst = dstPosVec - originPosVec;
-	float radians = M_PI - atan2(dst.y, dst.x);
-	float degree = CC_RADIANS_TO_DEGREES(radians);
-	bomb->setRotation(degree);
-	bomb->setPosition(player->getPosition());
+	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
+	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
+	Vec2 route = thisTerminalPos - thisStartPos;
+
+	//set bullet rotation
+	pointBulletTo(bomb, route, 0);
+
+	bomb->setScale(0.5f);
+	bomb->setPosition(thisStartPos);
 
 	auto action1 = RepeatForever::create(RotateTo::create(0.5f, 1280));
-	auto action2 = JumpTo::create(1.0f, dstPosVec, 3.0f, 2);
+	auto action2 = JumpTo::create(1.0f, thisTerminalPos, 3.0f, 2);
 	auto action3 = FadeOut::create(0.5f);
 	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
 	auto spawn = Spawn::create(action1, action2, NULL);
@@ -322,7 +334,7 @@ void BulletLayer::addToxicBomb()
 	bomb->setName("toxicBomb");
 }
 
-void BulletLayer::addFlameThrower()
+void BulletLayer::addFlameThrower(Vec2 startPos, Vec2 terminalPos)
 {
 	const double c_flameSurvivalDuration= 0.2f;
 	auto flame = Sprite::create("objects/ammo/ammo_flame.png");
@@ -331,17 +343,14 @@ void BulletLayer::addFlameThrower()
 	this->addChild(flame);
 	m_allFriendlyBullets.pushBack(flame);
 
-	//set bomb position and dst
-	Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
-	CrossHair* crossHair = CrossHair::getInstance();
-	Vec2 dstPosVec = this->convertToNodeSpace(crossHair->getCursorPos());
-	Vec2 originPosVec = player->getPosition();
-	Vec2 dst = dstPosVec - originPosVec;
-	float radians = M_PI - atan2(dst.y, dst.x);
-	float degree = CC_RADIANS_TO_DEGREES(radians);
+	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
+	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
+	Vec2 route = thisTerminalPos - thisStartPos;
 
-	flame->setRotation(degree);
-	flame->setPosition(player->getPosition());
+	//set bullet rotation
+	pointBulletTo(flame, route, 0);
+
+	flame->setPosition(thisStartPos);
 
 	//flame anime and auto cleanup
 	auto fadein = FadeIn::create(c_flameSurvivalDuration / 2);
@@ -360,54 +369,47 @@ void BulletLayer::initHostileBulletDamageMap()
 	m_hostileBulletDamageMap.insert(std::make_pair("hostileFlameCircle", 2.0f));
 }
 
-void BulletLayer::addSpiritualPower(Node* sender)
+void BulletLayer::addSpiritualPower(Node* sender, Vec2 startPos, Vec2 terminalPos)
 {
-	//create effect
-	auto effect = Sprite::createWithSpriteFrame(m_chargeSpiritAnime.front());
-	effect->setScale(0.5f);
-	auto animation = Animation::createWithSpriteFrames(m_chargeSpiritAnime,0.5f/29);
-	auto animate = Animate::create(animation);
-	auto effectAction = Repeat::create(animate, 1);
-	sender->addChild(effect,100);
-	auto effectCallFunc = CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, effect));
-	auto effectSequence = Sequence::create(effectAction, effectCallFunc, NULL);
-	effect->runAction(effectSequence);
+	runEffect(sender, m_chargeSpiritAnime);
 
 	//create bullet sprite
 	auto bullet = Sprite::create("objects/ammo/ammo_spiritualPower.png");
-	bullet->setScale(0.1f);
 	this->addChild(bullet);
 	m_allHostileBullets.pushBack(bullet);
 
-	Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
-	Vec2 targetPosVec = sender->getPosition();
-	Vec2 playerPosVec = player->getPosition();
-	Vec2 dst = playerPosVec - targetPosVec;
-	float radians = M_PI - atan2(dst.y, dst.x);
-	float degree = CC_RADIANS_TO_DEGREES(radians);
+	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
+	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
+	Vec2 route = thisTerminalPos - thisStartPos;
 
-	bullet->setRotation(degree);
-	bullet->setPosition(sender->getPosition());
+	//set bullet rotation
+	pointBulletTo(bullet, route, 0);
+	bullet->setScale(0.1f);
+	bullet->setPosition(thisStartPos);
 
-	auto action = MoveTo::create(TARGET_BULLET_SPEED,1024 * Vec2(cos(atan2(dst.y, dst.x)), sin(atan2(dst.y, dst.x))));
+	auto action = MoveTo::create(TARGET_BULLET_SPEED, thisStartPos+1024 * Vec2(cos(atan2(route.y, route.x)), sin(atan2(route.y, route.x))));
 	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
 	auto sequence = Sequence::create(action, callFunc, NULL);
 	bullet->runAction(Repeat::create(sequence, 1));
 	bullet->setName("hostileSpiritualPower");
 }
 
-void BulletLayer::addFlameCircle(Node* sender)
+void BulletLayer::addFlameCircle(Node* sender, Vec2 startPos, Vec2 terminalPos)
 {
 	const double c_totalExpessionPeriodLength = 1.5f;
 	//create bullet sprite
 	auto bullet = Sprite::create("objects/ammo/ammo_flameCircle.png");
-	bullet->setScale(0.2f);
 	this->addChild(bullet);
 	m_allHostileBullets.pushBack(bullet);
 
-	Vec2 targetPosVec = sender->getPosition();
+	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
+	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
+	Vec2 route = thisTerminalPos - thisStartPos;
 
-	bullet->setPosition(targetPosVec);
+	//set bullet rotation
+	pointBulletTo(bullet, route, 0);
+	bullet->setScale(0.2f);
+	bullet->setPosition(thisStartPos);
 
 	auto scaleby = ScaleBy::create(c_totalExpessionPeriodLength, 10.0f); //zoom out
 	auto rotateby = RotateBy::create(c_totalExpessionPeriodLength, 360 * 10); //rotate by
@@ -422,25 +424,23 @@ void BulletLayer::addFlameCircle(Node* sender)
 	bullet->runAction(spawn);
 }
 
-void BulletLayer::addMeleeAttack()
+void BulletLayer::addMeleeAttack(Vec2 startPos, Vec2 terminalPos)
 {
 	const double c_effectDuration = 0.2f;
 	auto effect = Sprite::create("objects/ammo/ammo_slash.png");
 	effect->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-	effect->setScale(0.3f);
 	this->addChild(effect);
 	m_allFriendlyBullets.pushBack(effect);
 
-	//set bomb position and dst
-	Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
-	CrossHair* crossHair = CrossHair::getInstance();
-	Vec2 dstPosVec = this->convertToNodeSpace(crossHair->getCursorPos());
-	Vec2 originPosVec = player->getPosition();
-	Vec2 dst = dstPosVec - originPosVec;
-	float radians = M_PI - atan2(dst.y, dst.x);
-	float degree = CC_RADIANS_TO_DEGREES(radians);
-	effect->setRotation(degree);
-	effect->setPosition(player->getPosition());
+	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
+	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
+	Vec2 route = thisTerminalPos - thisStartPos;
+
+	//set bullet rotation
+	pointBulletTo(effect, route, 0);
+
+	effect->setScale(0.3f);
+	effect->setPosition(thisStartPos);
 
 	//flame anime and auto cleanup
 	auto fadein = FadeIn::create(c_effectDuration / 2);

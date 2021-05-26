@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Controls/Specs.h"
+#include "Objects/CrossHair.h"
 
 USING_NS_CC;
 
@@ -67,6 +68,8 @@ bool Player::isAi()
 void Player::setAiControl(bool value)
 {
 	m_isAi = value;
+	if (m_isAi)
+		this->setControlOffListen();
 }
 
 void Player::deployTo(Vec2 pos)
@@ -206,9 +209,10 @@ void Player::update(float delta)
 		m_magazineSpecLabel->setString(Value(m_currentWeapon->m_ammoInCurrentMagazine).asString() + "/" + Value(m_currentWeapon->m_backupAmmo).asString());
 		else
 			m_magazineSpecLabel->setString("inf/inf");
+
 	//auto fire weapon
 	if (m_mouseButtonMap[EventMouse::MouseButton::BUTTON_LEFT] && m_currentWeapon->m_isAutoFire)
-		m_currentWeapon->fire();
+		m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()), CrossHair::getInstance()->getCursorPos());
 }
 
 void Player::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event)
@@ -312,6 +316,12 @@ void Player::setControlOnListen()
 	dispatcher->addEventListenerWithSceneGraphPriority(keyListener, this);
 }
 
+void Player::setControlOffListen()
+{
+	auto* dispatcher = Director::getInstance()->getEventDispatcher();
+	dispatcher->removeEventListenersForTarget(this, false);
+}
+
 void Player::onMouseDown(Event* event)
 {
 	EventMouse* mouseEvent = dynamic_cast<EventMouse*>(event);
@@ -321,7 +331,7 @@ void Player::onMouseDown(Event* event)
 	{
 	case EventMouse::MouseButton::BUTTON_LEFT:
 		if (m_currentWeapon != nullptr)
-			m_currentWeapon->fire();
+			m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()), CrossHair::getInstance()->getCursorPos());
 		break;
 	default:
 		break;
@@ -444,5 +454,5 @@ void Player::initAllWeapon()
 void Player::fastMeleeAttack()
 {
 	swapWeapon(0);
-	m_currentWeapon->fire();
+	m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()), CrossHair::getInstance()->getCursorPos());
 }

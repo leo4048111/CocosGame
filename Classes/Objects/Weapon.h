@@ -42,23 +42,26 @@ public:
 
 	//Ammo and fire related
 
-	void fire();
+	void fire(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 
-	void fireNormalBullet();
+	void runFireEffect(std::string filePath);
 
-	void fireLazer();
+	void fireNormalBullet(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 
-	void fireSprayAmmo();
+	void fireLazer(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 
-	void fireToxicBomb();
+	void fireSprayAmmo(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 
-	void fireFlameThrower();
+	void fireToxicBomb(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
+
+	void fireFlameThrower(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
+
+	void doMeleeAttack(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 
 	void reload();
 
 	void getBackupMagazine();
 
-	void doMeleeAttack();
 
 	//weapon status control
 	bool isLocked();
@@ -78,6 +81,7 @@ public:
 
 	//weapon status control
 	bool m_isLocked;
+
 };
 
 
