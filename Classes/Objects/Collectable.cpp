@@ -98,7 +98,8 @@ bool Collectable::loadGraphs()
 void Collectable::useCollectable()
 {
 	Player* player = dynamic_cast<Player*>(this->getParent()->getParent()->getChildByName(Specs::getInstance()->getPlayerName()));
-	Label* notification = Label::createWithTTF("=w=", "fonts/Notification Font.ttf", 20);
+	Label* notification = Label::createWithTTF("New weapon!", "fonts/Notification Font.ttf", 20);
+	notification->setColor(Color3B(160, 82, 45));
 	notification->enableBold();
 	switch (this->getCollectableType())
 	{

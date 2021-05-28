@@ -40,6 +40,8 @@ public:
 
 	void onMouseMove(cocos2d::Event* event);
 
+	void pointTo(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
+
 	//Ammo and fire related
 
 	void fire(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
@@ -59,6 +61,8 @@ public:
 	void doMeleeAttack(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 
 	void reload();
+
+	bool isCurrentMagazineEmpty();
 
 	void getBackupMagazine();
 

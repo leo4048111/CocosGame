@@ -1,5 +1,4 @@
 #include "SpriteLayer.h"
-#include "Algorithm/msws.h"
 #include "UILayer.h"
 #include "Controls/Specs.h"
 
@@ -42,7 +41,7 @@ void SpriteLayer::update(float delta)
 {
 	int maxPlayerCount = Specs::getInstance()->getMaxPlayer();
 
-	if (m_aiplayers.size() + 1 < Specs::getInstance()->getMaxPlayer())
+	if (m_players.size()< Specs::getInstance()->getMaxPlayer())
 	{
 		addAiPlayer();
 	}
@@ -50,7 +49,6 @@ void SpriteLayer::update(float delta)
 	//update target
 	if (m_targets.size() < MIN_TARGETS_COUNT+Specs::getInstance()->getCurrentRound())
 	{
-		msws_srand();
 		addTarget();
 	}
 }
@@ -64,6 +62,7 @@ void SpriteLayer::addPlayer()
 	//init player
 	 m_mainPlayer = Player::createPlayer();
 	this->addChild(m_mainPlayer, 20, Specs::getInstance()->getPlayerName());
+	m_players.push_back(m_mainPlayer);
 	m_mainPlayer->setPosition(dst);
 	m_mainPlayer->setControlOnListen();
 	m_mainPlayer->scheduleUpdate();
@@ -71,18 +70,17 @@ void SpriteLayer::addPlayer()
 
 void SpriteLayer::addAiPlayer()
 {
-	msws_srand();
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	auto origin = Director::getInstance()->getVisibleOrigin();
-	Vec2 dst = Vec2(msws() % ((int)Director::getInstance()->getVisibleSize().width), msws() % ((int)Director::getInstance()->getVisibleSize().height));
+	Vec2 dst = Vec2(random() % ((int)Director::getInstance()->getVisibleSize().width), random() % ((int)Director::getInstance()->getVisibleSize().height));
 
 	//init ai player
 	auto aiPlayer = AiPlayer::createPlayer();
-	this->addChild(aiPlayer, 20, "AI_"+Value(m_aiplayers.size()).asString());
+	this->addChild(aiPlayer, 20, "AI_"+Value(m_players.size()).asString());
 	aiPlayer->setPosition(dst);
 	aiPlayer->scheduleUpdate();
 
-	m_aiplayers.pushBack(aiPlayer);
+	m_players.push_back(aiPlayer);
 }
 
 void SpriteLayer::addTarget()
@@ -90,14 +88,19 @@ void SpriteLayer::addTarget()
 	auto target = Target::createTarget();
 	target->showStaminaBar();
 	this->addChild(target, 20);
-	target->setPosition(Vec2(msws() % ((int)Director::getInstance()->getVisibleSize().width), msws() % ((int)Director::getInstance()->getVisibleSize().height)));
+	target->setPosition(Vec2(random() % ((int)Director::getInstance()->getVisibleSize().width), random() % ((int)Director::getInstance()->getVisibleSize().height)));
 	m_targets.pushBack(target);
 	target->scheduleUpdate();
 }
 
-Vector<Target*>* SpriteLayer::getAllTargets()
+Vector<Target*> SpriteLayer::getAllTargets()
 {
-	return &m_targets;
+	return m_targets;
+}
+
+std::vector<Entity*> SpriteLayer::getAllPlayers()
+{
+	return m_players;
 }
 
 void SpriteLayer::initTargetSpecs()
@@ -115,3 +118,20 @@ int SpriteLayer::getThisTargetScore(Target* target)
 	return m_targetScoreMap[target->getTargetType()];
 }
 
+void SpriteLayer::removePlayer(Entity* player)
+{
+	for (vector<Entity*>::iterator iter = m_players.begin(); iter != m_players.end(); iter++)
+	{       
+		if (*iter == player)
+		{
+			m_players.erase(iter);
+			break;
+		}
+	}
+
+}
+
+void SpriteLayer::removeTarget(Target* target)
+{
+	m_targets.eraseObject(target);
+}

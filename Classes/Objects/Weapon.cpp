@@ -130,7 +130,7 @@ bool Weapon::isLocked()
 
 void Weapon::unlock()
 {
-	if (m_isLocked = true)
+	if (m_isLocked == true)
 	{
 		m_isLocked = false;
 		UILayer::getInstance()->unlockSlot(this->getWeaponType());
@@ -147,8 +147,13 @@ void Weapon::unlock()
 		auto repeat = Repeat::create(fadeSequence, 2);
 		auto sequence = Sequence::create(repeat, CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, notification)), NULL);
 		notification->runAction(sequence);
-		getBackupMagazine();
+		this->getBackupMagazine();
 	}
+}
+
+bool Weapon::isCurrentMagazineEmpty()
+{
+	return m_ammoInCurrentMagazine;
 }
 
 void Weapon::setControlOnListen()
@@ -174,15 +179,20 @@ void Weapon::onMouseMove(Event* event)
 	EventMouse* mouseEvent = dynamic_cast<EventMouse*>(event);
 	Vec2 weaponPosVec = this->getParent()->getParent()->convertToWorldSpaceAR(this->getParent()->getPosition());
 	Vec2 mousePosVec = Vec2(mouseEvent->getCursorX(), mouseEvent->getCursorY());
-	Vec2 dst = mousePosVec - weaponPosVec;
-	float radians =M_PI-atan2(dst.y, dst.x);
+	pointTo(weaponPosVec, mousePosVec);
+}
+
+void Weapon::pointTo(Vec2 startPos, Vec2 terminalPos)
+{
+	Vec2 route = terminalPos - startPos;
+	float radians = M_PI - atan2(route.y, route.x);
 	float degree = CC_RADIANS_TO_DEGREES(radians);
 	this->setRotation(degree);
 }
 
 void Weapon::reload()
 {
-	if (m_backupAmmo)
+	if (m_backupAmmo>0)
 	{
 		m_backupAmmo -= m_maxAmmoPerMagazine - m_ammoInCurrentMagazine;
 		m_ammoInCurrentMagazine = m_maxAmmoPerMagazine;
@@ -212,7 +222,7 @@ void Weapon::fire(Vec2 startPos,Vec2 terminalPos)
 		return;
 	}
 
-	if (m_ammoInCurrentMagazine>0||Specs::getInstance()->isInfiniteAmmoActivated())
+	if ((isCurrentMagazineEmpty())||Specs::getInstance()->isInfiniteAmmoActivated())
 	{
 		switch (this->getWeaponType())
 		{
@@ -277,7 +287,7 @@ void Weapon::runFireEffect(std::string filePath)
 void Weapon::fireNormalBullet(Vec2 startPos,Vec2 terminalPos)
 {
 	BulletLayer* bulletLayer = BulletLayer::getInstance();
-	bulletLayer->addBullet(startPos, terminalPos);
+	bulletLayer->addBullet(this,startPos, terminalPos);
 
 	runFireEffect("objects/UI/ui_biu.png");
 }
@@ -285,14 +295,14 @@ void Weapon::fireNormalBullet(Vec2 startPos,Vec2 terminalPos)
 void Weapon::fireLazer(Vec2 startPos, Vec2 terminalPos)
 {
 	BulletLayer* bulletLayer = BulletLayer::getInstance();
-	bulletLayer->addLazer(startPos, terminalPos);
+	bulletLayer->addLazer(this,startPos, terminalPos);
 	runFireEffect("objects/UI/ui_wow.png");
 }
 
 void Weapon::fireSprayAmmo(Vec2 startPos, Vec2 terminalPos)
 {
 	BulletLayer* bulletLayer = BulletLayer::getInstance();
-	bulletLayer->addSprayBullet(startPos, terminalPos);
+	bulletLayer->addSprayBullet(this,startPos, terminalPos);
 	runFireEffect("objects/UI/ui_biu.png");
 
 }
@@ -300,17 +310,17 @@ void Weapon::fireSprayAmmo(Vec2 startPos, Vec2 terminalPos)
 void Weapon::fireToxicBomb(Vec2 startPos, Vec2 terminalPos)
 {
 	BulletLayer* bulletLayer = BulletLayer::getInstance();
-	bulletLayer->addToxicBomb(startPos, terminalPos);
+	bulletLayer->addToxicBomb(this,startPos, terminalPos);
 }
 
 void Weapon::fireFlameThrower(Vec2 startPos, Vec2 terminalPos)
 {
 	BulletLayer* bulletLayer =BulletLayer::getInstance();
-	bulletLayer->addFlameThrower(startPos, terminalPos);
+	bulletLayer->addFlameThrower(this,startPos, terminalPos);
 }
 
 void Weapon::doMeleeAttack(Vec2 startPos, Vec2 terminalPos)
 {
 	BulletLayer* bulletLayer = BulletLayer::getInstance();
-	bulletLayer->addMeleeAttack(startPos, terminalPos);
+	bulletLayer->addMeleeAttack(this,startPos, terminalPos);
 }

@@ -20,13 +20,12 @@ public:
 
 	bool loadGraphs();
 
-	void runActionAnime(int dir);
 
 	CREATE_FUNC(AiPlayer);
 
 	virtual void update(float delta);
 
-	void deployTo(cocos2d::Vec2 pos);
+	void runActionAnime(int dir);
 
 	//Weapon related
 	void initRandomWeapon();
@@ -44,9 +43,7 @@ private:
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_rightWalkAnime;
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_forwardWalkAnime;
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_backWalkAnime;
-	cocos2d::Vector<cocos2d::SpriteFrame*> m_standBackAnime;
-	cocos2d::Vector<cocos2d::SpriteFrame*> m_leftSlideAnime;
-	cocos2d::Vector<cocos2d::SpriteFrame*> m_rightSlideAnime;
+
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_parachuteAnime;
 
 	//Control specs

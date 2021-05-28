@@ -85,35 +85,35 @@ bool UILayer::init()
 	chatbox->setControlOnListen();
 
 	//init player status window
-	const double gap = 10.0f;
+
 	m_statusWindowBg = Sprite::create("objects/UI/ui_playerStatusBg.png");
 	m_statusWindowBg->setScale(0.2f);
-	m_statusWindowBg->setPosition(Vec2(visibleSize.width/2,origin.y));
+	m_statusWindowBg->setPosition(Vec2(visibleSize.width/2,origin.y+20));
 	this->addChild(m_statusWindowBg);
 	m_playerHp = ProgressTimer::create(Sprite::create("objects/UI/ui_playerStatusHp.png"));
 	m_playerHp->setType(ProgressTimer::Type::BAR);
-	m_playerHp->setMidpoint(Vec2(1.0f, 0));
-	m_playerHp->setPosition(Vec2(-2, m_statusWindowBg->getContentSize().height));
-	m_playerHp->setBarChangeRate(Vec2(0, 1.0f));
-	m_playerHp->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
+	m_playerHp->setMidpoint(Vec2(0, 1.0f));
+	m_playerHp->setPosition(Vec2(m_statusWindowBg->getContentSize().width/5-5, 150));
+	m_playerHp->setBarChangeRate(Vec2(1.0f, 0));
+	m_playerHp->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
 	m_playerHp->setPercentage(100);
 	m_statusWindowBg->addChild(m_playerHp);
 
 	m_playerSpeed = ProgressTimer::create(Sprite::create("objects/UI/ui_playerStatusSpeed.png"));
 	m_playerSpeed->setType(ProgressTimer::Type::BAR);
-	m_playerSpeed->setMidpoint(Vec2(1.0f, 0));
-	m_playerSpeed->setPosition(Vec2(-2, m_statusWindowBg->getContentSize().height-gap));
-	m_playerSpeed->setBarChangeRate(Vec2(0, 1.0f));
-	m_playerSpeed->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
+	m_playerSpeed->setMidpoint(Vec2(0, 1.0f));
+	m_playerSpeed->setPosition(Vec2(m_statusWindowBg->getContentSize().width / 5-5,30));
+	m_playerSpeed->setBarChangeRate(Vec2(1.0f, 0));
+	m_playerSpeed->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
 	m_playerSpeed->setPercentage(100);
 	m_statusWindowBg->addChild(m_playerSpeed);
 
 	m_playerArmor = ProgressTimer::create(Sprite::create("objects/UI/ui_playerStatusArmor.png"));
 	m_playerArmor->setType(ProgressTimer::Type::BAR);
-	m_playerArmor->setMidpoint(Vec2(1.0f, 0));
-	m_playerArmor->setPosition(Vec2(-2, m_statusWindowBg->getContentSize().height-2*gap));
-	m_playerArmor->setBarChangeRate(Vec2(0, 1.0f));
-	m_playerArmor->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
+	m_playerArmor->setMidpoint(Vec2(0, 1.0f));
+	m_playerArmor->setPosition(Vec2(m_statusWindowBg->getContentSize().width / 5-5, 90));
+	m_playerArmor->setBarChangeRate(Vec2(1.0f,0));
+	m_playerArmor->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
 	m_playerArmor->setPercentage(100);
 	m_statusWindowBg->addChild(m_playerArmor);
 
@@ -175,6 +175,7 @@ void UILayer::update(float delta)
 
 	//update player status window
 	m_playerHp->setPercentage(player->getHealthPercentage());
+	double test = player->getSpeedPercentage();
 	m_playerSpeed->setPercentage(player->getSpeedPercentage());
 	m_playerArmor->setPercentage(player->getCurrentResistance());
 

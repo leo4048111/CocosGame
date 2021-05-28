@@ -6,6 +6,7 @@
 #include "Objects/Player.h"
 #include "Objects/AiPlayer.h"
 #include "CollectableLayer.h"
+#include "Objects/Entity.h"
 #include <map>
 
 #define MIN_TARGETS_COUNT 3
@@ -36,7 +37,9 @@ public:
 
 	virtual void update(float delta);
 
-	cocos2d::Vector<Target*>* getAllTargets();
+	cocos2d::Vector<Target*> getAllTargets();
+
+	std::vector<Entity*> getAllPlayers();
 
 	//target specs related
 	void initTargetSpecs();
@@ -49,9 +52,10 @@ public:
 
 	void addTarget();
 
-	int getPlayerCount();
+	void removePlayer(Entity* player);
 
-	int getAiCount();
+	void removeTarget(Target* target);
+
 
 private:
 
@@ -62,7 +66,7 @@ private:
 
 	//Player specs
 	Player* m_mainPlayer;
-	cocos2d::Vector<AiPlayer*> m_aiplayers;
+	std::vector<Entity*> m_players;
 };
 
 #endif // !_TARGET_LAYER_H_

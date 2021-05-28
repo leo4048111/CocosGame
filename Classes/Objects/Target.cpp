@@ -1,6 +1,8 @@
 #include "Target.h"
 #include "Controls/Specs.h"
 #include "Layer/UILayer.h"
+#include "Layer/SpriteLayer.h"
+#include <vector>
 
 USING_NS_CC;
 
@@ -204,7 +206,8 @@ void Target::attack()
 	this->runAction(sequence);
 
 	//init route
-	Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName(Specs::getInstance()->getPlayerName()));
+	auto allPlayers = SpriteLayer::getInstance()->getAllPlayers();
+	Entity* player = allPlayers[random() % (allPlayers.size())];
 	Vec2 startPos = this->getParent()->convertToWorldSpace(this->getPosition());
 	Vec2 terminalPos =player->getParent()->convertToWorldSpace(player->getPosition());
 
@@ -216,6 +219,9 @@ void Target::attack()
 		break;
 	case targetType::jellyGhost:
 		fireFlameCircle(startPos, terminalPos);
+		break;
+	case targetType::ghost:
+		fireSubterrainAssualt(startPos, terminalPos);
 		break;
 	default:
 		fireSpiritualPower(startPos, terminalPos);
@@ -241,4 +247,11 @@ void Target::fireFlameCircle(Vec2 startPos, Vec2 terminalPos)
 	BulletLayer* bulletLayer = dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getChildByName("BulletLayer"));
 	UILayer::getInstance()->instructorGivesInstruction("Watch out\nthat flame circle burns");
 	bulletLayer->addFlameCircle(this, startPos, terminalPos);
+}
+
+void Target::fireSubterrainAssualt(Vec2 startPos, Vec2 terminalPos)
+{
+	BulletLayer* bulletLayer = dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getChildByName("BulletLayer"));
+	UILayer::getInstance()->instructorGivesInstruction("Subterrain Assualt!");
+	bulletLayer->addSubterrainAssualt(this, startPos, terminalPos);
 }

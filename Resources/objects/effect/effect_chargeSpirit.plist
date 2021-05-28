@@ -4,7 +4,7 @@
     <dict>
         <key>frames</key>
         <dict>
-            <key>effect_chargeSpirit0</key>
+            <key>effect_chargeSpirit_0</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -19,7 +19,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit1</key>
+            <key>effect_chargeSpirit_1</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -34,7 +34,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit10</key>
+            <key>effect_chargeSpirit_10</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -49,7 +49,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit11</key>
+            <key>effect_chargeSpirit_11</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -64,7 +64,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit12</key>
+            <key>effect_chargeSpirit_12</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -79,7 +79,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit13</key>
+            <key>effect_chargeSpirit_13</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -94,7 +94,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit14</key>
+            <key>effect_chargeSpirit_14</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -109,7 +109,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit15</key>
+            <key>effect_chargeSpirit_15</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -124,7 +124,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit16</key>
+            <key>effect_chargeSpirit_16</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -139,7 +139,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit17</key>
+            <key>effect_chargeSpirit_17</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -154,7 +154,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit18</key>
+            <key>effect_chargeSpirit_18</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -169,7 +169,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit19</key>
+            <key>effect_chargeSpirit_19</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -184,7 +184,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit2</key>
+            <key>effect_chargeSpirit_2</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -199,7 +199,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit20</key>
+            <key>effect_chargeSpirit_20</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -214,7 +214,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit21</key>
+            <key>effect_chargeSpirit_21</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -229,7 +229,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit22</key>
+            <key>effect_chargeSpirit_22</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -244,7 +244,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit23</key>
+            <key>effect_chargeSpirit_23</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -259,7 +259,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit24</key>
+            <key>effect_chargeSpirit_24</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -274,7 +274,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit25</key>
+            <key>effect_chargeSpirit_25</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -289,7 +289,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit26</key>
+            <key>effect_chargeSpirit_26</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -304,7 +304,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit27</key>
+            <key>effect_chargeSpirit_27</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -319,7 +319,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit28</key>
+            <key>effect_chargeSpirit_28</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -334,7 +334,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit3</key>
+            <key>effect_chargeSpirit_3</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -349,7 +349,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit4</key>
+            <key>effect_chargeSpirit_4</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -364,7 +364,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit5</key>
+            <key>effect_chargeSpirit_5</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -379,7 +379,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit6</key>
+            <key>effect_chargeSpirit_6</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -394,7 +394,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit7</key>
+            <key>effect_chargeSpirit_7</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -409,7 +409,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit8</key>
+            <key>effect_chargeSpirit_8</key>
             <dict>
                 <key>aliases</key>
                 <array/>
@@ -424,7 +424,7 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
-            <key>effect_chargeSpirit9</key>
+            <key>effect_chargeSpirit_9</key>
             <dict>
                 <key>aliases</key>
                 <array/>

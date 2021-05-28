@@ -46,7 +46,28 @@ bool BulletLayer::loadGraphs()
 		cache->addSpriteFramesWithFile("objects/effect/effect_chargeSpirit.plist");
 		for (int c = 0; c <= 28; c++)
 		{
-			m_chargeSpiritAnime.pushBack(cache->getSpriteFrameByName("effect_chargeSpirit" + Value(c).asString()));
+			m_chargeSpiritAnime.pushBack(cache->getSpriteFrameByName("effect_chargeSpirit_" + Value(c).asString()));
+		}
+		cache->addSpriteFramesWithFile("objects/effect/effect_flameCircle.plist");
+		for (int c = 0; c <= 5; c++)
+		{
+			m_flameCircleAnime.pushBack(cache->getSpriteFrameByName("effect_flameCircle_" + Value(c).asString()));
+
+		}
+		cache->addSpriteFramesWithFile("objects/effect/effect_subterrainAssuat.plist");
+		for (int c = 0; c <= 5; c++)
+		{
+			m_subterrainAssualtAnime.pushBack(cache->getSpriteFrameByName("effect_subterrainAssual_" + Value(c).asString()));
+		}
+		cache->addSpriteFramesWithFile("objects/effect/effect_bomb.plist");
+		for (int c = 0; c <= 11; c++)
+		{
+			m_bombAnime.pushBack(cache->getSpriteFrameByName("effect_bomb_" + Value(c).asString()));
+		}
+		cache->addSpriteFramesWithFile("objects/effect/effect_hit1.plist");
+		for (int c = 0; c <= 8; c++)
+		{
+			m_hit1Anime.pushBack(cache->getSpriteFrameByName("effect_hit1_" + Value(c).asString()));
 		}
 
 		return true;
@@ -86,21 +107,24 @@ void BulletLayer::cleanBullet(Node* sender)
 void BulletLayer::update(float delta)
 {
 	SpriteLayer* spriteLayer = SpriteLayer::getInstance();
-	Vector<Target*>* allTargets = spriteLayer->getAllTargets();
+	auto allTargets = spriteLayer->getAllTargets();
+	auto allPlayers = spriteLayer->getAllPlayers();
 	UILayer* uiLayer = UILayer::getInstance();
 	CrossHair* crossHair = CrossHair::getInstance();
-	Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));
+	/*Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));*/
+	
 	Vector<Sprite*> tmpEraseFriendlyBullet;
 	Vector<Sprite*> tmpEraseHostileBullet;
 	Vector<Target*> tmpEraseTarget;
+	Vector<Entity*> tmpErasePlayer;
 
-	if (player == NULL)
+	if (allPlayers.front() == NULL)
 		return;
 
 	//update all friendly bullets and detect collision
 	for (auto currentBullet : m_allFriendlyBullets)
 	{
-		for (auto currentTarget : *allTargets)
+		for (auto currentTarget : allTargets)
 		{
 			targetType currentTargetType = currentTarget->getTargetType();
 			Rect bulletRect = currentBullet->getBoundingBox();
@@ -108,14 +132,15 @@ void BulletLayer::update(float delta)
 			if (bulletRect.intersectsRect(targetRect)) //Collision Detection
 			{
 				crossHair->showHitNotification(); //show hit anime on crosshair
-				if (!currentTarget->receiveDamage(player->getCurrentWeapon()->getWeaponDamage()))
+				if (!currentTarget->receiveDamage(m_bulletDamageMap[currentBullet->getName()]))
 				{
+					runEffect(currentTarget, m_hit1Anime);
 					Specs::getInstance()->addScore(spriteLayer->getThisTargetScore(currentTarget));
 					tmpEraseTarget.pushBack(currentTarget);
 				}
 
 				std::string str = currentBullet->getName();
-				if (str != "lazer" && str != "flame" && str != "meleeAttack")
+				if (str != "lazer" && str != "flame" && str != "meleeAttack"&&str!="toxicBomb")
 				{
 					tmpEraseFriendlyBullet.pushBack(currentBullet);
 					break;
@@ -128,18 +153,26 @@ void BulletLayer::update(float delta)
 	for (auto currentBullet : m_allHostileBullets)
 	{
 		Rect bulletRect = currentBullet->getBoundingBox();
-		Rect mainCharacterRect = Rect(player->getBoundingBox().origin, player->m_sprite->getContentSize() / 10.0f);
-		if (bulletRect.intersectsRect(mainCharacterRect)) //Collision Detection
+		for (auto currentPlayer : allPlayers)
 		{
-			if (!Specs::getInstance()->isInvincibleActivated())
+			Rect playerRect = Rect(currentPlayer->getBoundingBox().origin, currentPlayer->getContentSize() / 10.0f);
+			if (bulletRect.intersectsRect(playerRect)) //Collision Detection
 			{
-				if (!player->receiveDamage(m_hostileBulletDamageMap[currentBullet->getName()]))
+				if (!Specs::getInstance()->isInvincibleActivated())
 				{
-					Specs::getInstance()->setWinOrLose(false);
+					if (!currentPlayer->receiveDamage(m_bulletDamageMap[currentBullet->getName()]))
+					{
+						if (currentPlayer->getName() == Specs::getInstance()->getPlayerName())
+							Specs::getInstance()->setWinOrLose(false);
+						else
+							tmpErasePlayer.pushBack(currentPlayer);
+					}
 				}
+
+				std::string str = currentBullet->getName();
+				if (str != "hostileFlameCircle" && str != "hostileSubterrainAssualt")
+					tmpEraseHostileBullet.pushBack(currentBullet);
 			}
-			if(currentBullet->getName()!="hostileFlameCircle")
-			tmpEraseHostileBullet.pushBack(currentBullet);
 		}
 	}
 
@@ -190,11 +223,22 @@ void BulletLayer::update(float delta)
 		{
 			//speak some lines
 			tmpTarget->speak(Specs::getInstance()->speakRandom());
-
 			tmpTarget->dropRandomCollectable();
 			tmpEraseTarget.popBack();
-			allTargets->eraseObject(tmpTarget);
+			spriteLayer->removeTarget(tmpTarget);
 			tmpTarget->runDeadAction();
+		}
+	}
+
+	//cleanup targets
+	while (!tmpErasePlayer.empty())
+	{
+		auto tmpPlayer = tmpErasePlayer.back();
+		if (tmpPlayer != nullptr)
+		{
+			tmpErasePlayer.popBack();
+			spriteLayer->removePlayer(tmpPlayer);
+			tmpPlayer->runDeadAction();
 		}
 	}
 }
@@ -206,7 +250,7 @@ void BulletLayer::pointBulletTo(Node* obj, Vec2 route,double offset)
 	obj->setRotation(degree+offset);
 }
 
-void BulletLayer::addBullet(Vec2 startPos,Vec2 terminalPos)
+void BulletLayer::addBullet(Node* sender,Vec2 startPos,Vec2 terminalPos)
 {
 	//create bullet
 	auto bullet = Sprite::create("objects/ammo/ammo_normal.png");
@@ -246,7 +290,7 @@ void BulletLayer::addBullet(Vec2 startPos,Vec2 terminalPos)
 
 }
 
-void BulletLayer::addLazer(Vec2 startPos, Vec2 terminalPos)
+void BulletLayer::addLazer(Node* sender,Vec2 startPos, Vec2 terminalPos)
 {
 	//create bullet
 	auto lazer = Sprite::create("objects/ammo/ammo_lazer.png");
@@ -272,7 +316,7 @@ void BulletLayer::addLazer(Vec2 startPos, Vec2 terminalPos)
 	lazer->setName("lazer");
 }
 
-void BulletLayer::addSprayBullet(Vec2 startPos, Vec2 terminalPos)
+void BulletLayer::addSprayBullet(Node* sender, Vec2 startPos, Vec2 terminalPos)
 {
 	const double offsetAngle = 0.418;
 
@@ -302,7 +346,7 @@ void BulletLayer::addSprayBullet(Vec2 startPos, Vec2 terminalPos)
 
 }
 
-void BulletLayer::addToxicBomb(Vec2 startPos, Vec2 terminalPos)
+void BulletLayer::addToxicBomb(Node* sender, Vec2 startPos, Vec2 terminalPos)
 {
 	//create bomb sprite
 	auto bomb = Sprite::create("objects/ammo/ammo_toxicBomb.png");
@@ -322,18 +366,20 @@ void BulletLayer::addToxicBomb(Vec2 startPos, Vec2 terminalPos)
 
 	auto action1 = RepeatForever::create(RotateTo::create(0.5f, 1280));
 	auto action2 = JumpTo::create(1.0f, thisTerminalPos, 3.0f, 2);
-	auto action3 = FadeOut::create(0.5f);
 	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
 	auto spawn = Spawn::create(action1, action2, NULL);
-	auto animation = Animation::createWithSpriteFrames(m_explodeAnime, 1.0f);
+
+	auto animation = Animation::createWithSpriteFrames(m_bombAnime, 0.5f / m_bombAnime.size());
 	auto animate = Animate::create(animation);
-	auto action4 = Repeat::create(animate, 10);
-	auto sequence = Sequence::create(spawn, action3, action4, callFunc, NULL);
+	auto action4 = Repeat::create(animate, 1);
+
+	auto sequence = Sequence::create(spawn, action4, callFunc, NULL);
+
 	bomb->runAction(sequence);
 	bomb->setName("toxicBomb");
 }
 
-void BulletLayer::addFlameThrower(Vec2 startPos, Vec2 terminalPos)
+void BulletLayer::addFlameThrower(Node* sender, Vec2 startPos, Vec2 terminalPos)
 {
 	const double c_flameSurvivalDuration= 0.2f;
 	auto flame = Sprite::create("objects/ammo/ammo_flame.png");
@@ -362,10 +408,47 @@ void BulletLayer::addFlameThrower(Vec2 startPos, Vec2 terminalPos)
 
 }
 
+void BulletLayer::addMeleeAttack(Node* sender, Vec2 startPos, Vec2 terminalPos)
+{
+	const double c_effectDuration = 0.2f;
+	auto effect = Sprite::create("objects/ammo/ammo_slash.png");
+	effect->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+	this->addChild(effect);
+	m_allFriendlyBullets.pushBack(effect);
+
+	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
+	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
+	Vec2 route = thisTerminalPos - thisStartPos;
+
+	//set bullet rotation
+	pointBulletTo(effect, route, 0);
+
+	effect->setScale(0.3f);
+	effect->setPosition(thisStartPos);
+
+	//flame anime and auto cleanup
+	auto fadein = FadeIn::create(c_effectDuration / 2);
+	auto fadeout = FadeOut::create(c_effectDuration / 2);
+	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
+	auto sequence = Sequence::create(fadein, fadeout, callFunc, NULL);
+
+	effect->runAction(sequence);
+
+	effect->setName("meleeAttack");
+}
+
 void BulletLayer::initHostileBulletDamageMap()
 {
-	m_hostileBulletDamageMap.insert(std::make_pair("hostileSpiritualPower", 30));
-	m_hostileBulletDamageMap.insert(std::make_pair("hostileFlameCircle", 2.0f));
+	m_bulletDamageMap.insert(std::make_pair("hostileSpiritualPower", 30));
+	m_bulletDamageMap.insert(std::make_pair("hostileFlameCircle", 2.0f));
+	m_bulletDamageMap.insert(std::make_pair("hostileSubterrainAssualt", 0.25f));
+	m_bulletDamageMap.insert(std::make_pair("bullet", 20.0f));
+	m_bulletDamageMap.insert(std::make_pair("lazer", 0.5f));
+	m_bulletDamageMap.insert(std::make_pair("sprayBullet", 15.0f));
+	m_bulletDamageMap.insert(std::make_pair("toxicBomb", 0.25f));
+	m_bulletDamageMap.insert(std::make_pair("flame", 0.25f));
+	m_bulletDamageMap.insert(std::make_pair("meleeAttack", 2.0f));
+
 }
 
 void BulletLayer::addSpiritualPower(Node* sender, Vec2 startPos, Vec2 terminalPos)
@@ -395,6 +478,8 @@ void BulletLayer::addSpiritualPower(Node* sender, Vec2 startPos, Vec2 terminalPo
 
 void BulletLayer::addFlameCircle(Node* sender, Vec2 startPos, Vec2 terminalPos)
 {
+	runEffect(sender,m_flameCircleAnime);
+
 	const double c_totalExpessionPeriodLength = 1.5f;
 	//create bullet sprite
 	auto bullet = Sprite::create("objects/ammo/ammo_flameCircle.png");
@@ -423,31 +508,34 @@ void BulletLayer::addFlameCircle(Node* sender, Vec2 startPos, Vec2 terminalPos)
 	bullet->runAction(spawn);
 }
 
-void BulletLayer::addMeleeAttack(Vec2 startPos, Vec2 terminalPos)
+void BulletLayer::addSubterrainAssualt(Node* sender, Vec2 startPos, Vec2 terminalPos)
 {
-	const double c_effectDuration = 0.2f;
-	auto effect = Sprite::create("objects/ammo/ammo_slash.png");
-	effect->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
-	this->addChild(effect);
-	m_allFriendlyBullets.pushBack(effect);
+	const double c_totalExpessionPeriodLength = 1.5f;
+	//create bullet sprite
+	auto bullet = Sprite::create("objects/UI/ui_attackWarning.png");
+	this->addChild(bullet);
+	m_allHostileBullets.pushBack(bullet);
 
 	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
 	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
 	Vec2 route = thisTerminalPos - thisStartPos;
 
 	//set bullet rotation
-	pointBulletTo(effect, route, 0);
+	bullet->setScale(0.2f);
+	bullet->setPosition(thisTerminalPos);
 
-	effect->setScale(0.3f);
-	effect->setPosition(thisStartPos);
+	auto fadein = FadeIn::create(0.5f);
+	auto fadeout = FadeOut::create(0.5f);
+	auto sequence = Sequence::create(fadeout,fadein, NULL);
+	auto glow = Repeat::create(sequence, 3);
+	
+	auto animation = Animation::createWithSpriteFrames(m_subterrainAssualtAnime, 0.5f / m_subterrainAssualtAnime.size());
+	auto animate = Animate::create(animation);
+	auto action = Repeat::create(animate,2);
 
-	//flame anime and auto cleanup
-	auto fadein = FadeIn::create(c_effectDuration / 2);
-	auto fadeout = FadeOut::create(c_effectDuration / 2);
-	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
-	auto sequence = Sequence::create(fadein, fadeout, callFunc, NULL);
+	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet)); //cleanup
 
-	effect->runAction(sequence);
-
-	effect->setName("meleeAttack");
+	auto sequence1 = Sequence::create(glow, action, callFunc,NULL);
+	bullet->setName("hostileSubterrainAssualt");
+	bullet->runAction(sequence1);
 }

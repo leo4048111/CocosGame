@@ -34,7 +34,6 @@ bool Player::init()
 	m_magazineSpecLabel->setPosition(Vec2(this->getContentSize().width / 2, -m_magazineSpecLabel->getContentSize().height));
 	m_magazineSpecLabel->setScale(0.3f);
 	this->addChild(m_magazineSpecLabel);
-	this->addSpeed(1.0f);
 	
 	//init weapons
 	initAllWeapon();
@@ -147,8 +146,8 @@ void Player::runActionAnime(int dir)
 void Player::update(float delta)
 {
 	//Update anime
-	double offsetX = this->getCurrentSpeed();
-	double offsetY = this->getCurrentSpeed();
+	double offsetX = this->getCurrentSpeed()+1.0f;
+	double offsetY = this->getCurrentSpeed()+1.0f;
 	if (m_keyMap[EventKeyboard::KeyCode::KEY_SHIFT]&&this->getCurrentStamina())
 	{
 		offsetX *= 2.5f;
@@ -191,7 +190,7 @@ void Player::update(float delta)
 		if (Specs::getInstance()->isAimbotActivated())
 		{
 			auto allTargets = SpriteLayer::getInstance()->getAllTargets();
-			m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()), allTargets->front()->getParent()->convertToWorldSpace(allTargets->front()->getPosition()));
+			m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()), allTargets.front()->getParent()->convertToWorldSpace(allTargets.front()->getPosition()));
 		}
 		else
 		{
@@ -319,7 +318,7 @@ void Player::onMouseDown(Event* event)
 			if (Specs::getInstance()->isAimbotActivated())
 			{	
 				auto allTargets = SpriteLayer::getInstance()->getAllTargets();
-				m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()),allTargets->front()->getParent()->convertToWorldSpace(allTargets->front()->getPosition()));
+				m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()),allTargets.front()->getParent()->convertToWorldSpace(allTargets.front()->getPosition()));
 			}
 			else
 			{
