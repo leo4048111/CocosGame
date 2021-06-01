@@ -1,6 +1,9 @@
 #pragma once
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include <iostream>
 #include <ctime>
+#include <regex>
+#include <experimental/filesystem> 
 #include <vector>
 using namespace std;
 
@@ -72,6 +75,19 @@ public:
 	void initLines();
 
 	std::string speakRandom();
+
+	//preload
+	std::vector<std::string> getAllBgMusic();
+
+    void getAllFiles(std::string path, std::vector<std::string>& files, std::string format);
+
+	int getNextSong();
+
+	int getPreviousSong();
+
+	int getCurrentSong();
+
+	void initBgMusicPath();
 private:
 	//time settings
 	time_t m_startTime;
@@ -102,6 +118,9 @@ private:
 	//chatting and radio
 	std::vector<std::string> m_targetLines;
 	std::vector<std::string> m_radioLines;
-
+	
+	//audio files
+	std::vector<std::string> m_allBgMusic;
+	int m_currentBgMusic;
 };
 

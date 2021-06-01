@@ -1,6 +1,7 @@
 #include "MenuScene.h"
-#include "PreparationScene.h"
+#include "SetupScene.h"
 #include "Controls/Specs.h"
+#include "Controls/AudioControlPanel.h"
 USING_NS_CC;
 
 MenuScene* MenuScene::createMenuScene()
@@ -20,7 +21,7 @@ bool MenuScene::init()
 
 	Specs::getInstance()->refreshInstance();
 
-	auto startGameLabel = Label::createWithTTF("Start Game", "fonts/HashedBrowns-WyJgn.ttf", 50);
+	auto startGameLabel = Label::createWithTTF("Press To Start", "fonts/HashedBrowns-WyJgn.ttf", 50);
 	auto startGame = MenuItemLabel::create(startGameLabel, CC_CALLBACK_1(MenuScene::menuCallBack, this));
 	auto audioControlLabel = Label::createWithTTF("Audio Off", "fonts/HashedBrowns-WyJgn.ttf", 50);
 	auto audioControl = MenuItemLabel::create(audioControlLabel, CC_CALLBACK_1(MenuScene::menuCallBack,this));
@@ -35,6 +36,12 @@ bool MenuScene::init()
 	quitGame->setTag(2);
 	quitGame->setColor(Color3B(220, 220, 220));
 	quitGame->setScale(0.3f);
+
+	auto fadeout = FadeOut::create(0.5f);
+	auto fadein = FadeIn::create(0.5f);
+	auto sequence = Sequence::create(fadeout, fadein, NULL);
+	auto action = RepeatForever::create(sequence);
+	startGame->runAction(action);
 
 	auto menu = Menu::create(startGame,audioControl,quitGame,NULL);
 	menu->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
@@ -58,9 +65,9 @@ bool MenuScene::init()
 	info->setPosition(Vec2(logo->getPosition().x + logo->getContentSize().width-20, logo->getPosition().y-logo->getContentSize().height/2));
 	info->setColor(Color3B(255, 255, 255));
 
-	/*auto backgroundImg = Sprite::create("background.png");
-	backgroundImg->setPosition(origin + visibleSize / 2);
-	this->addChild(backgroundImg,10);*/
+	AudioControlPanel* audioControlPanel = AudioControlPanel::createAudioControlPanel();
+	this->addChild(audioControlPanel);
+	audioControlPanel->setPosition(visibleSize.width- audioControlPanel->getContentSize().width-150,visibleSize.height- audioControlPanel->getContentSize().height-50);
 	return true;
 }
 
@@ -75,7 +82,7 @@ void MenuScene::menuCallBack(Ref* sender)
 	switch (item->getTag())
 	{
 	case sg:
-		goToPreparationScene();
+		goToSetupScene();
 		break;
 	case ac:
 		setBackgroundMusic();
@@ -100,9 +107,9 @@ void MenuScene::setBackgroundMusic()
 	}
 }
 
-void MenuScene::goToPreparationScene()
+void MenuScene::goToSetupScene()
 {
-	PreparationScene* preparationScene = PreparationScene::create();
-	auto transition = TransitionFlipX::create(0.5f, preparationScene);
+	SetupScene* setupScene = SetupScene::createSetupScene();
+	auto transition = TransitionFlipX::create(0.5f, setupScene);
 	Director::getInstance()->replaceScene(transition);
 }

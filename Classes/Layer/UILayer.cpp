@@ -1,5 +1,6 @@
 #include <ctime>
 #include "UILayer.h"
+#include "Controls/AudioControlPanel.h"
 #include "../objects/Player.h"
 #include "Controls/Specs.h"
 
@@ -116,6 +117,11 @@ bool UILayer::init()
 	m_playerArmor->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
 	m_playerArmor->setPercentage(100);
 	m_statusWindowBg->addChild(m_playerArmor);
+
+	//init audio control
+	AudioControlPanel* audioControlPanel = AudioControlPanel::createAudioControlPanel();
+	this->addChild(audioControlPanel);
+	audioControlPanel->setPosition(visibleSize.width - audioControlPanel->getContentSize().width - 150, visibleSize.height - audioControlPanel->getContentSize().height - 50);
 
 	this->setName("UILayer");
 	return true;

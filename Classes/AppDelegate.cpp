@@ -23,6 +23,7 @@
  ****************************************************************************/
 
 #include "AppDelegate.h"
+#include "Controls/Specs.h"
 #include "./Scene/MenuScene.h"
 
 // #define USE_AUDIO_ENGINE 1
@@ -117,8 +118,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
     register_all_packages();
 
-    CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic("background.mp3");
-    CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic("background.mp3", 1);
+    //preload all audios
+    preloadAllAudios();
 
     // create a scene. it's an autorelease object
     auto scene = MenuScene::createMenuScene();
@@ -151,4 +152,15 @@ void AppDelegate::applicationWillEnterForeground() {
     SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
     SimpleAudioEngine::getInstance()->resumeAllEffects();
 #endif
+}
+
+void AppDelegate::preloadAllAudios()
+{
+    auto allNames = Specs::getInstance()->getAllBgMusic();
+    for (auto fileName : allNames)
+    {
+        CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic(("Audio/BG/"+ fileName).c_str());
+    }
+
+    CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic(("Audio/BG/" + allNames.front()).c_str(), true);
 }

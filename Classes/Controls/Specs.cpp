@@ -1,4 +1,7 @@
 #include "Specs.h"
+#include "cocos2d.h"
+
+USING_NS_CC;
 
 Specs* Specs::_instance = NULL;
 
@@ -28,6 +31,10 @@ Specs::Specs()
 
 	//init lines
 	initLines();
+
+	//init bg music path
+	initBgMusicPath();
+	m_currentBgMusic = 0;
 }
 
 void Specs::refreshInstance()
@@ -192,4 +199,49 @@ void Specs::setMaxPlayer(int num)
 int Specs::getMaxPlayer()
 {
 	return m_maxPlayer;
+}
+
+std::vector<std::string> Specs::getAllBgMusic()
+{
+	return m_allBgMusic;
+}
+
+void Specs::initBgMusicPath()
+{
+	getAllFiles("Audio/BG", m_allBgMusic, "mp3");
+	m_currentBgMusic = m_allBgMusic.size();
+}
+
+void Specs::getAllFiles(std::string path, std::vector<string>& files, std::string format)
+{
+	regex fileSuffix("(.*)(." + format + ")");// *.jpg, *.png  
+	for (const auto& entry : std::experimental::filesystem::directory_iterator(path))
+	{
+		string file = entry.path().filename().string();
+		if (std::regex_match(file, fileSuffix))
+		{
+			files.push_back(file);
+		}
+	}
+}
+
+int Specs::getNextSong()
+{
+	m_currentBgMusic++;
+	if (m_currentBgMusic >= m_allBgMusic.size())
+		m_currentBgMusic = 0;
+	return m_currentBgMusic;
+}
+
+int Specs::getPreviousSong()
+{
+	m_currentBgMusic--;
+	if (m_currentBgMusic < 0)
+		m_currentBgMusic = m_allBgMusic.size()-1;
+	return m_currentBgMusic;
+}
+
+int Specs::getCurrentSong()
+{
+	return m_currentBgMusic;
 }

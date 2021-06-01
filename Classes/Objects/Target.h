@@ -52,6 +52,8 @@ public:
 
 	void fireSubterrainAssualt(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 
+	void doFastStrike(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
+
 private:
 	//target anime update scheduler
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_leftWalkAnime;

@@ -147,8 +147,8 @@ void Target::setTargetType(targetType type)
 		targetName = "target_spirit";
 		targetLeftMoveFrameName = "target_spirit_leftMove";
 		targetRightMoveFrameName = "target_spirit_rightMove";
-		targetLeftAttackFrameName = "target_ghost_leftAttack";
-		targetRightAttackFrameName = "target_ghost_rightAttack";
+		targetLeftAttackFrameName = "target_spirit_leftAttack";
+		targetRightAttackFrameName = "target_spirit_rightAttack";
 		break;
 	default:
 		return;
@@ -223,6 +223,9 @@ void Target::attack()
 	case targetType::ghost:
 		fireSubterrainAssualt(startPos, terminalPos);
 		break;
+	case targetType::spirit:
+		doFastStrike(startPos, terminalPos);
+		break;
 	default:
 		fireSpiritualPower(startPos, terminalPos);
 		break;
@@ -254,4 +257,19 @@ void Target::fireSubterrainAssualt(Vec2 startPos, Vec2 terminalPos)
 	BulletLayer* bulletLayer = dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getChildByName("BulletLayer"));
 	UILayer::getInstance()->instructorGivesInstruction("Subterrain Assualt!");
 	bulletLayer->addSubterrainAssualt(this, startPos, terminalPos);
+}
+
+void Target::doFastStrike(Vec2 startPos, Vec2 terminalPos)
+{
+	BulletLayer* bulletLayer = dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getChildByName("BulletLayer"));
+	UILayer::getInstance()->instructorGivesInstruction("!!!!");
+
+	auto moveto = MoveTo::create(0.1f, this->convertToNodeSpaceAR(terminalPos));
+	auto fadeout = FadeOut::create(0.05f);
+	auto fadein = FadeIn::create(0.05f);
+	auto sequence = Sequence::create(fadeout, fadein, NULL);
+	auto spawn = Spawn::create(moveto, sequence, NULL);
+	this->runAction(spawn);
+
+	bulletLayer->addFastStrike(this, startPos, terminalPos);
 }

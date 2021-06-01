@@ -15,7 +15,7 @@ public:
 
 	void setBackgroundMusic();
 
-	void goToPreparationScene();
+	void goToSetupScene();
 
 	CREATE_FUNC(MenuScene);
 };

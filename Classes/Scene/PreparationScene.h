@@ -16,7 +16,9 @@ public:
 
 	void backToMenuScene();
 
-	void goToSetupAndGTGScene();
+	void backToSetupScene();
+
+	void startGame();
 
 	void goToCreateRoomScene();
 

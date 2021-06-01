@@ -13,9 +13,9 @@ public:
 
 	void menuCallBack(Ref* sender);
 
-	void goToSetupAndGTGScene();
-
 	void backToPreparationScene();
+
+	void startGame();
 
 	void addMaxPlayer();
 

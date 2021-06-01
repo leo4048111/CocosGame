@@ -49,19 +49,6 @@ bool Player::init()
 	return true;
 }
 
-//
-//
-//void Player::deployTo(Vec2 pos)
-//{
-//	auto moveto = MoveTo::create(2.0f, pos);
-//	auto animation = Animation::createWithSpriteFrames(m_parachuteAnime, 2.0f);
-//	auto animate = Animate::create(animation);
-//	auto spawn = Spawn::create(moveto, animate, NULL);
-//	auto callFunc = CallFunc::create(CC_CALLBACK_0(Player::setReady, this));
-//	auto sequence = Sequence::create(spawn, callFunc,NULL);
-//	this->runAction(sequence);
-//}
-
 bool Player::loadGraphs()
 {
 	try
@@ -185,6 +172,7 @@ void Player::update(float delta)
 			m_magazineSpecLabel->setString("inf/inf");
 
 	//auto fire weapon
+	swapWeapon(m_currentWeaponSlot);
 	if (m_mouseButtonMap[EventMouse::MouseButton::BUTTON_LEFT] && m_currentWeapon->m_isAutoFire)
 	{
 		if (Specs::getInstance()->isAimbotActivated())
@@ -231,25 +219,25 @@ void Player::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Even
 		fastMeleeAttack();
 		break;
 	case EventKeyboard::KeyCode::KEY_1:
-		swapWeapon(1);
+		m_currentWeaponSlot = 1;
 		break;
 	case EventKeyboard::KeyCode::KEY_2:
-		swapWeapon(2);
+		m_currentWeaponSlot = 2;
 		break;
 	case EventKeyboard::KeyCode::KEY_3:
-		swapWeapon(3);
+		m_currentWeaponSlot = 3;
 		break;
 	case EventKeyboard::KeyCode::KEY_4:
-		swapWeapon(4);
+		m_currentWeaponSlot = 4;
 		break;
 	case EventKeyboard::KeyCode::KEY_5:
-		swapWeapon(5);
+		m_currentWeaponSlot = 5;
 		break;
 	case EventKeyboard::KeyCode::KEY_6:
-		swapWeapon(6);
+		m_currentWeaponSlot = 6;
 		break;
 	case EventKeyboard::KeyCode::KEY_7:
-		swapWeapon(7);
+		m_currentWeaponSlot = 7;
 		break;
 	case EventKeyboard::KeyCode::KEY_R:
 		m_currentWeapon->reload();
@@ -339,37 +327,38 @@ void Player::onMouseUp(Event* event)
 
 void Player::swapWeapon(int num)
 {
-		if(m_allWeaponsMap[num]->isLocked()&&(!Specs::getInstance()->isAllWeaponActivated()))
-		{
-			auto notification = Label::createWithTTF("This weapon isn't unlocked yet", "fonts/Notification Font.ttf", 10);
-			notification->setColor(Color3B(255, 4, 56));
-			notification->setPosition(Vec2(this->getParent()->getContentSize().width / 2, -2));
-			this->getParent()->addChild(notification);
-			auto fadein = FadeIn::create(0.25f);
-			auto fadeout = FadeOut::create(0.25f);
-			auto fadeSequence = Sequence::create(fadein, fadeout, NULL);
-			auto repeat = Repeat::create(fadeSequence, 2);
-			auto sequence = Sequence::create(repeat, CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, notification)), NULL);
-			notification->runAction(sequence);
-			return;
-		}
+	if (m_lastWeaponSlot == num)
+		return;
 
-		if (m_currentWeaponSlot == num)
-			return;
+	if (m_allWeaponsMap[num]->isLocked() && (!Specs::getInstance()->isAllWeaponActivated()))
+	{
+		auto notification = Label::createWithTTF("This weapon isn't unlocked yet", "fonts/Notification Font.ttf", 10);
+		notification->setColor(Color3B(255, 4, 56));
+		notification->setPosition(Vec2(this->getParent()->getContentSize().width / 2, -2));
+		this->getParent()->addChild(notification);
+		auto fadein = FadeIn::create(0.25f);
+		auto fadeout = FadeOut::create(0.25f);
+		auto fadeSequence = Sequence::create(fadein, fadeout, NULL);
+		auto repeat = Repeat::create(fadeSequence, 2);
+		auto sequence = Sequence::create(repeat, CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, notification)), NULL);
+		notification->runAction(sequence);
+		return;
+	}
 
-		//Update sprite
-		if (m_currentWeapon != nullptr)
-		{
-			m_currentWeapon->setVisible(false);
-			m_currentWeapon->pauseControlListen();
-		}
-		m_currentWeapon = m_allWeaponsMap[num];
-		m_currentWeapon->setVisible(true);
-		m_currentWeapon->resumeControlListen();
-		m_currentWeaponSlot = num;
+	//Update sprite
+	if (m_currentWeapon != nullptr)
+	{
+		m_currentWeapon->setVisible(false);
+		m_currentWeapon->pauseControlListen();
+	}
+	m_currentWeapon = m_allWeaponsMap[num];
+	m_currentWeapon->setVisible(true);
+	m_currentWeapon->resumeControlListen();
+	m_lastWeaponSlot = m_currentWeaponSlot;
+	m_currentWeaponSlot = num;
 
-		m_magazineSpecLabel->setString(Value(m_currentWeapon->m_ammoInCurrentMagazine).asString() + "/" + Value(m_currentWeapon->m_backupAmmo).asString());
-	
+	m_magazineSpecLabel->setString(Value(m_currentWeapon->m_ammoInCurrentMagazine).asString() + "/" + Value(m_currentWeapon->m_backupAmmo).asString());
+
 }
 
 void Player::unlockWeapon(int num)
@@ -399,7 +388,7 @@ void Player::addWeapon(Weapon* weapon)
 
 void Player::initAllWeapon()
 {
-	m_currentWeaponSlot = 1;
+	m_lastWeaponSlot = 1;
 
 	auto wbigKnife = Weapon::createWeapon();
 	wbigKnife->setWeaponType(weaponType::bigKnife);

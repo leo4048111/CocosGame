@@ -69,6 +69,11 @@ bool BulletLayer::loadGraphs()
 		{
 			m_hit1Anime.pushBack(cache->getSpriteFrameByName("effect_hit1_" + Value(c).asString()));
 		}
+		cache->addSpriteFramesWithFile("objects/effect/effect_fastStrike.plist");
+		for (int c = 0; c <= 13; c++)
+		{
+			m_fastStrikeAnime.pushBack(cache->getSpriteFrameByName("effect_fastStrike_" + Value(c).asString()));
+		}
 
 		return true;
 	}
@@ -170,7 +175,7 @@ void BulletLayer::update(float delta)
 				}
 
 				std::string str = currentBullet->getName();
-				if (str != "hostileFlameCircle" && str != "hostileSubterrainAssualt")
+				if (str != "hostileFlameCircle" && str != "hostileSubterrainAssualt"&&str!="hostileFastStrike")
 					tmpEraseHostileBullet.pushBack(currentBullet);
 			}
 		}
@@ -442,6 +447,7 @@ void BulletLayer::initHostileBulletDamageMap()
 	m_bulletDamageMap.insert(std::make_pair("hostileSpiritualPower", 30));
 	m_bulletDamageMap.insert(std::make_pair("hostileFlameCircle", 2.0f));
 	m_bulletDamageMap.insert(std::make_pair("hostileSubterrainAssualt", 0.25f));
+	m_bulletDamageMap.insert(std::make_pair("hostileFastStrike", 0.25f));
 	m_bulletDamageMap.insert(std::make_pair("bullet", 20.0f));
 	m_bulletDamageMap.insert(std::make_pair("lazer", 0.5f));
 	m_bulletDamageMap.insert(std::make_pair("sprayBullet", 15.0f));
@@ -538,4 +544,29 @@ void BulletLayer::addSubterrainAssualt(Node* sender, Vec2 startPos, Vec2 termina
 	auto sequence1 = Sequence::create(glow, action, callFunc,NULL);
 	bullet->setName("hostileSubterrainAssualt");
 	bullet->runAction(sequence1);
+}
+
+void BulletLayer::addFastStrike(Node* sender, Vec2 startPos, Vec2 terminalPos)
+{
+	const double c_totalExpessionPeriodLength = 1.5f;
+	//create bullet sprite
+	auto strike = Sprite::create("objects/ammo/ammo_slash.png");
+	this->addChild(strike);
+	m_allHostileBullets.pushBack(strike);
+
+	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
+	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
+	Vec2 route = thisTerminalPos - thisStartPos;
+
+	strike->setPosition(thisTerminalPos);
+
+	auto animation = Animation::createWithSpriteFrames(m_fastStrikeAnime, 0.5f / m_fastStrikeAnime.size());
+	auto animate = Animate::create(animation);
+	auto action = Repeat::create(animate, 2);
+
+	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet)); //cleanup
+
+	auto sequence1 = Sequence::create(action, callFunc, NULL);
+	strike->runAction(sequence1);
+	strike->setName("hostileFastStrike");
 }

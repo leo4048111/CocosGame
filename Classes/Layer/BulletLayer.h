@@ -66,6 +66,8 @@ public:
 	
 	void addSubterrainAssualt(cocos2d::Node* sender, cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 
+	void addFastStrike(cocos2d::Node* sender, cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
+
 private:
 	cocos2d::Vector<cocos2d::Sprite*> m_allFriendlyBullets;
 	cocos2d::Vector<cocos2d::Sprite*> m_allHostileBullets;
@@ -79,6 +81,7 @@ private:
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_subterrainAssualtAnime;
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_bombAnime;
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_hit1Anime;
+	cocos2d::Vector<cocos2d::SpriteFrame*> m_fastStrikeAnime;
 
 
 };

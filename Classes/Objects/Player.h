@@ -57,9 +57,12 @@ public:
 	Weapon* getCurrentWeapon();
 
 	std::map<int, Weapon*> getAllWeaponMap();
+
+	//returns sync data as json
+	std::string buildSynData();
 	
+
 private:
-	bool m_isReady;
 
 	//Anime frames
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_leftWalkAnime;
@@ -79,6 +82,7 @@ private:
 	std::map<int,Weapon*> m_allWeaponsMap;
 	Weapon* m_currentWeapon;
 	int m_currentWeaponSlot;
+	int m_lastWeaponSlot;
 
 	cocos2d::Label* m_magazineSpecLabel;
 	cocos2d::Menu* m_weaponSpecMenu;

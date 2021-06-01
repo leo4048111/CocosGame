@@ -1,6 +1,6 @@
 #include "CreateRoomScene.h"
-#include "SetupAndGTGScene.h"
 #include "PreparationScene.h"
+#include "GameScene.h"
 #include "Controls/Specs.h"
 
 USING_NS_CC;
@@ -21,7 +21,7 @@ bool CreateRoomScene::init()
 	auto origin = Director::getInstance()->getVisibleOrigin();
 
 
-	auto confirmLabel = Label::createWithTTF("Confirm", "fonts/HashedBrowns-WyJgn.ttf", 50);
+	auto confirmLabel = Label::createWithTTF("Let's roll", "fonts/HashedBrowns-WyJgn.ttf", 50);
 	auto confirm = MenuItemLabel::create(confirmLabel, CC_CALLBACK_1(CreateRoomScene::menuCallBack, this));
 	auto backLabel = Label::createWithTTF("Back", "fonts/HashedBrowns-WyJgn.ttf", 50);
 	auto back = MenuItemLabel::create(backLabel, CC_CALLBACK_1(CreateRoomScene::menuCallBack, this));
@@ -75,7 +75,7 @@ bool CreateRoomScene::init()
 void CreateRoomScene::menuCallBack(Ref* sender)
 {
 	MenuItem* item = dynamic_cast<MenuItem*>(sender);
-	auto callFunc = CallFunc::create(CC_CALLBACK_0(CreateRoomScene::goToSetupAndGTGScene, this));
+	auto callFunc = CallFunc::create(CC_CALLBACK_0(CreateRoomScene::startGame, this));
 	FiniteTimeAction* action = Sequence::create(DelayTime::create(1.5f), callFunc, NULL);
 
 	switch (item->getTag())
@@ -99,20 +99,6 @@ void CreateRoomScene::menuCallBack(Ref* sender)
 	}
 }
 
-void CreateRoomScene::goToSetupAndGTGScene()
-{
-	SetupAndGTGScene* setupAndGTGScene = SetupAndGTGScene::create();
-	auto transition = TransitionFlipX::create(0.5f, setupAndGTGScene);
-	Director::getInstance()->replaceScene(transition);
-}
-
-void CreateRoomScene::backToPreparationScene()
-{
-	SetupAndGTGScene* setupAndGTGScene = SetupAndGTGScene::create();
-	auto transition = TransitionFlipX::create(0.5f, setupAndGTGScene);
-	Director::getInstance()->replaceScene(transition);
-}
-
 void CreateRoomScene::addMaxPlayer()
 {
 	if(m_maxPlayer<=7)
@@ -127,4 +113,18 @@ void CreateRoomScene::minusMaxPlayer()
 		m_maxPlayer--;
 
 	m_maxPlayerDisplay->setString("Max Player:"+Value(m_maxPlayer).asString());
+}
+
+void CreateRoomScene::startGame()
+{
+	auto gameScene = GameScene::createGameScene();
+	auto transition = TransitionFlipX::create(1.0f, gameScene);
+	Director::getInstance()->replaceScene(transition);
+}
+
+void CreateRoomScene::backToPreparationScene()
+{
+	auto preparationScene = PreparationScene::createPreparationScene();
+	auto transition = TransitionFlipX::create(1.0f, preparationScene);
+	Director::getInstance()->replaceScene(transition);
 }
