@@ -8,6 +8,8 @@
 #include "../Layer//SpriteLayer.h"
 #include "GameoverScene.h"
 #include <ctime>
+#include <WinSock2.h>
+#include <map>
 
 class GameScene :public cocos2d::Scene
 {
@@ -32,6 +34,8 @@ private:
 	//Window specs
 	cocos2d::Vec2 m_origin;
 	cocos2d::Size m_visibleSize;
+
+	
 
 };
 

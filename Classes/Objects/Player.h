@@ -6,6 +6,7 @@
 #include "Weapon.h"
 #include <map>
 #include <ctime>
+#include "CJsonObject/CJsonObject.hpp"
 
 #define MAX_WEAPON_CARRY 6
 #define SLIDE_COOLDOWN 2.5
@@ -18,7 +19,7 @@ class Player : public Entity
 {
 public:
 	//Sprite related
-	static Player* createPlayer();
+	static Player* createPlayer(std::string name);
 
 	virtual bool init();
 
@@ -38,6 +39,10 @@ public:
 	void onMouseDown(cocos2d::Event* event);
 
 	void onMouseUp(cocos2d::Event* event);
+
+	void setMe(bool value);
+
+	bool isMe();
 
 	//Weapon related
 	void initAllWeapon();
@@ -59,11 +64,12 @@ public:
 	std::map<int, Weapon*> getAllWeaponMap();
 
 	//returns sync data as json
-	std::string buildSynData();
+	std::string buildSyncData();
+
+	void updateWithSyncData(neb::CJsonObject ojson);
 	
 
 private:
-
 	//Anime frames
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_leftWalkAnime;
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_rightWalkAnime;
@@ -87,7 +93,15 @@ private:
 	cocos2d::Label* m_magazineSpecLabel;
 	cocos2d::Menu* m_weaponSpecMenu;
 
+	bool m_isMe;
+
+	std::mutex _playerUpdateLock;
+
+public:
 	std::string m_playerName;
+
+
+	
 };
 
 

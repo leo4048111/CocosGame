@@ -14,7 +14,7 @@ class AiPlayer : public Entity
 {
 public:
 	//Sprite related
-	static AiPlayer* createPlayer();
+	static AiPlayer* createPlayer(std::string name);
 
 	virtual bool init();
 
@@ -53,7 +53,7 @@ private:
 	//Weapon specs
 	Weapon* m_currentWeapon;
 
-	std::string m_playerName;
+	static std::string m_playerName;
 
 	//update specs
 	time_t m_lastUpdate;

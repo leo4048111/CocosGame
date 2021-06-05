@@ -1,6 +1,7 @@
 #include "PreparationScene.h"
 #include "SetupScene.h"
 #include "CreateRoomScene.h"
+#include "JoinRoomScene.h"
 #include "GameScene.h"
 #include "Controls/Specs.h"
 #include "Scene/MenuScene.h"
@@ -38,7 +39,7 @@ bool PreparationScene::init()
 	createRoom->setTag(1);
 	createRoom->setColor(Color3B(220, 220, 220));
 	createRoom->setScale(0.3f);
-	joinRoom->setTag(1);
+	joinRoom->setTag(2);
 	joinRoom->setColor(Color3B(220, 220, 220));
 	joinRoom->setScale(0.3f);
 	back->setTag(3);
@@ -76,10 +77,13 @@ void PreparationScene::menuCallBack(Ref* sender)
 	FiniteTimeAction* action = Sequence::create(DelayTime::create(1.5f), callFunc, NULL);
 	auto callFunc2 = CallFunc::create(CC_CALLBACK_0(PreparationScene::goToCreateRoomScene, this));
 	FiniteTimeAction* action2 = Sequence::create(DelayTime::create(1.5f), callFunc2, NULL);
+	auto callFunc3 = CallFunc::create(CC_CALLBACK_0(PreparationScene::goToJoinRoomScene, this));
+	FiniteTimeAction* action3 = Sequence::create(DelayTime::create(1.5f), callFunc3, NULL);
 	switch (item->getTag())
 	{
 	case 0:
 		Specs::getInstance()->setGamemodeAsSinglePlayer(true);
+		Specs::getInstance()->setMaxPlayer(1);
 		m_word->setString("Well well, a lone wolf..");
 		this->runAction(action);
 		break;
@@ -91,7 +95,7 @@ void PreparationScene::menuCallBack(Ref* sender)
 	case 2:
 		Specs::getInstance()->setGamemodeAsSinglePlayer(false);
 		m_word->setString("Join Room");
-		this->runAction(action2);
+		this->runAction(action3);
 		break;
 	case 3:
 		backToSetupScene();
@@ -117,5 +121,12 @@ void PreparationScene::startGame()
 {
 	auto gameScene = GameScene::createGameScene();
 	auto transition = TransitionFlipX::create(1.0f, gameScene);
+	Director::getInstance()->replaceScene(transition);
+}
+
+void PreparationScene::goToJoinRoomScene()
+{
+	auto joinRoomScene = JoinRoomScene::createJoinRoomScene();
+	auto transition = TransitionFlipX::create(1.0f, joinRoomScene);
 	Director::getInstance()->replaceScene(transition);
 }

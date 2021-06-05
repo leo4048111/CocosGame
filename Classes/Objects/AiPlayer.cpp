@@ -5,8 +5,11 @@
 
 USING_NS_CC;
 
-AiPlayer* AiPlayer::createPlayer()
+std::string AiPlayer::m_playerName = "AI";
+
+AiPlayer* AiPlayer::createPlayer(std::string name)
 {
+	m_playerName = name;
 	return AiPlayer::create();
 }
 
@@ -32,7 +35,6 @@ bool AiPlayer::init()
 	initRandomWeapon();
 
 	//init name
-	m_playerName ="testAi";
 	auto nameLabel = Label::createWithTTF(m_playerName, "fonts/HashedBrowns-WyJgn.ttf", 7);
 	this->addChild(nameLabel);
 	nameLabel->setColor(Color3B(255, 255, 255));

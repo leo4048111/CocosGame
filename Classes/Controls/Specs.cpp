@@ -23,7 +23,7 @@ Specs::Specs()
 	//init cheats
 	m_isAimbot = false;
 	m_isInfiniteAmmo = false;
-	m_isInvincible = false;
+	m_isInvincible = true;
 	m_isAllWeapon = false;
 
 	//init player name
@@ -55,7 +55,7 @@ void Specs::refreshInstance()
 	//init cheats
 	m_isAimbot = false;
 	m_isInfiniteAmmo = false;
-	m_isInvincible = false;
+	m_isInvincible = true;
 	m_isAllWeapon = false;
 
 }
@@ -187,8 +187,12 @@ std::string Specs::speakRandom()
 
 void Specs::setGamemodeAsSinglePlayer(bool value)
 {
-	setMaxPlayer(1);
 	m_isSinglePlayer = value;
+}
+
+bool Specs::isSinglePlayer()
+{
+	return m_isSinglePlayer;
 }
 
 void Specs::setMaxPlayer(int num)
@@ -245,3 +249,14 @@ int Specs::getCurrentSong()
 {
 	return m_currentBgMusic;
 }
+
+void Specs::asServer(bool value)
+{
+	m_isServer = value;
+}
+
+bool Specs::isServer()
+{
+	return m_isServer;
+}
+

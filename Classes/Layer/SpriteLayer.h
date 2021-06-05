@@ -6,6 +6,7 @@
 #include "Objects/Player.h"
 #include "Objects/AiPlayer.h"
 #include "CollectableLayer.h"
+#include "Network/SocketServer.h"
 #include "Objects/Entity.h"
 #include <map>
 
@@ -56,7 +57,8 @@ public:
 
 	void removeTarget(Target* target);
 
-
+	//socket related
+	void onRecv(HSocket socket, const char* data, int count);
 private:
 
 	//Target specs
@@ -67,6 +69,12 @@ private:
 	//Player specs
 	Player* m_mainPlayer;
 	std::vector<Entity*> m_players;
+
+	//socket specs
+	std::map<SOCKET, Player*> m_playerSocketMap;
+
+	//update lock
+	std::mutex _socketLock;
 };
 
 #endif // !_TARGET_LAYER_H_

@@ -25,6 +25,8 @@ public:
 		return _instance;
 	}
 
+	void close();
+
 	bool startServer();
 	void sendMessage(HSocket socket, const char* data, int count);
 	void sendMessage(const char* data, int count);
@@ -36,6 +38,8 @@ public:
 	std::function<void(HSocket socket)> onDisconnect;
 
 	void update(float delta);
+
+	std::list<HSocket> getClientSockets();
 
 private:
 	bool initServer();
@@ -51,6 +55,7 @@ private:
 	std::list<HSocket> _clientSockets;
 	std::list<SocketMessage*> _UIMessageQueue;  // contains all messages
 	std::mutex   _UIMessageQueueMutex;      //mutex variable for resolving thread collision
+	std::mutex _sendMessageLock;
 
 
 };

@@ -5,26 +5,40 @@
 #include <regex>
 #include <experimental/filesystem> 
 #include <vector>
+#include <map>
+
 using namespace std;
+
+#define MAX_PLAYER 3
+
+typedef enum JsonMsgType
+{
+	PlayerList, SCommand,PlayerCount,PlayerData
+};
+
+typedef enum SocketCommand
+{
+	JOIN, CANT_JOIN, IS_JOIN, DISCON, START, NAME
+};
 
 class Specs
 {
 public:
-	typedef void (_stdcall Specs::*CheatFp)();
+	typedef void(_stdcall Specs::* CheatFp)();
 
-private: 
+private:
 
-Specs();
+	Specs();
 
-static Specs* _instance;
+	static Specs* _instance;
 
 public:
-    static Specs* getInstance() 
-    { 
-        if (_instance == NULL)
-            _instance = new Specs();
-        return _instance; 
-    }
+	static Specs* getInstance()
+	{
+		if (_instance == NULL)
+			_instance = new Specs();
+		return _instance;
+	}
 
 	void refreshInstance();
 
@@ -52,6 +66,8 @@ public:
 	//gamemode setting
 	void setGamemodeAsSinglePlayer(bool value);
 
+	bool isSinglePlayer();
+
 	void setMaxPlayer(int num);
 
 	int getMaxPlayer();
@@ -76,10 +92,15 @@ public:
 
 	std::string speakRandom();
 
+	//socket related
+	void asServer(bool value);
+
+	bool isServer();
+
 	//preload
 	std::vector<std::string> getAllBgMusic();
 
-    void getAllFiles(std::string path, std::vector<std::string>& files, std::string format);
+	void getAllFiles(std::string path, std::vector<std::string>& files, std::string format);
 
 	int getNextSong();
 
@@ -88,6 +109,9 @@ public:
 	int getCurrentSong();
 
 	void initBgMusicPath();
+
+	//Scene toggle
+
 private:
 	//time settings
 	time_t m_startTime;
@@ -118,7 +142,11 @@ private:
 	//chatting and radio
 	std::vector<std::string> m_targetLines;
 	std::vector<std::string> m_radioLines;
-	
+
+	//socket related
+	std::map<SocketCommand, std::string>m_socketCommand;
+	bool m_isServer;
+
 	//audio files
 	std::vector<std::string> m_allBgMusic;
 	int m_currentBgMusic;

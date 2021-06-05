@@ -1,5 +1,7 @@
 #include "SocketClient.h"
 
+SocketClient* SocketClient::_instance = NULL;
+
 SocketClient::SocketClient(void) :
 	onRecv(nullptr),
 	_socektClient(0)
@@ -75,7 +77,10 @@ void SocketClient::recvMessage()
 		{
 			//push data to vector, then parse them in update()
 			std::lock_guard<std::mutex> lk(_UIMessageQueueMutex); //set mutex on lock
-			SocketMessage* msg = new SocketMessage(RECEIVE, (unsigned char*)recvBuf, ret);
+			recvBuf[ret]='\0';
+			auto test = (unsigned char*)recvBuf;
+
+			SocketMessage* msg = new SocketMessage(RECEIVE,(unsigned char*)recvBuf, ret);
 			_UIMessageQueue.push_back(msg);
 		}
 	}
@@ -91,14 +96,17 @@ void SocketClient::recvMessage()
 
 void SocketClient::sendMessage(const char* data, int count)
 {
+	_sendMessageLock.lock();
 	if (_socektClient != 0)
 	{
-		int ret = send(_socektClient, data, count, 0);
+		int ret = send(_socektClient, (char*)&count, sizeof(int), 0);
+		ret = send(_socektClient, data, count, 0);
 		if (ret < 0)
 		{
 			log("send error!");
 		}
 	}
+	_sendMessageLock.unlock();
 }
 
 void SocketClient::update(float delta)
@@ -137,17 +145,13 @@ void SocketClient::update(float delta)
 	}
 
 	CC_SAFE_DELETE(msg); //message cleanup
-	_UIMessageQueueMutex.unlock();  // mutex unlock
+	_UIMessageQueueMutex.unlock(); 
 }
 
-SocketClient* SocketClient::construct()
-{
-	SocketClient* client = new SocketClient;
-	return client;
-}
 
 void SocketClient::destroy()
 {
+	if(this!=nullptr)
 	delete this;
 }
 
@@ -168,4 +172,10 @@ void SocketClient::clear()
 
 	Director::getInstance()->getScheduler()->unscheduleAllForTarget(this);
 
+}
+
+void SocketClient::close()
+{
+	if(_socektClient!=0)
+	closeConnect(_socektClient);
 }

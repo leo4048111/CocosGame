@@ -2,12 +2,15 @@
 #include "Controls/Specs.h"
 #include "Objects/CrossHair.h"
 #include "Layer/SpriteLayer.h"
+#include "Network/SocketClient.h"
 
 USING_NS_CC;
 
-Player* Player::createPlayer()
+Player* Player::createPlayer(std::string name)
 {
-	return Player::create();
+	Player* player = Player::create();
+	player->m_playerName = name;
+	return player;
 }
 
 bool Player::init()
@@ -39,13 +42,13 @@ bool Player::init()
 	initAllWeapon();
 
 	//init name
-	m_playerName = Specs::getInstance()->getPlayerName();
 	auto nameLabel = Label::create(m_playerName,"fonts/HashedBrowns-WyJgn.ttf",7);
 	this->addChild(nameLabel);
 	nameLabel->setColor(Color3B(255, 255, 255));
 	nameLabel->setPosition(Vec2(this->getContentSize().width / 2, 20));
 
-	this->setName(Specs::getInstance()->getPlayerName());
+	this->setName(m_playerName);
+
 	return true;
 }
 
@@ -135,6 +138,9 @@ void Player::update(float delta)
 	//Update anime
 	double offsetX = this->getCurrentSpeed()+1.0f;
 	double offsetY = this->getCurrentSpeed()+1.0f;
+
+	_playerUpdateLock.lock();
+
 	if (m_keyMap[EventKeyboard::KeyCode::KEY_SHIFT]&&this->getCurrentStamina())
 	{
 		offsetX *= 2.5f;
@@ -185,6 +191,24 @@ void Player::update(float delta)
 			m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()), CrossHair::getInstance()->getCursorPos());
 		}
 	}
+
+	_playerUpdateLock.unlock();
+
+	if (Specs::getInstance()->isSinglePlayer())
+		return;
+
+	std::string jsonStr = buildSyncData();
+	
+	if (Specs::getInstance()->isServer())
+	{
+		return; //xxxxxxxxxxxxxxxxxxxxx
+	}
+	else
+	{
+		SocketClient::getInstance()->sendMessage(jsonStr.c_str(), strlen(jsonStr.c_str()));
+	}
+
+
 }
 
 void Player::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Event* event)
@@ -436,4 +460,57 @@ void Player::fastMeleeAttack()
 {
 	swapWeapon(0);
 	m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()), CrossHair::getInstance()->getCursorPos());
+}
+
+void Player::setMe(bool value)
+{
+	m_isMe = value;
+}
+
+bool Player::isMe()
+{
+	return m_isMe;
+}
+
+std::string Player::buildSyncData()
+{
+	neb::CJsonObject ojson;
+	ojson.Add("Type", JsonMsgType::PlayerData);
+	ojson.AddEmptySubArray("KeyMap");
+	ojson["KeyMap"].Add(m_keyMap[EventKeyboard::KeyCode::KEY_W]);
+	ojson["KeyMap"].Add(m_keyMap[EventKeyboard::KeyCode::KEY_A]);
+	ojson["KeyMap"].Add(m_keyMap[EventKeyboard::KeyCode::KEY_S]);
+	ojson["KeyMap"].Add(m_keyMap[EventKeyboard::KeyCode::KEY_D]);
+
+	ojson.Add("Slot", m_currentWeaponSlot);
+
+	ojson.AddEmptySubArray("Position");
+	ojson["Position"].Add(this->getPosition().x);
+	ojson["Position"].Add(this->getPosition().y);
+
+	return ojson.ToString();
+}
+
+void Player::updateWithSyncData(neb::CJsonObject ojson)
+{
+	////update pos
+	//int boolValue = 0;
+	//ojson["KeyMap"].Get(0,boolValue);
+	//m_keyMap[EventKeyboard::KeyCode::KEY_W] = boolValue > 0;
+	//ojson["KeyMap"].Get(1, boolValue);
+	//m_keyMap[EventKeyboard::KeyCode::KEY_A] = boolValue > 0;
+	//ojson["KeyMap"].Get(2, boolValue);
+	//m_keyMap[EventKeyboard::KeyCode::KEY_S] = boolValue > 0;
+	//ojson["KeyMap"].Get(3, boolValue);
+	//m_keyMap[EventKeyboard::KeyCode::KEY_D] = boolValue > 0;
+
+	//update pos
+	double posx, posy;
+	ojson["Position"].Get(0, posx);
+	ojson["Position"].Get(1, posy);
+	this->setPosition(Vec2(posx, posy));
+
+	//update weapon
+	ojson.Get("Slot", m_currentWeaponSlot);
+
 }

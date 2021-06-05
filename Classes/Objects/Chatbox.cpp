@@ -118,7 +118,7 @@ void Chatbox::runCheat(std::string command)
 	Specs::CheatFp fp = m_cheatFunctionMap[command];
 	if (fp != NULL)
 	{
-		(Specs::getInstance()->*fp)();
+		(Specs::getInstance()->*fp)(); //run the function pointer
 		m_currentText = "";
 		m_inputBox->setString("");
 	}

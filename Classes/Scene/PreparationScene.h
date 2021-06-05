@@ -22,6 +22,8 @@ public:
 
 	void goToCreateRoomScene();
 
+	void goToJoinRoomScene();
+
 private:
 	cocos2d::Label* m_word;
 

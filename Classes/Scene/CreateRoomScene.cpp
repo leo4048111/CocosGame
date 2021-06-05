@@ -2,6 +2,7 @@
 #include "PreparationScene.h"
 #include "GameScene.h"
 #include "Controls/Specs.h"
+#include "CJsonObject/CJsonObject.hpp"
 
 USING_NS_CC;
 
@@ -40,20 +41,6 @@ bool CreateRoomScene::init()
 	menu->setName("menu");
 	menu->setPositionY(menu->getPositionY() - 50);
 
-	auto instructor = Sprite::create("objects/UI/ui_instructor.png");
-	instructor->setPosition(Vec2(visibleSize.width / 4, visibleSize.height * 3 / 5));
-	this->addChild(instructor);
-	instructor->setScale(0.7f);
-
-	auto messageBubble = Sprite::create("objects/UI/ui_messageBubble.png");
-	instructor->addChild(messageBubble);
-	messageBubble->setPosition(Vec2(instructor->getContentSize().width + 80, instructor->getContentSize().height));
-
-	m_word = Label::createWithTTF("So, how many capable men\n are you looking for", "fonts/HashedBrowns-WyJgn.ttf", 20);
-	m_word->setColor(Color3B(0, 0, 0));
-	m_word->setPosition(Vec2(messageBubble->getContentSize().width / 2, messageBubble->getContentSize().height / 2 + 15));
-	messageBubble->addChild(m_word);
-
 	m_maxPlayer = 2;
 	m_maxPlayerDisplay = Label::createWithTTF("Max Player:" + Value(m_maxPlayer).asString(), "fonts/HashedBrowns-WyJgn.ttf", 20);
 	this->addChild(m_maxPlayerDisplay);
@@ -69,6 +56,8 @@ bool CreateRoomScene::init()
 	this->addChild(menu2);
 	menu2->alignItemsHorizontallyWithPadding(10);
 
+	createRoom();
+
 	return true;
 }
 
@@ -81,8 +70,6 @@ void CreateRoomScene::menuCallBack(Ref* sender)
 	switch (item->getTag())
 	{
 	case 0:
-		Specs::getInstance()->setMaxPlayer(m_maxPlayer);
-		m_word->setString(Value(m_maxPlayer).asString()+"\nSure");
 		this->runAction(action);
 		break;
 	case 1:
@@ -101,10 +88,10 @@ void CreateRoomScene::menuCallBack(Ref* sender)
 
 void CreateRoomScene::addMaxPlayer()
 {
-	if(m_maxPlayer<=7)
+	if(m_maxPlayer<MAX_PLAYER)
 	m_maxPlayer++;
 
-	m_maxPlayerDisplay->setString("Max Player:"+Value(m_maxPlayer).asString());
+	m_maxPlayerDisplay->setString("Player count:"+Value(m_maxPlayer).asString());
 }
 
 void CreateRoomScene::minusMaxPlayer()
@@ -112,11 +99,27 @@ void CreateRoomScene::minusMaxPlayer()
 	if (m_maxPlayer > 2)
 		m_maxPlayer--;
 
-	m_maxPlayerDisplay->setString("Max Player:"+Value(m_maxPlayer).asString());
+	m_maxPlayerDisplay->setString("Player count:"+Value(m_maxPlayer).asString());
 }
 
 void CreateRoomScene::startGame()
 {
+	neb::CJsonObject ojson2;
+	ojson2.Add("Type", JsonMsgType::SCommand);
+	ojson2.Add("Cmd", SocketCommand::START);
+	SocketServer::getInstance()->sendMessage(ojson2.ToString().c_str(), ojson2.ToString().length());
+	Specs::getInstance()->setMaxPlayer(m_maxPlayer);
+
+	neb::CJsonObject ojson;
+	ojson.Add("Type",JsonMsgType::PlayerList);
+	ojson.AddEmptySubArray("Player");
+	for (auto client : SocketServer::getInstance()->getClientSockets())
+	{
+		ojson["Player"].Add(client);
+	}
+	ojson["Player"].Add(0);
+	SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+
 	auto gameScene = GameScene::createGameScene();
 	auto transition = TransitionFlipX::create(1.0f, gameScene);
 	Director::getInstance()->replaceScene(transition);
@@ -127,4 +130,43 @@ void CreateRoomScene::backToPreparationScene()
 	auto preparationScene = PreparationScene::createPreparationScene();
 	auto transition = TransitionFlipX::create(1.0f, preparationScene);
 	Director::getInstance()->replaceScene(transition);
+}
+
+void CreateRoomScene::createRoom()
+{
+	SocketServer::getInstance()->startServer(); //init server
+	Specs::getInstance()->asServer(true);
+	SocketServer::getInstance()->onNewConnection = CC_CALLBACK_1(CreateRoomScene::onNewConnection, this);
+	Director::getInstance()->getScheduler()->scheduleUpdate(SocketServer::getInstance(), 0, false); //add server to scheduler, ready for accepting messages
+}
+
+void CreateRoomScene::onNewConnection(HSocket socket)
+{
+	neb::CJsonObject ojson;
+	ojson.Add("Type", JsonMsgType::SCommand);
+	if (m_maxPlayer >= MAX_PLAYER)
+	{
+		ojson.Add("Cmd", SocketCommand::CANT_JOIN);
+		SocketServer::getInstance()->sendMessage(socket, ojson.ToString().c_str(), ojson.ToString().length());
+		return;
+	}
+
+	ojson.Add("Cmd", SocketCommand::IS_JOIN);
+	SocketServer::getInstance()->sendMessage(socket, ojson.ToString().c_str(), ojson.ToString().length());
+	m_maxPlayer++;
+	m_maxPlayerDisplay->setString("JOINED!");
+
+	//send current player count
+	neb::CJsonObject ojson2;
+	ojson2.Add("Type", JsonMsgType::PlayerCount);
+	ojson2.Add("Num", m_maxPlayer);
+	SocketServer::getInstance()->sendMessage(socket, ojson2.ToString().c_str(), ojson2.ToString().length());
+}
+
+void CreateRoomScene::onDisconnect(HSocket socket)
+{
+	neb::CJsonObject ojson;
+	ojson.Add("Type", JsonMsgType::SCommand);
+	ojson.Add("Cmd", SocketCommand::DISCON);
+	SocketServer::getInstance()->sendMessage(socket, ojson.ToString().c_str(), ojson.ToString().length());
 }

@@ -31,6 +31,7 @@ SocketServer::~SocketServer()
 void SocketServer::destroyInstance()
 {
 	CC_SAFE_DELETE(_instance);
+	Director::getInstance()->getScheduler()->unscheduleAllForTarget(_instance);
 }
 
 bool SocketServer::startServer()
@@ -143,10 +144,11 @@ void SocketServer::recvMessage(HSocket socket)
 {
 	char buff[1024];
 	int ret = 0;
+	int dataLen = 0;
 
 	while (true)
 	{
-		ret = recv(socket, buff, sizeof(buff), 0);
+		ret = recv(socket, (char*)&dataLen, sizeof(int), 0);
 		if (ret < 0) //invalid data
 		{
 			log("recv(%d) error!", socket);
@@ -163,15 +165,18 @@ void SocketServer::recvMessage(HSocket socket)
 		}
 		else
 		{
+			ret = recv(socket, buff, dataLen, 0);
 			buff[ret] = 0;
+
 			log("recv msg : %s", buff);
 			if (ret > 0 && onRecv != nullptr)
 			{
 				std::lock_guard<std::mutex> lk(_UIMessageQueueMutex);
-				RecvData recvData;          // ±£¥Êsocket–≈œ¢
+				RecvData recvData;          //store socket data
 				recvData.socketClient = socket;
 				memcpy(recvData.data, buff, ret);
 				recvData.dataLen = ret;
+				recvData.data[ret] = 0;
 				SocketMessage* msg = new SocketMessage(RECEIVE, (unsigned char*)&recvData, sizeof(RecvData));
 				_UIMessageQueue.push_back(msg);
 			}
@@ -181,6 +186,7 @@ void SocketServer::recvMessage(HSocket socket)
 
 void SocketServer::sendMessage(HSocket socket, const char* data, int count)
 {
+	_sendMessageLock.lock();
 	for (auto& sock : _clientSockets)
 	{
 		if (sock == socket)
@@ -193,11 +199,12 @@ void SocketServer::sendMessage(HSocket socket, const char* data, int count)
 			break;
 		}
 	}
-
+	_sendMessageLock.unlock();
 }
 
 void SocketServer::sendMessage(const char* data, int count)
 {
+	_sendMessageLock.lock();
 	for (auto& socket : _clientSockets)
 	{
 		int ret = send(socket, data, count, 0);
@@ -206,6 +213,7 @@ void SocketServer::sendMessage(const char* data, int count)
 			log("send error!");
 		}
 	}
+	_sendMessageLock.unlock();
 }
 
 void SocketServer::update(float delta)
@@ -254,4 +262,14 @@ void SocketServer::update(float delta)
 
 	CC_SAFE_DELETE(msg); //message cleanup
 	_UIMessageQueueMutex.unlock();  // mutex unlock
+}
+
+std::list<HSocket> SocketServer::getClientSockets()
+{
+	return _clientSockets;
+}
+
+void SocketServer::close()
+{
+	closeConnect(_socketServer);
 }

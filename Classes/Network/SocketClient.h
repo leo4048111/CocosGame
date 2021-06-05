@@ -5,13 +5,25 @@
 class SocketClient : public SocketBase
 {
 private:
+	static SocketClient* _instance;
+
+public:
+	static SocketClient* getInstance() {
+		if (_instance == NULL)
+			_instance = new SocketClient();
+
+		return _instance;
+	}
+
+private:
 	SocketClient(void);
 	~SocketClient(void);
 	void clear();
 
 public:
-	SocketClient* construct();
 	void destroy();
+
+	void close();
 
 	bool connectServer(const char* serverIP, unsigned short port);
 	void sendMessage(const char* data, int count);
@@ -30,4 +42,6 @@ private:
 	HSocket _socektClient;
 	std::list<SocketMessage*> _UIMessageQueue;  //contains all messages
 	std::mutex   _UIMessageQueueMutex;      //mutex variable for resolving thread collision
+	std::mutex _sendMessageLock;
+
 };

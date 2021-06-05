@@ -52,7 +52,7 @@ bool SetupScene::init()
 	instructor->addChild(messageBubble);
 	messageBubble->setPosition(Vec2(instructor->getContentSize().width+80, instructor->getContentSize().height));
 
-	m_word = Label::create("Tell me your name son","fonts/HashedBrowns-WyJgn.ttf",20);
+	m_word = Label::create("Tell me your name","fonts/HashedBrowns-WyJgn.ttf",20);
 	m_word->setColor(Color3B(0, 0, 0));
 	m_word->setPosition(Vec2(messageBubble->getContentSize().width / 2, messageBubble->getContentSize().height / 2 + 15));
 	messageBubble->addChild(m_word);
@@ -62,6 +62,12 @@ bool SetupScene::init()
 	this->addChild(m_inputNameBox);
 	m_inputNameBox->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
 	m_inputNameBox->attachWithIME();
+
+	auto fadeout = FadeOut::create(0.5f);
+	auto fadein = FadeIn::create(0.5f);
+	auto sequence = Sequence::create(fadeout, fadein, NULL);
+	auto action = RepeatForever::create(sequence);
+	m_inputNameBox->runAction(action);
 
 	return true;
 }

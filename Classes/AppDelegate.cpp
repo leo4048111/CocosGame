@@ -25,6 +25,7 @@
 #include "AppDelegate.h"
 #include "Controls/Specs.h"
 #include "./Scene/MenuScene.h"
+#include "./Scene/JoinRoomScene.h"
 
 // #define USE_AUDIO_ENGINE 1
 // #define USE_SIMPLE_AUDIO_ENGINE 1

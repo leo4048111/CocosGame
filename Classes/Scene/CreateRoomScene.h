@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cocos2d.h"
+#include "Network/SocketServer.h"
 
 class CreateRoomScene :public cocos2d::Scene
 {
@@ -21,11 +22,16 @@ public:
 
 	void minusMaxPlayer();
 
+	//create room
+	void createRoom();
 
 private:
-	cocos2d::Label* m_word;
-
 	int m_maxPlayer;
 
 	cocos2d::Label* m_maxPlayerDisplay;
+
+	//server functions in create room
+	void onNewConnection(HSocket socket);
+
+	void onDisconnect(HSocket socket);
 };
