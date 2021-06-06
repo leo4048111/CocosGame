@@ -65,9 +65,11 @@ void SocketClient::recvMessage()
 {
 	char recvBuf[1024];
 	int ret = 0;
+	int dataLen = 0;
+
 	while (true)
 	{
-		ret = recv(_socektClient, recvBuf, sizeof(recvBuf), 0);
+		ret = recv(_socektClient, (char*)&dataLen, sizeof(int), 0);
 		if (ret < 0)
 		{
 			log("recv error");
@@ -75,11 +77,10 @@ void SocketClient::recvMessage()
 		}
 		if (ret > 0 && onRecv != nullptr)
 		{
+			ret = recv(_socektClient, recvBuf,dataLen, 0);
 			//push data to vector, then parse them in update()
 			std::lock_guard<std::mutex> lk(_UIMessageQueueMutex); //set mutex on lock
 			recvBuf[ret]='\0';
-			auto test = (unsigned char*)recvBuf;
-
 			SocketMessage* msg = new SocketMessage(RECEIVE,(unsigned char*)recvBuf, ret);
 			_UIMessageQueue.push_back(msg);
 		}
@@ -178,4 +179,9 @@ void SocketClient::close()
 {
 	if(_socektClient!=0)
 	closeConnect(_socektClient);
+}
+
+HSocket SocketClient::getClientSocket()
+{
+	return _socektClient;
 }

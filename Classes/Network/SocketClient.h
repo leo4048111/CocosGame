@@ -33,6 +33,8 @@ public:
 
 	void update(float delta);
 
+	HSocket getClientSocket();
+
 private:
 	bool initClient();
 	void recvMessage();

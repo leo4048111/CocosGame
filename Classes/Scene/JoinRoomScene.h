@@ -1,6 +1,8 @@
 #pragma once
 
 #include "cocos2d.h"
+#include "network/SocketClient.h"
+#include <vector>
 
 class JoinRoomScene :public cocos2d::Scene
 {
@@ -27,4 +29,6 @@ private:
 	bool m_isJoin;
 	cocos2d::Label* m_connectionStatus;
 	cocos2d::Label* m_joinStatus;
+
+	std::vector<HSocket> m_allPlayerSockets;
 };

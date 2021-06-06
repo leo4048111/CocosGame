@@ -167,7 +167,7 @@ void BulletLayer::update(float delta)
 				{
 					if (!currentPlayer->receiveDamage(m_bulletDamageMap[currentBullet->getName()]))
 					{
-						if (currentPlayer->getName() == Specs::getInstance()->getPlayerName())
+						if (currentPlayer->isMe())
 							Specs::getInstance()->setWinOrLose(false);
 						else
 							tmpErasePlayer.pushBack(currentPlayer);
@@ -262,32 +262,15 @@ void BulletLayer::addBullet(Node* sender,Vec2 startPos,Vec2 terminalPos)
 	this->addChild(bullet);
 	m_allFriendlyBullets.pushBack(bullet);
 	
-	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
-	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
-	Vec2 route = thisTerminalPos - thisStartPos;
+	Vec2 route = terminalPos - startPos;
 
 	//set bullet rotation
 	pointBulletTo(bullet, route,0);
 
 	bullet->setScale(0.2f);
-	bullet->setPosition(thisStartPos);
+	bullet->setPosition(startPos);
 
-	////DEBUG
-	//std::string str1 = "ch:" + Value(mainCharacter->getPosition().x).asString() + "," + Value(mainCharacter->getPosition().y).asString() + "\n";
-	//OutputDebugString(str1.c_str());
-	//std::string str2 = "bullet:" + Value(bullet->getPosition().x).asString() + "," + Value(bullet->getPosition().y).asString() + "\n";
-	//OutputDebugString(str2.c_str());
-	//std::string str4 = "mouse:" + Value(mousePosVec.x).asString() + "," + Value(mousePosVec.y).asString() + "\n";
-	//OutputDebugString(str4.c_str());
-	//std::string str5 = "dst:" + Value(dst.x).asString() + "," + Value(dst.y).asString() + "\n";
-	//OutputDebugString(str5.c_str());
-	//std::string str3 = mainCharacter->getName() + "\n";
-	//OutputDebugString(str3.c_str());
-	//SpriteLayer* spriteLayer = dynamic_cast<SpriteLayer*>(this->getParent()->getChildByName("SpriteLayer"));
-	//Vector<Target*>* allTargets = spriteLayer->getAllTargets();
-
-
-	auto action = MoveTo::create(1.0f, thisStartPos+ 1024 * Vec2(cos(atan2(route.y, route.x)), sin(atan2(route.y, route.x))));
+	auto action = MoveTo::create(1.0f, startPos + 1024 * Vec2(cos(atan2(route.y, route.x)), sin(atan2(route.y, route.x))));
 	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
 	auto sequence = Sequence::create(action, callFunc, NULL);
 	bullet->runAction(Repeat::create(sequence, 1));
@@ -303,15 +286,13 @@ void BulletLayer::addLazer(Node* sender,Vec2 startPos, Vec2 terminalPos)
 	this->addChild(lazer);
 	m_allFriendlyBullets.pushBack(lazer);
 
-	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
-	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
-	Vec2 route = thisTerminalPos - thisStartPos;
+	Vec2 route = terminalPos - startPos;
 
 	//set bullet rotation
 	pointBulletTo(lazer, route,0);
 
 	lazer->setScale(0.5f);
-	lazer->setPosition(thisStartPos);
+	lazer->setPosition(startPos);
 
 	auto action = FadeIn::create(0.2f);
 	auto action2 = FadeOut::create(0.5f);
@@ -325,9 +306,7 @@ void BulletLayer::addSprayBullet(Node* sender, Vec2 startPos, Vec2 terminalPos)
 {
 	const double offsetAngle = 0.418;
 
-	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
-	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
-	Vec2 route = thisTerminalPos - thisStartPos;
+	Vec2 route = terminalPos - startPos;
 
 	//create bullet X 3
 	for (int offset = -15; offset <= 15; offset += 15)
@@ -340,9 +319,9 @@ void BulletLayer::addSprayBullet(Node* sender, Vec2 startPos, Vec2 terminalPos)
 		pointBulletTo(bullet, route, offset);
 
 		bullet->setScale(0.2f);
-		bullet->setPosition(thisStartPos);
+		bullet->setPosition(startPos);
 
-		auto action = MoveTo::create(1.0f, thisStartPos+ 1024 * Vec2(cos(atan2(route.y, route.x)+offset/180.0*M_PI), sin(atan2(route.y, route.x)+offset / 180.0 * M_PI)));
+		auto action = MoveTo::create(1.0f, startPos + 1024 * Vec2(cos(atan2(route.y, route.x)+offset/180.0*M_PI), sin(atan2(route.y, route.x)+offset / 180.0 * M_PI)));
 		CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
 		auto sequence = Sequence::create(action, callFunc, NULL);
 		bullet->runAction(sequence);
@@ -359,18 +338,16 @@ void BulletLayer::addToxicBomb(Node* sender, Vec2 startPos, Vec2 terminalPos)
 	this->addChild(bomb);
 	m_allFriendlyBullets.pushBack(bomb);
 
-	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
-	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
-	Vec2 route = thisTerminalPos - thisStartPos;
+	Vec2 route = terminalPos - startPos;
 
 	//set bullet rotation
 	pointBulletTo(bomb, route, 0);
 
 	bomb->setScale(0.5f);
-	bomb->setPosition(thisStartPos);
+	bomb->setPosition(startPos);
 
 	auto action1 = RepeatForever::create(RotateTo::create(0.5f, 1280));
-	auto action2 = JumpTo::create(1.0f, thisTerminalPos, 3.0f, 2);
+	auto action2 = JumpTo::create(1.0f, terminalPos, 3.0f, 2);
 	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
 	auto spawn = Spawn::create(action1, action2, NULL);
 
@@ -393,14 +370,12 @@ void BulletLayer::addFlameThrower(Node* sender, Vec2 startPos, Vec2 terminalPos)
 	this->addChild(flame);
 	m_allFriendlyBullets.pushBack(flame);
 
-	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
-	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
-	Vec2 route = thisTerminalPos - thisStartPos;
+	Vec2 route = terminalPos - startPos;
 
 	//set bullet rotation
 	pointBulletTo(flame, route, 0);
 
-	flame->setPosition(thisStartPos);
+	flame->setPosition(startPos);
 
 	//flame anime and auto cleanup
 	auto fadein = FadeIn::create(c_flameSurvivalDuration / 2);
@@ -421,15 +396,13 @@ void BulletLayer::addMeleeAttack(Node* sender, Vec2 startPos, Vec2 terminalPos)
 	this->addChild(effect);
 	m_allFriendlyBullets.pushBack(effect);
 
-	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
-	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
-	Vec2 route = thisTerminalPos - thisStartPos;
+	Vec2 route = terminalPos - startPos;
 
 	//set bullet rotation
 	pointBulletTo(effect, route, 0);
 
 	effect->setScale(0.3f);
-	effect->setPosition(thisStartPos);
+	effect->setPosition(startPos);
 
 	//flame anime and auto cleanup
 	auto fadein = FadeIn::create(c_effectDuration / 2);

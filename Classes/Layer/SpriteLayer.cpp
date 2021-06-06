@@ -39,8 +39,10 @@ bool SpriteLayer::init()
 	if (Specs::getInstance()->isSinglePlayer())
 		return true;
 
-	if(Specs::getInstance()->isServer())
-	SocketServer::getInstance()->onRecv = CC_CALLBACK_3(SpriteLayer::onRecv, this);
+	if (Specs::getInstance()->isServer())
+		SocketServer::getInstance()->onRecv = CC_CALLBACK_3(SpriteLayer::onRecvServer, this);
+	else
+		SocketClient::getInstance()->onRecv = CC_CALLBACK_2(SpriteLayer::onRecvClient, this);
 
 	return true;
 }
@@ -84,9 +86,9 @@ void SpriteLayer::addPlayer()
 		auto clientSockets = SocketServer::getInstance()->getClientSockets();
 		for (auto client : clientSockets)
 		{
-			auto player = Player::createPlayer("test");
-			player->setMe(false);
-			this->addChild(player, 20, "test");
+			std::string name =Specs::getInstance()->m_allPlayerSocket[client];
+			auto player = Player::createPlayer(name);
+			this->addChild(player, 20, name);
 			m_players.push_back(player);
 			player->setPosition(dst);
 			player->scheduleUpdate();
@@ -95,7 +97,19 @@ void SpriteLayer::addPlayer()
 			m_playerSocketMap.insert(std::make_pair(client,player)); //bind a player to each client
 			_socketLock.unlock();
 		}
-
+	}
+	else //init as client
+	{
+		for (auto name:Specs::getInstance()->m_allPlayerName)
+		{
+			if (name == Specs::getInstance()->getPlayerName())
+				continue;
+			auto player = Player::createPlayer(name);
+			this->addChild(player, 20, name);
+			m_players.push_back(player);
+			player->setPosition(dst);
+			player->scheduleUpdate();
+		}
 	}
 
 }
@@ -167,37 +181,84 @@ void SpriteLayer::removeTarget(Target* target)
 	m_targets.eraseObject(target);
 }
 
-void SpriteLayer::onRecv(HSocket socket, const char* data, int count)
+void SpriteLayer::onRecvServer(HSocket socket, const char* data, int count)
 {
-	char* tmp = const_cast<char*>(data);
-	tmp[count] = '\0';
-
-	neb::CJsonObject ojson(tmp);
-	if (!ojson.Parse(tmp))
+	neb::CJsonObject ojson(data);
+	if (!ojson.Parse(data))
 		return;
 
 	int type = 0;
 	if (!ojson.Get("Type", type))
 		return;
+
 	switch (type)
 	{
 	case JsonMsgType::PlayerData:
-		if (Specs::getInstance()->isServer()) //onRecv as server
-		{
-			_socketLock.lock();
-			if (m_playerSocketMap[socket] != NULL)
-				m_playerSocketMap[socket]->updateWithSyncData(ojson);
-			_socketLock.unlock();
+		_socketLock.lock();
+		if (m_playerSocketMap[socket] != NULL)
+			m_playerSocketMap[socket]->updateWithSyncData(ojson);
+		_socketLock.unlock();
 
-			ojson.Add("Tag", socket); //broadcast the message to each socket
-			return;
-		}
+		ojson.Add("Tag", Specs::getInstance()->m_allPlayerSocket[socket]); //broadcast the message to each socket
+		SocketServer::getInstance()->castMessage(ojson.ToString().c_str(), ojson.ToString().length(), socket);
+		break;
+	case JsonMsgType::Speak:
+	{
+		std::string str;
+		ojson.Get("Sentence", str);
+		m_playerSocketMap[socket]->speak(str);
+		Chatbox::getInstance()->appendTextInChat(str);
+	}
+	break;
+	default:
+		break;
+	}
+}
 
-		//onRecv as client
+void SpriteLayer::onRecvClient(const char* data, int count)
+{
+	neb::CJsonObject ojson(data);
+	log(data);
+	if (!ojson.Parse(data))
+		return;
+
+	int type = 0;
+	if (!ojson.Get("Type", type))
+		return;
+
+	switch (type)
+	{
+	case JsonMsgType::PlayerData:
+	{
+		_socketLock.lock();
+		std::string tag;
+		ojson.Get("Tag", tag);
+		if (tag == Specs::getInstance()->getPlayerName())
+			break;
+
+		Player* player = dynamic_cast<Player*>(this->getChildByName(tag));
+		if (player != NULL)
+			player->updateWithSyncData(ojson);
+		_socketLock.unlock();
+	}
+		break;
+
+	case JsonMsgType::Speak:
+	{
+		std::string str;
+		ojson.Get("Sentence", str);
+		std::string tag;
+		ojson.Get("Tag", tag);
+		if (tag == Specs::getInstance()->getPlayerName())
+			break;
+		Player* player = dynamic_cast<Player*>(this->getChildByName(tag));
+		if (player != NULL)
+			player->speak(str);
+		Chatbox::getInstance()->appendTextInChat(str);
+	}
+	break;
 
 	default:
 		break;
 	}
-	
-
 }

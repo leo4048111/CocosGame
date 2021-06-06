@@ -62,6 +62,10 @@ public:
 	//chat method
 	void speak(std::string str);
 
+	bool isMe();
+
+	void setMe(bool value);
+
 private:
 	double m_maxHealth;
 	double m_currentHealth;
@@ -75,6 +79,8 @@ private:
 	double m_currentResistance;
 
 	double m_currentSpeed;
+
+	bool m_isMe;
 
 };
 

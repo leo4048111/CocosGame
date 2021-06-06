@@ -151,7 +151,7 @@ void Weapon::unlock()
 	}
 }
 
-bool Weapon::isCurrentMagazineEmpty()
+bool Weapon::isCurrentMagazineNotEmpty()
 {
 	return m_ammoInCurrentMagazine;
 }
@@ -222,7 +222,7 @@ void Weapon::fire(Vec2 startPos,Vec2 terminalPos)
 		return;
 	}
 
-	if ((isCurrentMagazineEmpty())||Specs::getInstance()->isInfiniteAmmoActivated())
+	if ((isCurrentMagazineNotEmpty())||Specs::getInstance()->isInfiniteAmmoActivated())
 	{
 		switch (this->getWeaponType())
 		{

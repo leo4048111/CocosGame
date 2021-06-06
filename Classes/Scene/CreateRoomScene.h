@@ -25,6 +25,8 @@ public:
 	//create room
 	void createRoom();
 
+	void onRecv(HSocket socket, const char* data, int count);
+
 private:
 	int m_maxPlayer;
 

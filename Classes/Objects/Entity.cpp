@@ -39,6 +39,8 @@ bool Entity::init()
 	m_currentStaminaRecovery = 0.5f;
 	m_currentSpeed = 0.25f;
 	m_currentResistance = 20.0f;
+	
+	m_isMe = false;
 	return true;
 }
 
@@ -193,4 +195,14 @@ void Entity::speak(std::string str)
 	auto sequence = Sequence::create(fadein, fadeout, callFunc,NULL);
 	messageBubble->runAction(sequence);
 	sentence->runAction(sequence->clone());
+}
+
+void Entity::setMe(bool value)
+{
+	m_isMe = value;
+}
+
+bool Entity::isMe()
+{
+	return m_isMe;
 }

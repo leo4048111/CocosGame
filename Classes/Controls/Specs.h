@@ -5,6 +5,7 @@
 #include <regex>
 #include <experimental/filesystem> 
 #include <vector>
+#include "Network/SocketBase.h"
 #include <map>
 
 using namespace std;
@@ -13,12 +14,12 @@ using namespace std;
 
 typedef enum JsonMsgType
 {
-	PlayerList, SCommand,PlayerCount,PlayerData
+	PlayerList, SCommand,PlayerCount,PlayerData,PlayerName,Speak
 };
 
 typedef enum SocketCommand
 {
-	JOIN, CANT_JOIN, IS_JOIN, DISCON, START, NAME
+	JOIN, CANT_JOIN, IS_JOIN, DISCON, START
 };
 
 class Specs
@@ -144,10 +145,14 @@ private:
 	std::vector<std::string> m_radioLines;
 
 	//socket related
-	std::map<SocketCommand, std::string>m_socketCommand;
 	bool m_isServer;
 
+	public:
+	std::map<HSocket,std::string> m_allPlayerSocket;
+	std::vector<std::string> m_allPlayerName;
+
 	//audio files
+	private:
 	std::vector<std::string> m_allBgMusic;
 	int m_currentBgMusic;
 };

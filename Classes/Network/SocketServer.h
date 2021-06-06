@@ -30,6 +30,7 @@ public:
 	bool startServer();
 	void sendMessage(HSocket socket, const char* data, int count);
 	void sendMessage(const char* data, int count);
+	void castMessage(const char* data, int count, HSocket socket);
 	void destroyInstance();
 
 	std::function<void(const char* ip)> onStart;

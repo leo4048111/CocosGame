@@ -40,10 +40,6 @@ public:
 
 	void onMouseUp(cocos2d::Event* event);
 
-	void setMe(bool value);
-
-	bool isMe();
-
 	//Weapon related
 	void initAllWeapon();
 
@@ -64,7 +60,7 @@ public:
 	std::map<int, Weapon*> getAllWeaponMap();
 
 	//returns sync data as json
-	std::string buildSyncData();
+	neb::CJsonObject buildSyncData();
 
 	void updateWithSyncData(neb::CJsonObject ojson);
 	
@@ -93,15 +89,15 @@ private:
 	cocos2d::Label* m_magazineSpecLabel;
 	cocos2d::Menu* m_weaponSpecMenu;
 
-	bool m_isMe;
-
 	std::mutex _playerUpdateLock;
 
 public:
 	std::string m_playerName;
 
+	cocos2d::Vec2 _fireStartPos;
 
-	
+	cocos2d::Vec2 _fireTerminalPos;
+
 };
 
 

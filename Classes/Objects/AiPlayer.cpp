@@ -92,7 +92,7 @@ void AiPlayer::update(float delta)
 		Vec2 terminalPos = allTargets.front()->getParent()->convertToWorldSpace(allTargets.front()->getPosition());
 		m_currentWeapon->pointTo(startPos, terminalPos);
 		m_currentWeapon->fire(startPos, terminalPos);
-		if (m_currentWeapon->isCurrentMagazineEmpty())
+		if (m_currentWeapon->isCurrentMagazineNotEmpty())
 		{
 			m_currentWeapon->getBackupMagazine();
 			m_currentWeapon->reload();

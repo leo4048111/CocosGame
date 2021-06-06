@@ -104,21 +104,21 @@ void CreateRoomScene::minusMaxPlayer()
 
 void CreateRoomScene::startGame()
 {
+	neb::CJsonObject ojson;
+	ojson.Add("Type",JsonMsgType::PlayerList);
+	ojson.AddEmptySubArray("Player");
+	for (auto name : Specs::getInstance()->m_allPlayerName)
+	{
+		ojson["Player"].Add(name);
+	}
+	ojson["Player"].Add(Specs::getInstance()->getPlayerName());
+	SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+
 	neb::CJsonObject ojson2;
 	ojson2.Add("Type", JsonMsgType::SCommand);
 	ojson2.Add("Cmd", SocketCommand::START);
 	SocketServer::getInstance()->sendMessage(ojson2.ToString().c_str(), ojson2.ToString().length());
 	Specs::getInstance()->setMaxPlayer(m_maxPlayer);
-
-	neb::CJsonObject ojson;
-	ojson.Add("Type",JsonMsgType::PlayerList);
-	ojson.AddEmptySubArray("Player");
-	for (auto client : SocketServer::getInstance()->getClientSockets())
-	{
-		ojson["Player"].Add(client);
-	}
-	ojson["Player"].Add(0);
-	SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
 
 	auto gameScene = GameScene::createGameScene();
 	auto transition = TransitionFlipX::create(1.0f, gameScene);
@@ -135,6 +135,7 @@ void CreateRoomScene::backToPreparationScene()
 void CreateRoomScene::createRoom()
 {
 	SocketServer::getInstance()->startServer(); //init server
+	SocketServer::getInstance()->onRecv = CC_CALLBACK_3(CreateRoomScene::onRecv, this);
 	Specs::getInstance()->asServer(true);
 	SocketServer::getInstance()->onNewConnection = CC_CALLBACK_1(CreateRoomScene::onNewConnection, this);
 	Director::getInstance()->getScheduler()->scheduleUpdate(SocketServer::getInstance(), 0, false); //add server to scheduler, ready for accepting messages
@@ -169,4 +170,25 @@ void CreateRoomScene::onDisconnect(HSocket socket)
 	ojson.Add("Type", JsonMsgType::SCommand);
 	ojson.Add("Cmd", SocketCommand::DISCON);
 	SocketServer::getInstance()->sendMessage(socket, ojson.ToString().c_str(), ojson.ToString().length());
+}
+
+void CreateRoomScene::onRecv(HSocket socket, const char* data, int count)
+{
+	neb::CJsonObject ojson(data);
+	if (!ojson.Parse(data))
+		return;
+
+	int type = 0;
+	if (!ojson.Get("Type", type))
+		return;
+
+	if (type == JsonMsgType::PlayerName)
+	{
+		std::string name;
+		ojson.Get("Name", name);
+		Specs::getInstance()->m_allPlayerSocket.insert(make_pair(socket,name));
+		Specs::getInstance()->m_allPlayerName.push_back(name);
+
+	}
+
 }

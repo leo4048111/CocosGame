@@ -58,6 +58,9 @@ void Specs::refreshInstance()
 	m_isInvincible = true;
 	m_isAllWeapon = false;
 
+	//init socket specs
+	m_allPlayerSocket.clear();
+
 }
 
 void Specs::addScore(int score)

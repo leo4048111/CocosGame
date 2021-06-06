@@ -15,6 +15,12 @@ UILayer* UILayer::createUILayer()
 	return _instance;
 }
 
+UILayer::~UILayer()
+{
+	this->removeFromParentAndCleanup(1);
+	_instance = NULL;
+}
+
 bool UILayer::init()
 {
 	if (!Layer::init())

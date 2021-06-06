@@ -39,6 +39,8 @@ public:
 	//display methods
 	void sendText();
 
+	void appendTextInChat(std::string str);
+
 	void _stdcall showHelp();
 
 	//run cheat

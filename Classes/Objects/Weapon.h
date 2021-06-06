@@ -5,10 +5,10 @@
 #include "Entity.h"
 #include "Layer/BulletLayer.h"
 
-enum weaponType
+typedef enum _weaponType
 {
 	bigKnife,pistol, lazer, sniperRifle, sawedOff, rifle, plagueBringer,flameThrower,totalWeapons
-};
+}weaponType;
 
 class Weapon :public Entity
 {
@@ -62,7 +62,7 @@ public:
 
 	void reload();
 
-	bool isCurrentMagazineEmpty();
+	bool isCurrentMagazineNotEmpty();
 
 	void getBackupMagazine();
 

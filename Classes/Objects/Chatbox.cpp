@@ -1,5 +1,9 @@
 #include "Chatbox.h"
 #include "Objects/Player.h"
+#include "Network/SocketClient.h"
+#include "Network/SocketServer.h"
+#include "CJsonObject/CJsonObject.hpp"
+
 
 USING_NS_CC;
 
@@ -73,7 +77,6 @@ void Chatbox::setControlOnListen()
 
 void Chatbox::sendText()
 {
-	const int MAX_MESSAGES_SHOW = 15;
 	m_currentText = m_inputBox->getString();
 
 	if (m_currentText == "")
@@ -92,12 +95,33 @@ void Chatbox::sendText()
 		m_currentText = Specs::getInstance()->getPlayerName() + " says: " + m_currentText;
 	}
 
+	appendTextInChat(m_currentText);
+	
+	if (Specs::getInstance()->isSinglePlayer())
+		return;
+
+	neb::CJsonObject ojson;
+	ojson.Add("Type", JsonMsgType::Speak);
+	ojson.Add("Sentence", m_currentText);
+	ojson.Add("Tag", Specs::getInstance()->getPlayerName());
+
+	if (Specs::getInstance()->isServer())
+		SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+	else
+		SocketClient::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+
+}
+
+void Chatbox::appendTextInChat(std::string str)
+{
+	const int MAX_MESSAGES_SHOW = 15;
+
 	while (m_allMessages.size() >= MAX_MESSAGES_SHOW)
 		m_allMessages.pop_front();
 
-	m_allMessages.push_back(m_currentText);
+	m_allMessages.push_back(str);
 	std::string showText = "";
-	for (auto message:m_allMessages)
+	for (auto message : m_allMessages)
 	{
 		showText += message + "\n";
 	}
@@ -110,7 +134,6 @@ void Chatbox::sendText()
 	auto fadeout = FadeOut::create(3.0f);
 	auto sequence = Sequence::create(fadein, fadeout, NULL);
 	m_messageBox->runAction(sequence);
-
 }
 
 void Chatbox::runCheat(std::string command)

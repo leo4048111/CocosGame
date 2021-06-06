@@ -7,6 +7,7 @@
 #include "Objects/AiPlayer.h"
 #include "CollectableLayer.h"
 #include "Network/SocketServer.h"
+#include "Network/SocketClient.h"
 #include "Objects/Entity.h"
 #include <map>
 
@@ -58,7 +59,9 @@ public:
 	void removeTarget(Target* target);
 
 	//socket related
-	void onRecv(HSocket socket, const char* data, int count);
+	void onRecvServer(HSocket socket, const char* data, int count); //SERVER
+
+	void onRecvClient(const char* data, int count); //client
 private:
 
 	//Target specs

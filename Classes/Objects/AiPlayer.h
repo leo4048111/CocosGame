@@ -54,7 +54,7 @@ private:
 	Weapon* m_currentWeapon;
 
 	static std::string m_playerName;
-
+	
 	//update specs
 	time_t m_lastUpdate;
 };

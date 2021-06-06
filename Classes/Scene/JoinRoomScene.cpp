@@ -1,5 +1,4 @@
 #include "JoinRoomScene.h"
-#include "network/SocketClient.h"
 #include "PreparationScene.h"
 #include "GameScene.h"
 #include "Controls/Specs.h"
@@ -84,8 +83,12 @@ bool JoinRoomScene::joinRoom()
 		return false;
 	}
 
-	//std::string str = Specs::getInstance()->getSocketCommand(Specs::SocketCommand::NAME) + Specs::getInstance()->getPlayerName();
-	//SocketClient::getInstance()->sendMessage(str.c_str(), strlen(str.c_str()));
+	//send name
+	neb::CJsonObject ojson;
+	ojson.Add("Type", JsonMsgType::PlayerName);
+	ojson.Add("Name", Specs::getInstance()->getPlayerName());
+	SocketClient::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+
 	m_connectionStatus->setString("Connected");
 	return true;
 }
@@ -112,6 +115,19 @@ void JoinRoomScene::onRecv(const char* data, int count)
 		int count = 0;
 		ojson.Get("Num", count);
 		Specs::getInstance()->setMaxPlayer(count);
+		return;
+	}
+
+	if (type == JsonMsgType::PlayerList)
+	{
+		int size = ojson["Player"].GetArraySize();
+		for (int c = 0; c < size; c++)
+		{
+			std::string name;
+			ojson["Player"].Get(c, name);
+			if(name!=Specs::getInstance()->getPlayerName())
+			Specs::getInstance()->m_allPlayerName.push_back(name);
+		}
 	}
 
 	if (type != JsonMsgType::SCommand)

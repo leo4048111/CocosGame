@@ -13,7 +13,7 @@ class UILayer :public cocos2d::Layer
 private:
 	UILayer() {};
 
-	~UILayer() { this->removeFromParentAndCleanup(1);  _instance = NULL; };
+	~UILayer();
 
 	static UILayer* _instance;
 

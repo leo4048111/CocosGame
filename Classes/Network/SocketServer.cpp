@@ -191,7 +191,8 @@ void SocketServer::sendMessage(HSocket socket, const char* data, int count)
 	{
 		if (sock == socket)
 		{
-			int ret = send(socket, data, count, 0);
+			int ret = send(sock, (char*)&count, sizeof(int), 0);
+			ret = send(sock, data, count, 0);
 			if (ret < 0)
 			{
 				log("send error!");
@@ -207,7 +208,25 @@ void SocketServer::sendMessage(const char* data, int count)
 	_sendMessageLock.lock();
 	for (auto& socket : _clientSockets)
 	{
-		int ret = send(socket, data, count, 0);
+		int ret = send(socket, (char*)&count, sizeof(int), 0);
+		ret = send(socket, data, count, 0);
+		if (ret < 0)
+		{
+			log("send error!");
+		}
+	}
+	_sendMessageLock.unlock();
+}
+
+void SocketServer::castMessage(const char* data, int count, HSocket srcsocket)
+{
+	_sendMessageLock.lock();
+	for (auto& socket : _clientSockets)
+	{
+		if (socket == srcsocket) continue;
+
+		int ret = send(socket, (char*)&count, sizeof(int), 0);
+		ret = send(socket, data, count, 0);
 		if (ret < 0)
 		{
 			log("send error!");

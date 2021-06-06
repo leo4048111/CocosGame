@@ -10,6 +10,11 @@ Player* Player::createPlayer(std::string name)
 {
 	Player* player = Player::create();
 	player->m_playerName = name;
+	Label* label = dynamic_cast<Label*>(player->getChildByTag(100));
+	if (label != nullptr)
+	{
+		label->setString(name);
+	}
 	return player;
 }
 
@@ -42,8 +47,9 @@ bool Player::init()
 	initAllWeapon();
 
 	//init name
-	auto nameLabel = Label::create(m_playerName,"fonts/HashedBrowns-WyJgn.ttf",7);
+	auto nameLabel = Label::create(m_playerName,"fonts/HashedBrowns-WyJgn.ttf",15);
 	this->addChild(nameLabel);
+	nameLabel->setTag(100);
 	nameLabel->setColor(Color3B(255, 255, 255));
 	nameLabel->setPosition(Vec2(this->getContentSize().width / 2, 20));
 
@@ -138,36 +144,36 @@ void Player::update(float delta)
 	//Update anime
 	double offsetX = this->getCurrentSpeed()+1.0f;
 	double offsetY = this->getCurrentSpeed()+1.0f;
+	if (isMe())
+	{
+		if (m_keyMap[EventKeyboard::KeyCode::KEY_SHIFT] && this->getCurrentStamina())
+		{
+			offsetX *= 2.5f;
+			offsetY *= 2.5f;
+			this->addStamina(-2.0f);
+		}
+		else if (!m_keyMap[EventKeyboard::KeyCode::KEY_SHIFT])
+		{
+			this->addStamina(this->getStaminaRecovery());
+		}
 
-	_playerUpdateLock.lock();
+		if (m_keyMap[EventKeyboard::KeyCode::KEY_W])
+		{
+			this->setPosition(this->getPosition() + Vec2(0, offsetY));
+		}
 
-	if (m_keyMap[EventKeyboard::KeyCode::KEY_SHIFT]&&this->getCurrentStamina())
-	{
-		offsetX *= 2.5f;
-		offsetY *= 2.5f;
-		this->addStamina(-2.0f);
-	}
-	else if(!m_keyMap[EventKeyboard::KeyCode::KEY_SHIFT])
-	{
-		this->addStamina(this->getStaminaRecovery());
-	}
-
-	if (m_keyMap[EventKeyboard::KeyCode::KEY_W])
-	{
-		this->setPosition(this->getPosition() + Vec2(0, offsetY));
-	}
-
-	if (m_keyMap[EventKeyboard::KeyCode::KEY_S])
-	{
-		this->setPosition(this->getPosition() - Vec2(0, offsetY));
-	}
-	if (m_keyMap[EventKeyboard::KeyCode::KEY_A])
-	{
-		this->setPosition(this->getPosition() - Vec2(offsetX, 0));
-	}
-	if (m_keyMap[EventKeyboard::KeyCode::KEY_D])
-	{
-		this->setPosition(this->getPosition() + Vec2(offsetX, 0));
+		if (m_keyMap[EventKeyboard::KeyCode::KEY_S])
+		{
+			this->setPosition(this->getPosition() - Vec2(0, offsetY));
+		}
+		if (m_keyMap[EventKeyboard::KeyCode::KEY_A])
+		{
+			this->setPosition(this->getPosition() - Vec2(offsetX, 0));
+		}
+		if (m_keyMap[EventKeyboard::KeyCode::KEY_D])
+		{
+			this->setPosition(this->getPosition() + Vec2(offsetX, 0));
+		}
 	}
 
 	//update visual specs
@@ -181,33 +187,41 @@ void Player::update(float delta)
 	swapWeapon(m_currentWeaponSlot);
 	if (m_mouseButtonMap[EventMouse::MouseButton::BUTTON_LEFT] && m_currentWeapon->m_isAutoFire)
 	{
-		if (Specs::getInstance()->isAimbotActivated())
+		if (isMe())
 		{
-			auto allTargets = SpriteLayer::getInstance()->getAllTargets();
-			m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()), allTargets.front()->getParent()->convertToWorldSpace(allTargets.front()->getPosition()));
+			if (Specs::getInstance()->isAimbotActivated())
+			{
+				auto allTargets = SpriteLayer::getInstance()->getAllTargets();
+				_fireStartPos = m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition());
+				_fireTerminalPos = allTargets.front()->getParent()->convertToWorldSpace(allTargets.front()->getPosition());
+			}
+			else
+			{
+				_fireStartPos = m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition());
+				_fireTerminalPos = CrossHair::getInstance()->getCursorPos();
+			}
 		}
-		else
-		{
-			m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()), CrossHair::getInstance()->getCursorPos());
-		}
+		_fireStartPos = BulletLayer::getInstance()->convertToNodeSpace(_fireStartPos);
+		_fireTerminalPos = BulletLayer::getInstance()->convertToNodeSpace(_fireTerminalPos);
+		m_currentWeapon->fire(_fireStartPos, _fireTerminalPos);
 	}
 
-	_playerUpdateLock.unlock();
 
-	if (Specs::getInstance()->isSinglePlayer())
+	if (Specs::getInstance()->isSinglePlayer()||(!isMe()))
 		return;
 
-	std::string jsonStr = buildSyncData();
-	
-	if (Specs::getInstance()->isServer())
-	{
-		return; //xxxxxxxxxxxxxxxxxxxxx
-	}
-	else
-	{
-		SocketClient::getInstance()->sendMessage(jsonStr.c_str(), strlen(jsonStr.c_str()));
-	}
+	neb::CJsonObject ojson = buildSyncData();
+	ojson.Add("Tag", Specs::getInstance()->getPlayerName());
 
+
+	if (Specs::getInstance()->isServer()) //send as server
+	{
+		SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+	}
+	else //send as client
+	{
+		SocketClient::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+	}
 
 }
 
@@ -328,14 +342,19 @@ void Player::onMouseDown(Event* event)
 	case EventMouse::MouseButton::BUTTON_LEFT:
 		if (m_currentWeapon != nullptr)
 			if (Specs::getInstance()->isAimbotActivated())
-			{	
+			{
 				auto allTargets = SpriteLayer::getInstance()->getAllTargets();
-				m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()),allTargets.front()->getParent()->convertToWorldSpace(allTargets.front()->getPosition()));
+				_fireStartPos = m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition());
+				_fireTerminalPos = allTargets.front()->getParent()->convertToWorldSpace(allTargets.front()->getPosition());
 			}
 			else
 			{
-				m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()), CrossHair::getInstance()->getCursorPos());
+				_fireStartPos = m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition());
+				_fireTerminalPos = CrossHair::getInstance()->getCursorPos();
 			}
+		_fireStartPos = BulletLayer::getInstance()->convertToNodeSpace(_fireStartPos);
+		_fireTerminalPos = BulletLayer::getInstance()->convertToNodeSpace(_fireTerminalPos);
+		m_currentWeapon->fire(_fireStartPos, _fireTerminalPos);
 		break;
 	default:
 		break;
@@ -354,7 +373,7 @@ void Player::swapWeapon(int num)
 	if (m_lastWeaponSlot == num)
 		return;
 
-	if (m_allWeaponsMap[num]->isLocked() && (!Specs::getInstance()->isAllWeaponActivated()))
+	if (m_allWeaponsMap[num]->isLocked() && (!Specs::getInstance()->isAllWeaponActivated())&&isMe())
 	{
 		auto notification = Label::createWithTTF("This weapon isn't unlocked yet", "fonts/Notification Font.ttf", 10);
 		notification->setColor(Color3B(255, 4, 56));
@@ -459,36 +478,42 @@ void Player::initAllWeapon()
 void Player::fastMeleeAttack()
 {
 	swapWeapon(0);
-	m_currentWeapon->fire(m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition()), CrossHair::getInstance()->getCursorPos());
+	_fireStartPos = m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition());
+	_fireTerminalPos = CrossHair::getInstance()->getCursorPos();
+	_fireStartPos = BulletLayer::getInstance()->convertToNodeSpace(_fireStartPos);
+	_fireTerminalPos = BulletLayer::getInstance()->convertToNodeSpace(_fireTerminalPos);
+	m_currentWeapon->fire(_fireStartPos, _fireTerminalPos);
 }
 
-void Player::setMe(bool value)
-{
-	m_isMe = value;
-}
-
-bool Player::isMe()
-{
-	return m_isMe;
-}
-
-std::string Player::buildSyncData()
+neb::CJsonObject Player::buildSyncData()
 {
 	neb::CJsonObject ojson;
 	ojson.Add("Type", JsonMsgType::PlayerData);
+	//keymap data
 	ojson.AddEmptySubArray("KeyMap");
 	ojson["KeyMap"].Add(m_keyMap[EventKeyboard::KeyCode::KEY_W]);
 	ojson["KeyMap"].Add(m_keyMap[EventKeyboard::KeyCode::KEY_A]);
 	ojson["KeyMap"].Add(m_keyMap[EventKeyboard::KeyCode::KEY_S]);
 	ojson["KeyMap"].Add(m_keyMap[EventKeyboard::KeyCode::KEY_D]);
 
+	//weapon data
 	ojson.Add("Slot", m_currentWeaponSlot);
 
+	//position data
 	ojson.AddEmptySubArray("Position");
 	ojson["Position"].Add(this->getPosition().x);
 	ojson["Position"].Add(this->getPosition().y);
 
-	return ojson.ToString();
+	//fire data
+	ojson.Add("IsFire", m_mouseButtonMap[EventMouse::MouseButton::BUTTON_LEFT]);
+	ojson.AddEmptySubArray("FireStart");
+	ojson["FireStart"].Add(_fireStartPos.x);
+	ojson["FireStart"].Add(_fireStartPos.y);
+	ojson.AddEmptySubArray("FireEnd");
+	ojson["FireEnd"].Add(_fireTerminalPos.x);
+	ojson["FireEnd"].Add(_fireTerminalPos.y);
+
+	return ojson;
 }
 
 void Player::updateWithSyncData(neb::CJsonObject ojson)
@@ -512,5 +537,19 @@ void Player::updateWithSyncData(neb::CJsonObject ojson)
 
 	//update weapon
 	ojson.Get("Slot", m_currentWeaponSlot);
+
+	//fire
+	int boolValue = 0;
+	ojson.Get("IsFire", boolValue);
+	m_mouseButtonMap[EventMouse::MouseButton::BUTTON_LEFT] = boolValue > 0;
+	ojson["FireStart"].Get(0, _fireStartPos.x);
+	ojson["FireStart"].Get(1, _fireStartPos.y);
+	ojson["FireEnd"].Get(0, _fireTerminalPos.x);
+	ojson["FireEnd"].Get(1, _fireTerminalPos.y);
+
+	if (m_mouseButtonMap[EventMouse::MouseButton::BUTTON_LEFT])
+	{
+		m_currentWeapon->fire(_fireStartPos, _fireTerminalPos);
+	}
 
 }
