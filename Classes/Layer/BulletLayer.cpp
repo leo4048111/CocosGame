@@ -114,6 +114,7 @@ void BulletLayer::update(float delta)
 	SpriteLayer* spriteLayer = SpriteLayer::getInstance();
 	auto allTargets = spriteLayer->getAllTargets();
 	auto allPlayers = spriteLayer->getAllPlayers();
+	auto allObstacles = spriteLayer->getObstacles();
 	UILayer* uiLayer = UILayer::getInstance();
 	CrossHair* crossHair = CrossHair::getInstance();
 	/*Player* player = dynamic_cast<Player*>(this->getParent()->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName()));*/
@@ -129,6 +130,28 @@ void BulletLayer::update(float delta)
 	//update all friendly bullets and detect collision
 	for (auto currentBullet : m_allFriendlyBullets)
 	{
+		bool isHit = false;
+		for (auto ob : allObstacles) //detect ob collision
+		{
+			Rect bulletRect = currentBullet->getBoundingBox();
+			Rect obRect = Rect(ob->getBoundingBox().origin, ob->m_sprite->getContentSize() / 5);
+			if (bulletRect.intersectsRect(obRect)) //Collision Detection
+			{
+				crossHair->showHitNotification(); //show hit anime on crosshair
+
+				std::string str = currentBullet->getName();
+				if (str != "lazer" && str != "flame" && str != "meleeAttack" && str != "toxicBomb")
+				{
+					tmpEraseFriendlyBullet.pushBack(currentBullet);
+					isHit = true;
+					break;
+				}
+			}
+		}
+
+		if (isHit)
+			continue;
+
 		for (auto currentTarget : allTargets)
 		{
 			targetType currentTargetType = currentTarget->getTargetType();
@@ -157,10 +180,29 @@ void BulletLayer::update(float delta)
 	//update all hostile bullets and detect collision
 	for (auto currentBullet : m_allHostileBullets)
 	{
+		bool isHit = false;
+		for (auto ob : allObstacles)
+		{
+			Rect bulletRect = currentBullet->getBoundingBox();
+			Rect obRect = Rect(ob->getBoundingBox().origin, ob->m_sprite->getContentSize() / 5);
+			if (bulletRect.intersectsRect(obRect)) //Collision Detection
+			{
+				std::string str = currentBullet->getName();
+				if (str != "hostileFlameCircle" && str != "hostileSubterrainAssualt" && str != "hostileFastStrike")
+				{
+					tmpEraseHostileBullet.pushBack(currentBullet);
+					break;
+				}
+			}
+		}
+
+		if (isHit)
+			continue;
+
 		Rect bulletRect = currentBullet->getBoundingBox();
 		for (auto currentPlayer : allPlayers)
 		{
-			Rect playerRect = Rect(currentPlayer->getBoundingBox().origin, currentPlayer->getContentSize() / 10.0f);
+			Rect playerRect = Rect(currentPlayer->getBoundingBox().origin, currentPlayer->getContentSize() / 5);
 			if (bulletRect.intersectsRect(playerRect)) //Collision Detection
 			{
 				if (!Specs::getInstance()->isInvincibleActivated())
@@ -175,8 +217,11 @@ void BulletLayer::update(float delta)
 				}
 
 				std::string str = currentBullet->getName();
-				if (str != "hostileFlameCircle" && str != "hostileSubterrainAssualt"&&str!="hostileFastStrike")
+				if (str != "hostileFlameCircle" && str != "hostileSubterrainAssualt" && str != "hostileFastStrike")
+				{
 					tmpEraseHostileBullet.pushBack(currentBullet);
+					break;
+				}
 			}
 		}
 	}
@@ -267,7 +312,7 @@ void BulletLayer::addBullet(Node* sender,Vec2 startPos,Vec2 terminalPos)
 	//set bullet rotation
 	pointBulletTo(bullet, route,0);
 
-	bullet->setScale(0.2f);
+	bullet->setScale(0.4f);
 	bullet->setPosition(startPos);
 
 	auto action = MoveTo::create(1.0f, startPos + 1024 * Vec2(cos(atan2(route.y, route.x)), sin(atan2(route.y, route.x))));
@@ -318,7 +363,7 @@ void BulletLayer::addSprayBullet(Node* sender, Vec2 startPos, Vec2 terminalPos)
 		//set bullet rotation
 		pointBulletTo(bullet, route, offset);
 
-		bullet->setScale(0.2f);
+		bullet->setScale(0.4f);
 		bullet->setPosition(startPos);
 
 		auto action = MoveTo::create(1.0f, startPos + 1024 * Vec2(cos(atan2(route.y, route.x)+offset/180.0*M_PI), sin(atan2(route.y, route.x)+offset / 180.0 * M_PI)));
@@ -439,8 +484,8 @@ void BulletLayer::addSpiritualPower(Node* sender, Vec2 startPos, Vec2 terminalPo
 	this->addChild(bullet);
 	m_allHostileBullets.pushBack(bullet);
 
-	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
-	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
+	Vec2 thisStartPos = this->convertToNodeSpace(SpriteLayer::getInstance()->convertToWorldSpace(startPos));
+	Vec2 thisTerminalPos = this->convertToNodeSpace(SpriteLayer::getInstance()->convertToWorldSpace(terminalPos));
 	Vec2 route = thisTerminalPos - thisStartPos;
 
 	//set bullet rotation
@@ -465,13 +510,13 @@ void BulletLayer::addFlameCircle(Node* sender, Vec2 startPos, Vec2 terminalPos)
 	this->addChild(bullet);
 	m_allHostileBullets.pushBack(bullet);
 
-	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
-	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
+	Vec2 thisStartPos = this->convertToNodeSpace(SpriteLayer::getInstance()->convertToWorldSpace(startPos));
+	Vec2 thisTerminalPos = this->convertToNodeSpace(SpriteLayer::getInstance()->convertToWorldSpace(terminalPos));
 	Vec2 route = thisTerminalPos - thisStartPos;
 
 	//set bullet rotation
 	pointBulletTo(bullet, route, 0);
-	bullet->setScale(0.2f);
+	bullet->setScale(0.4f);
 	bullet->setPosition(thisStartPos);
 
 	auto scaleby = ScaleBy::create(c_totalExpessionPeriodLength, 10.0f); //zoom out
@@ -495,12 +540,12 @@ void BulletLayer::addSubterrainAssualt(Node* sender, Vec2 startPos, Vec2 termina
 	this->addChild(bullet);
 	m_allHostileBullets.pushBack(bullet);
 
-	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
-	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
+	Vec2 thisStartPos = this->convertToNodeSpace(SpriteLayer::getInstance()->convertToWorldSpace(startPos));
+	Vec2 thisTerminalPos = this->convertToNodeSpace(SpriteLayer::getInstance()->convertToWorldSpace(terminalPos));
 	Vec2 route = thisTerminalPos - thisStartPos;
 
 	//set bullet rotation
-	bullet->setScale(0.2f);
+	bullet->setScale(0.4f);
 	bullet->setPosition(thisTerminalPos);
 
 	auto fadein = FadeIn::create(0.5f);
@@ -527,8 +572,8 @@ void BulletLayer::addFastStrike(Node* sender, Vec2 startPos, Vec2 terminalPos)
 	this->addChild(strike);
 	m_allHostileBullets.pushBack(strike);
 
-	Vec2 thisStartPos = this->convertToNodeSpace(startPos);
-	Vec2 thisTerminalPos = this->convertToNodeSpace(terminalPos);
+	Vec2 thisStartPos = this->convertToNodeSpace(SpriteLayer::getInstance()->convertToWorldSpace(startPos));
+	Vec2 thisTerminalPos = this->convertToNodeSpace(SpriteLayer::getInstance()->convertToWorldSpace(terminalPos));
 	Vec2 route = thisTerminalPos - thisStartPos;
 
 	strike->setPosition(thisTerminalPos);

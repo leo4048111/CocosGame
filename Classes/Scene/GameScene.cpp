@@ -23,10 +23,18 @@ bool GameScene::init()
 	auto specs = Specs::getInstance();
 
 	//init map
-	TMXTiledMap* map = TMXTiledMap::create("map/testMap.tmx");
+	TMXTiledMap* map = TMXTiledMap::create("map/Map.tmx");
 	map->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
 	this->addChild(map, 0,"Map");
 	map->setPosition(Vec2(m_origin.x + m_visibleSize.width / 2, m_origin.y + m_visibleSize.height / 2));
+
+	//RenderTexture* tex = RenderTexture::create(map->getContentSize().width,map->getContentSize().height);
+	//tex->setPosition(m_visibleSize / 2);
+	//tex->begin();
+	//CCDirector::sharedDirector()->getRunningScene()->visit();
+	//tex->end();
+
+	//this->addChild(tex);
 
 	//init bullet layer
 	BulletLayer* bulletLayer = BulletLayer::getInstance();

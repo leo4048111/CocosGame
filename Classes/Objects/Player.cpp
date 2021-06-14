@@ -159,19 +159,23 @@ void Player::update(float delta)
 
 		if (m_keyMap[EventKeyboard::KeyCode::KEY_W])
 		{
+			if(this->canMoveForward())
 			this->setPosition(this->getPosition() + Vec2(0, offsetY));
 		}
 
 		if (m_keyMap[EventKeyboard::KeyCode::KEY_S])
 		{
+			if (this->canMoveBack())
 			this->setPosition(this->getPosition() - Vec2(0, offsetY));
 		}
 		if (m_keyMap[EventKeyboard::KeyCode::KEY_A])
 		{
+			if (this->canMoveLeft())
 			this->setPosition(this->getPosition() - Vec2(offsetX, 0));
 		}
 		if (m_keyMap[EventKeyboard::KeyCode::KEY_D])
 		{
+			if (this->canMoveRight())
 			this->setPosition(this->getPosition() + Vec2(offsetX, 0));
 		}
 	}
@@ -330,6 +334,26 @@ void Player::setControlOffListen()
 {
 	auto* dispatcher = Director::getInstance()->getEventDispatcher();
 	dispatcher->removeEventListenersForTarget(this, false);
+}
+
+bool Player::canMoveBack()
+{
+	return this->getPosition().y > MAP_BOTTOM_BORDER;
+}
+
+bool Player::canMoveForward()
+{
+	return this->getPosition().y < MAP_TOP_BORDER;
+}
+
+bool Player::canMoveLeft()
+{
+	return this->getPosition().x > MAP_LEFT_BORDER;
+}
+
+bool Player::canMoveRight()
+{
+	return this->getPosition().x < MAP_RIGHT_BORDER;
 }
 
 void Player::onMouseDown(Event* event)
@@ -513,6 +537,11 @@ neb::CJsonObject Player::buildSyncData()
 	ojson["FireEnd"].Add(_fireTerminalPos.x);
 	ojson["FireEnd"].Add(_fireTerminalPos.y);
 
+	//Specs
+	ojson.Add("Health", this->getHealthPercentage());
+	ojson.Add("Stamina", this->getStaminaPercentage());
+	ojson.Add("Res", this->getCurrentResistance());
+
 	return ojson;
 }
 
@@ -551,5 +580,18 @@ void Player::updateWithSyncData(neb::CJsonObject ojson)
 	{
 		m_currentWeapon->fire(_fireStartPos, _fireTerminalPos);
 	}
+
+	//update specs
+	double health;
+	ojson.Get("Health", health);
+	this->setHealth(health);
+
+	double stam;
+	ojson.Get("Stamina", stam);
+	this->setStamina(stam);
+
+	double res;
+	ojson.Get("Res", res);
+	this->setResistance(res);
 
 }

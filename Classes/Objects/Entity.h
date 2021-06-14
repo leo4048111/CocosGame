@@ -14,6 +14,9 @@ public:
 public:
 	virtual bool init();
 
+	static Entity* createEntity();
+
+	CREATE_FUNC(Entity);
 	void bindSprite(cocos2d::Sprite* sprite);
 
 	//health related
@@ -25,7 +28,9 @@ public:
 
 	bool receiveDamage(double damage);
 
-	void healUp(double heal);
+	void addHealth(double heal);
+
+	void setHealth(double health);
 
 	//speed related
 	void addSpeed(double speed);
@@ -38,6 +43,8 @@ public:
 	double getCurrentStamina();
 
 	void addStamina(double stamina);
+
+	void setStamina(double stamina);
 
 	void addStaminaRecovery(double stamina);
 
@@ -53,6 +60,8 @@ public:
 	void addResistance(double resistance);
 
 	double getCurrentResistance();
+
+	void setResistance(double resistance);
 
 	//cleanup methods
 	void runDeadAction();

@@ -2,6 +2,11 @@
 
 USING_NS_CC;
 
+Entity* Entity::createEntity()
+{
+	return Entity::create();
+}
+
 void Entity::bindSprite(Sprite* sprite)
 {
 	//bind sprite
@@ -85,7 +90,7 @@ void Entity::runDeadAction()
 	}
 }
 
-void Entity::healUp(double heal)
+void Entity::addHealth(double heal)
 {
 	m_currentHealth += heal;
 	if (m_currentHealth > m_maxHealth)
@@ -93,6 +98,17 @@ void Entity::healUp(double heal)
 	if (m_currentHealth < 0)
 		m_currentHealth = 0;
 	this->resetHealthBar();
+}
+
+void Entity::setHealth(double health)
+{
+	m_currentHealth = health;
+	if (m_currentHealth > m_maxHealth)
+		m_currentHealth = m_maxHealth;
+	if (m_currentHealth < 0)
+		m_currentHealth = 0;
+	this->resetHealthBar();
+
 }
 
 void Entity::addSpeed(double speed)
@@ -145,6 +161,11 @@ void Entity::addStaminaRecovery(double stamina)
 	m_currentStaminaRecovery += stamina;
 }
 
+void Entity::setStamina(double stamina)
+{
+	m_currentStamina = stamina;
+}
+
 void Entity::showStaminaBar()
 {
 	auto spriteSize = m_sprite->getContentSize();
@@ -168,6 +189,11 @@ void Entity::addResistance(double resistance)
 		m_currentResistance = 100;
 	if (m_currentResistance < 0)
 		m_currentResistance = 0;
+}
+
+void Entity::setResistance(double resistance)
+{
+	m_currentResistance = resistance;
 }
 
 double Entity::getCurrentResistance()

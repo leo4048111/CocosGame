@@ -172,7 +172,7 @@ void Collectable::addAmmo()
 void Collectable::addHealth()
 {
 	Player* mainCharacter = dynamic_cast<Player*>(this->getParent()->getParent()->getChildByName(Specs::getInstance()->getPlayerName()));
-	mainCharacter->healUp(20);
+	mainCharacter->addHealth(20);
 }
 
 void Collectable::addSpeed()

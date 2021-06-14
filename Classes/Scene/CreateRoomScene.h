@@ -5,6 +5,7 @@
 
 class CreateRoomScene :public cocos2d::Scene
 {
+
 public:
 	static CreateRoomScene* createCreateRoomScene();
 
@@ -31,6 +32,8 @@ private:
 	int m_maxPlayer;
 
 	cocos2d::Label* m_maxPlayerDisplay;
+
+	cocos2d::Label* _joinNotification;
 
 	//server functions in create room
 	void onNewConnection(HSocket socket);

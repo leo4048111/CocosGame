@@ -40,6 +40,15 @@ public:
 
 	void onMouseUp(cocos2d::Event* event);
 
+	bool canMoveForward();
+
+	bool canMoveBack();
+
+	bool canMoveLeft();
+
+	bool canMoveRight();
+
+
 	//Weapon related
 	void initAllWeapon();
 

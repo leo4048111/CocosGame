@@ -46,6 +46,11 @@ bool CreateRoomScene::init()
 	this->addChild(m_maxPlayerDisplay);
 	m_maxPlayerDisplay->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 + 15));
 
+	_joinNotification = Label::createWithTTF("Wait for joining", "fonts/HashedBrowns-WyJgn.ttf", 20);
+	this->addChild(_joinNotification);
+	_joinNotification->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2 + 40));
+
+
 	auto addButtonLabel = Label::createWithTTF("+", "fonts/HashedBrowns-WyJgn.ttf", 50);
 	auto addButton = MenuItemLabel::create(addButtonLabel, CC_CALLBACK_1(CreateRoomScene::menuCallBack, this));
 	addButton->setTag(2);
@@ -155,7 +160,7 @@ void CreateRoomScene::onNewConnection(HSocket socket)
 	ojson.Add("Cmd", SocketCommand::IS_JOIN);
 	SocketServer::getInstance()->sendMessage(socket, ojson.ToString().c_str(), ojson.ToString().length());
 	m_maxPlayer++;
-	m_maxPlayerDisplay->setString("JOINED!");
+	m_maxPlayerDisplay->setString("Player count:" + Value(m_maxPlayer).asString());
 
 	//send current player count
 	neb::CJsonObject ojson2;
@@ -188,7 +193,7 @@ void CreateRoomScene::onRecv(HSocket socket, const char* data, int count)
 		ojson.Get("Name", name);
 		Specs::getInstance()->m_allPlayerSocket.insert(make_pair(socket,name));
 		Specs::getInstance()->m_allPlayerName.push_back(name);
-
+		_joinNotification->setString(name + " joined");
 	}
 
 }

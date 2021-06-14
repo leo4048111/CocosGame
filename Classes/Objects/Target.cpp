@@ -2,9 +2,12 @@
 #include "Controls/Specs.h"
 #include "Layer/UILayer.h"
 #include "Layer/SpriteLayer.h"
+#include "Network/SocketServer.h"
+#include "CJsonObject/CJsonObject.hpp"
 #include <vector>
 
 USING_NS_CC;
+static int tagId = 1;
 
 Target* Target::createTarget()
 {
@@ -27,7 +30,6 @@ bool Target::loadGraphs()
 
 bool Target::init()
 {
-
 	if (!Entity::init())
 	{
 		return false;
@@ -39,10 +41,9 @@ bool Target::init()
 
 	m_lastUpdateTime = time(NULL);
 	m_currentDir = moveleft;
-
-	srand((unsigned long long)time(NULL));
-	Target::setTargetType((targetType)(rand() % 4));
+	this->setTargetType((targetType)(random() % 4));
 	Target::showHealthBar();
+	this->setTag(tagId++);
 
 	return true;
 }
@@ -50,10 +51,17 @@ bool Target::init()
 void Target::update(float delta)
 {
 	if (this->getCurrentStamina() == ENTITY_MAX_STAMINA)
-		this->attack();
+	{
+		//init route
+		auto allPlayers = SpriteLayer::getInstance()->getAllPlayers();
+		Entity* player = allPlayers[random() % (allPlayers.size())];
+		Vec2 startPos = this->getPosition();
+		Vec2 terminalPos = player->getPosition();
+		this->attack(startPos, terminalPos);
+	}
 
 	//Target always moves towards main character
-	double offset = 50*this->getCurrentSpeed();
+	double offset = 200*this->getCurrentSpeed();
 	auto mainCharacter=this->getParent()->getChildByName(Specs::getInstance()->getPlayerName());
 	Vec2 mainCharacterPos = mainCharacter->getParent()->convertToWorldSpaceAR(mainCharacter->getPosition());
 	Vec2 targetPos = this->getParent()->convertToWorldSpaceAR(this->getPosition());
@@ -112,14 +120,29 @@ void Target::update(float delta)
 	}
 
 	m_lastUpdateTime = currentTime;
-	this->runAction(MoveTo::create(0.5f,Vec2(this->getPosition().x + offsetX, this->getPosition().y+offsetY)));
+
+	double posX = this->getPosition().x + offsetX;
+	double posY = this->getPosition().y + offsetY;
+	this->runAction(MoveTo::create(0.5f, Vec2(posX, posY)));
+
+	if (Specs::getInstance()->isSinglePlayer())
+		return;
+
+	neb::CJsonObject ojson;
+	ojson.Add("Type", JsonMsgType::TargetData);
+	ojson.Add("PosX", posX);
+	ojson.Add("PosY", posY);
+	ojson.Add("Dir", m_currentDir);
+	ojson.Add("Tag", this->getTag());
+	SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+
 }
 
 void Target::setTargetType(targetType type)
 {
 	m_type = type;
 	String targetName,targetLeftMoveFrameName, targetRightMoveFrameName,targetLeftAttackFrameName, targetRightAttackFrameName;
-	//Name format as such: target_$TYPE_$DirMove
+	
 	switch (m_type)
 	{
 	case targetType::ghost:
@@ -165,11 +188,62 @@ void Target::setTargetType(targetType type)
 	//reset target sprite anime frame cache
 	auto cache = SpriteFrameCache::getInstance();
 
+	m_leftWalkAnime.clear();
+	m_rightWalkAnime.clear();
+	m_leftAttackAnime.clear();
+	m_rightAttackAnime.clear();
+
 	m_leftWalkAnime.pushBack(cache->getSpriteFrameByName(targetLeftMoveFrameName.getCString()));
 	m_rightWalkAnime.pushBack(cache->getSpriteFrameByName(targetRightMoveFrameName.getCString()));
 	m_leftAttackAnime.pushBack(cache->getSpriteFrameByName(targetLeftAttackFrameName.getCString()));
 	m_rightAttackAnime.pushBack(cache->getSpriteFrameByName(targetRightAttackFrameName.getCString()));
 
+}
+
+void Target::moveWithPos(double posX, double posY, int dir)
+{
+	this->runAction(MoveTo::create(0.5f, Vec2(posX, posY)));
+
+	if (dir == moveleft)
+	{
+		this->m_sprite->stopActionByTag(moveright);
+		this->m_sprite->stopActionByTag(attackright);
+		if (!m_isAttacking)
+		{
+			this->m_sprite->stopActionByTag(attackleft);
+			auto action = RepeatForever::create(Animate::create(Animation::createWithSpriteFrames(m_leftWalkAnime, 1.0f)));
+			action->setTag(moveleft);
+			this->m_sprite->runAction(action);
+		}
+		else
+		{
+			this->m_sprite->stopActionByTag(moveleft);
+			auto action = RepeatForever::create(Animate::create(Animation::createWithSpriteFrames(m_leftAttackAnime, 1.0f)));
+			action->setTag(attackleft);
+			this->m_sprite->runAction(action);
+		}
+		m_currentDir = moveleft;
+	}
+	else
+	{
+		this->m_sprite->stopActionByTag(moveleft);
+		this->m_sprite->stopActionByTag(attackleft);
+		if (!m_isAttacking)
+		{
+			this->m_sprite->stopActionByTag(attackright);
+			auto action = RepeatForever::create(Animate::create(Animation::createWithSpriteFrames(m_rightWalkAnime, 1.0f)));
+			action->setTag(moveright);
+			this->m_sprite->runAction(action);
+		}
+		else
+		{
+			this->m_sprite->stopActionByTag(moveright);
+			auto action = RepeatForever::create(Animate::create(Animation::createWithSpriteFrames(m_rightAttackAnime, 1.0f)));
+			action->setTag(attackright);
+			this->m_sprite->runAction(action);
+		}
+		m_currentDir = moveright;
+	}
 }
 
 targetType Target::getTargetType()
@@ -192,7 +266,7 @@ void Target::dropRandomCollectable()
 	dropSpecificCollectable(type);
 }
 
-void Target::attack()
+void Target::attack(Vec2 startPos,Vec2 terminalPos)
 {
 	//clear stambar
 	this->addStamina(-this->getCurrentStamina());
@@ -204,12 +278,6 @@ void Target::attack()
 	CallFuncN* callfunc = CallFuncN::create(this, callfuncN_selector(Target::attackEnd));
 	auto sequence = Sequence::create(testScaleBy1, testScaleBy2, callfunc, NULL);
 	this->runAction(sequence);
-
-	//init route
-	auto allPlayers = SpriteLayer::getInstance()->getAllPlayers();
-	Entity* player = allPlayers[random() % (allPlayers.size())];
-	Vec2 startPos = this->getParent()->convertToWorldSpace(this->getPosition());
-	Vec2 terminalPos =player->getParent()->convertToWorldSpace(player->getPosition());
 
 	//run function
 	switch (this->getTargetType())
@@ -224,12 +292,34 @@ void Target::attack()
 		fireSubterrainAssualt(startPos, terminalPos);
 		break;
 	case targetType::spirit:
+	{
+		auto moveto = MoveTo::create(0.1f, terminalPos);
+		auto fadeout = FadeOut::create(0.05f);
+		auto fadein = FadeIn::create(0.05f);
+		auto sequence = Sequence::create(fadeout, fadein, NULL);
+		auto spawn = Spawn::create(moveto, sequence, NULL);
+		this->runAction(spawn);
 		doFastStrike(startPos, terminalPos);
+	}
 		break;
 	default:
 		fireSpiritualPower(startPos, terminalPos);
 		break;
 	}
+
+
+	if (Specs::getInstance()->isSinglePlayer())
+		return;
+
+	neb::CJsonObject ojson;
+	ojson.Add("Type", JsonMsgType::TargetAttack);
+	ojson.Add("Tag", this->getTag());
+	ojson.Add("StartX", startPos.x);
+	ojson.Add("StartY", startPos.y);
+	ojson.Add("TerX", terminalPos.x);
+	ojson.Add("TerY", terminalPos.y);
+	SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+
 }
 
 void Target::attackEnd(Node* sender)
@@ -240,36 +330,31 @@ void Target::attackEnd(Node* sender)
 
 void Target::fireSpiritualPower(Vec2 startPos,Vec2 terminalPos)
 {
-	BulletLayer* bulletLayer =dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getChildByName("BulletLayer"));
+	BulletLayer* bulletLayer = BulletLayer::getInstance();
 	UILayer::getInstance()->instructorGivesInstruction("Spiritual power incoming!");
+	
 	bulletLayer->addSpiritualPower(this,startPos,terminalPos);
 }
 
 void Target::fireFlameCircle(Vec2 startPos, Vec2 terminalPos)
 {
-	BulletLayer* bulletLayer = dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getChildByName("BulletLayer"));
+	BulletLayer* bulletLayer = BulletLayer::getInstance();
 	UILayer::getInstance()->instructorGivesInstruction("Watch out\nthat flame circle burns");
 	bulletLayer->addFlameCircle(this, startPos, terminalPos);
 }
 
 void Target::fireSubterrainAssualt(Vec2 startPos, Vec2 terminalPos)
 {
-	BulletLayer* bulletLayer = dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getChildByName("BulletLayer"));
+	BulletLayer* bulletLayer = BulletLayer::getInstance();
 	UILayer::getInstance()->instructorGivesInstruction("Subterrain Assualt!");
 	bulletLayer->addSubterrainAssualt(this, startPos, terminalPos);
 }
 
 void Target::doFastStrike(Vec2 startPos, Vec2 terminalPos)
 {
-	BulletLayer* bulletLayer = dynamic_cast<BulletLayer*>(this->getParent()->getParent()->getChildByName("BulletLayer"));
-	UILayer::getInstance()->instructorGivesInstruction("!!!!");
+	BulletLayer* bulletLayer = BulletLayer::getInstance();
 
-	auto moveto = MoveTo::create(0.1f, this->convertToNodeSpaceAR(terminalPos));
-	auto fadeout = FadeOut::create(0.05f);
-	auto fadein = FadeIn::create(0.05f);
-	auto sequence = Sequence::create(fadeout, fadein, NULL);
-	auto spawn = Spawn::create(moveto, sequence, NULL);
-	this->runAction(spawn);
+	UILayer::getInstance()->instructorGivesInstruction("!!!!");
 
 	bulletLayer->addFastStrike(this, startPos, terminalPos);
 }

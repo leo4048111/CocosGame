@@ -11,7 +11,7 @@
 #include "Objects/Entity.h"
 #include <map>
 
-#define MIN_TARGETS_COUNT 3
+#define MIN_TARGETS_COUNT 6
 
 
 class SpriteLayer :public cocos2d::Layer
@@ -43,6 +43,11 @@ public:
 
 	std::vector<Entity*> getAllPlayers();
 
+	std::vector<Entity*> getObstacles();
+
+	//init obstacles
+	void initObstacles();
+
 	//target specs related
 	void initTargetSpecs();
 
@@ -52,7 +57,11 @@ public:
 
 	void addAiPlayer();
 
+	void addAiPlayer(double posX, double posY, weaponType weapon, std::string name);
+
 	void addTarget();
+
+	void addTarget(double posX, double posY, targetType type, int tag);
 
 	void removePlayer(Entity* player);
 
@@ -73,11 +82,18 @@ private:
 	Player* m_mainPlayer;
 	std::vector<Entity*> m_players;
 
+	//obstacles
+	std::vector<Entity*> m_obstacles;
+
 	//socket specs
 	std::map<SOCKET, Player*> m_playerSocketMap;
 
 	//update lock
 	std::mutex _socketLock;
+
+	//aiplayer count
+	int _aiCount;
+
 };
 
 #endif // !_TARGET_LAYER_H_

@@ -32,7 +32,11 @@ bool SpriteLayer::init()
 	this->addChild(collectableLayer,20,"CollectableLayer");
 	collectableLayer->scheduleUpdate();
 
+	_aiCount = 0;
 	addPlayer();
+
+	if(Specs::getInstance()->isSinglePlayer()||(!Specs::getInstance()->isSinglePlayer()&&Specs::getInstance()->isServer()))
+	initObstacles();
 
 	this->setName("SpriteLayer");
 
@@ -51,6 +55,9 @@ void SpriteLayer::update(float delta)
 {
 	int maxPlayerCount = Specs::getInstance()->getMaxPlayer();
 
+	if (!Specs::getInstance()->isServer())
+		return;
+
 	if (m_players.size()< Specs::getInstance()->getMaxPlayer())
 	{
 		addAiPlayer();
@@ -60,6 +67,35 @@ void SpriteLayer::update(float delta)
 	if (m_targets.size() < MIN_TARGETS_COUNT+Specs::getInstance()->getCurrentRound())
 	{
 		addTarget();
+	}
+}
+
+void SpriteLayer::initObstacles()
+{
+	std::vector<std::string> paths;
+	Specs::getInstance()->getAllFiles("objects/obstacle", paths, "png");
+
+	for (int c = 0; c < 80; c++)
+	{
+		auto ob = Entity::createEntity();
+		std::string str = paths[random() % paths.size()];
+		auto sprite = Sprite::create("objects/obstacle/" + str);
+		ob->bindSprite(sprite);
+		ob->setPosition(Vec2(Vec2(random() % (int)(MAP_RIGHT_BORDER - MAP_LEFT_BORDER) + MAP_LEFT_BORDER, random() % (int)(MAP_TOP_BORDER - MAP_BOTTOM_BORDER) + MAP_BOTTOM_BORDER)));
+		this->addChild(ob,1000);
+		ob->setScale(0.3f);
+		m_obstacles.push_back(ob);
+		ob->setName(str);
+
+		if (Specs::getInstance()->isSinglePlayer())
+			continue;
+
+		neb::CJsonObject ojson;
+		ojson.Add("Type", JsonMsgType::AddOb);
+		ojson.Add("What", str);
+		ojson.Add("PosX", ob->getPosition().x);
+		ojson.Add("PosY", ob->getPosition().y);
+		SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
 	}
 }
 
@@ -118,14 +154,37 @@ void SpriteLayer::addAiPlayer()
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	auto origin = Director::getInstance()->getVisibleOrigin();
-	Vec2 dst = Vec2(random() % ((int)Director::getInstance()->getVisibleSize().width), random() % ((int)Director::getInstance()->getVisibleSize().height));
+	Vec2 dst = Vec2(Vec2(random() % (int)(MAP_RIGHT_BORDER - MAP_LEFT_BORDER) + MAP_LEFT_BORDER, random() % (int)(MAP_TOP_BORDER - MAP_BOTTOM_BORDER) + MAP_BOTTOM_BORDER));
 
 	//init ai player
-	auto aiPlayer = AiPlayer::createPlayer("AI_" + Value(m_players.size()).asString());
-	this->addChild(aiPlayer, 20, "AI_" + Value(m_players.size()).asString());
+	auto aiPlayer = AiPlayer::createPlayer("AI_" + Value(_aiCount).asString());
+
+	this->addChild(aiPlayer, 20, _aiCount);
+	_aiCount++;
 	aiPlayer->setPosition(dst);
 	aiPlayer->scheduleUpdate();
 
+	m_players.push_back(aiPlayer);
+
+	if (Specs::getInstance()->isSinglePlayer())
+		return;
+
+	neb::CJsonObject ojson;
+	ojson.Add("Type", JsonMsgType::AddAi);
+	ojson.Add("Weapon", aiPlayer->getCurrentWeapon()->getWeaponType());
+	ojson.Add("PosX", aiPlayer->getPosition().x);
+	ojson.Add("PosY", aiPlayer->getPosition().y);
+	ojson.Add("Tag", aiPlayer->getName());
+	SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+}
+
+void SpriteLayer::addAiPlayer(double posX, double posY, weaponType weapon, std::string name)
+{
+	auto aiPlayer = AiPlayer::createPlayer(name);
+	this->addChild(aiPlayer, 20, name);
+	_aiCount++;
+	aiPlayer->setPosition(Vec2(posX,posY));
+	aiPlayer->setWeapon(weapon);
 	m_players.push_back(aiPlayer);
 }
 
@@ -134,9 +193,37 @@ void SpriteLayer::addTarget()
 	auto target = Target::createTarget();
 	target->showStaminaBar();
 	this->addChild(target, 20);
-	target->setPosition(Vec2(random() % ((int)Director::getInstance()->getVisibleSize().width), random() % ((int)Director::getInstance()->getVisibleSize().height)));
+	target->setPosition(Vec2(random() % (int)(MAP_RIGHT_BORDER-MAP_LEFT_BORDER)+ MAP_LEFT_BORDER, random() % (int)(MAP_TOP_BORDER - MAP_BOTTOM_BORDER) + MAP_BOTTOM_BORDER));
+
+	if (Specs::getInstance()->isSinglePlayer())
+		return;
+
+	neb::CJsonObject ojson;
+	ojson.Add("Type", JsonMsgType::AddTarget);
+	ojson.Add("What", target->getTargetType());
+	ojson.Add("PosX", target->getPosition().x);
+	ojson.Add("PosY", target->getPosition().y);
+	ojson.Add("Tag", target->getTag());
+	SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+
 	m_targets.pushBack(target);
 	target->scheduleUpdate();
+}
+
+void SpriteLayer::addTarget(double posX,double posY,targetType type,int tag)
+{
+	auto target = Target::createTarget();
+	target->setTargetType(type);
+	target->showHealthBar();
+	target->showStaminaBar();
+	this->addChild(target, 20);
+	target->setPosition(Vec2(posX,posY));
+	target->setTag(tag);
+	target->setTargetType((targetType)(random() % 4));
+
+	m_targets.pushBack(target);
+
+	//dont update 
 }
 
 Vector<Target*> SpriteLayer::getAllTargets()
@@ -147,6 +234,11 @@ Vector<Target*> SpriteLayer::getAllTargets()
 std::vector<Entity*> SpriteLayer::getAllPlayers()
 {
 	return m_players;
+}
+
+std::vector<Entity*> SpriteLayer::getObstacles()
+{
+	return m_obstacles;
 }
 
 void SpriteLayer::initTargetSpecs()
@@ -218,7 +310,7 @@ void SpriteLayer::onRecvServer(HSocket socket, const char* data, int count)
 void SpriteLayer::onRecvClient(const char* data, int count)
 {
 	neb::CJsonObject ojson(data);
-	log(data);
+	//log(data);
 	if (!ojson.Parse(data))
 		return;
 
@@ -258,6 +350,74 @@ void SpriteLayer::onRecvClient(const char* data, int count)
 	}
 	break;
 
+	case JsonMsgType::AddTarget:
+	{
+		int tgType;
+		ojson.Get("what", tgType);
+		double PosX, PosY;
+		ojson.Get("PosX", PosX); 
+		ojson.Get("PosY", PosY);
+		int tag;
+		ojson.Get("Tag", tag);
+		addTarget(PosX, PosY, (targetType)tgType, tag);
+	}
+	break;
+	case JsonMsgType::TargetData:
+	{
+		double PosX, PosY;
+		ojson.Get("PosX", PosX);
+		ojson.Get("PosY", PosY);
+		int dir;
+		ojson.Get("Dir", dir);
+		int tag;
+		ojson.Get("Tag", tag);
+		auto target = dynamic_cast<Target*>(this->getChildByTag(tag));
+		if(target!=NULL)
+		target->moveWithPos(PosX, PosY, dir);
+	}
+	break;
+	case JsonMsgType::TargetAttack:
+	{
+		double PosX, PosY;
+		ojson.Get("TerX", PosX);
+		ojson.Get("TerY", PosY);
+		int tag;
+		ojson.Get("Tag", tag);
+		auto target = dynamic_cast<Target*>(this->getChildByTag(tag));
+		if (target != NULL)
+		{
+			target->attack(target->getPosition(), Vec2(PosX, PosY));
+		}
+	}
+	break;
+	case JsonMsgType::AddOb:
+	{
+		double PosX, PosY;
+		ojson.Get("PosX", PosX);
+		ojson.Get("PosY", PosY);
+		std::string str;
+		ojson.Get("What", str);
+		auto ob = Entity::create();
+		auto sprite = Sprite::create("objects/obstacle/" + str);
+		ob->bindSprite(sprite);
+		ob->setScale(0.3f);
+		this->addChild(ob,10000);
+		ob->setPosition(Vec2(PosX, PosY));
+		m_obstacles.push_back(ob);
+	}
+	break;
+	case JsonMsgType::AddAi:
+	{
+		double PosX, PosY;
+		ojson.Get("PosX", PosX);
+		ojson.Get("PosY", PosY);
+		int wType;
+		ojson.Get("Weapon", wType);
+		std::string name;
+		ojson.Get("Tag", name);
+		addAiPlayer(PosX, PosY, (weaponType)wType, name);
+	}
+	break;
 	default:
 		break;
 	}

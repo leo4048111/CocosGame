@@ -20,8 +20,17 @@ public:
 
 	bool loadGraphs();
 
-
 	CREATE_FUNC(AiPlayer);
+
+	bool canMoveForward();
+
+	bool canMoveBack();
+
+	bool canMoveLeft();
+
+	bool canMoveRight();
+
+	void setWeapon(weaponType type);
 
 	virtual void update(float delta);
 
@@ -34,7 +43,6 @@ public:
 
 	//ai control features
 	void AiControlAutoUpdate();
-
 
 private:
 

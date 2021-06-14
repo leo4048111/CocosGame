@@ -45,7 +45,7 @@ bool AiPlayer::init()
 
 	this->addSpeed(1.0f);
 
-	this->setName("testAi");
+	this->setName(m_playerName);
 	return true;
 }
 
@@ -140,10 +140,21 @@ Weapon* AiPlayer::getCurrentWeapon()
 
 void AiPlayer::initRandomWeapon()
 {
-	srand((unsigned int)time(NULL));
 	m_currentWeapon = Weapon::createWeapon();
 	m_sprite->addChild(m_currentWeapon);
 	m_currentWeapon->setWeaponType((weaponType)(random() % weaponType::totalWeapons));
+	m_currentWeapon->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+	m_currentWeapon->setPosition(Vec2(0, m_sprite->getContentSize().height / 3));
+}
+
+void AiPlayer::setWeapon(weaponType type)
+{
+	if (m_currentWeapon != NULL)
+		m_currentWeapon->removeFromParent();
+
+	m_currentWeapon = Weapon::createWeapon();
+	m_sprite->addChild(m_currentWeapon);
+	m_currentWeapon->setWeaponType(type);
 	m_currentWeapon->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
 	m_currentWeapon->setPosition(Vec2(0, m_sprite->getContentSize().height / 3));
 }
@@ -225,4 +236,24 @@ void AiPlayer::runActionAnime(int dir)
 		action->setTag(dir);
 		m_sprite->runAction(action);
 	}
+}
+
+bool AiPlayer::canMoveBack()
+{
+	return this->getPosition().y > MAP_BOTTOM_BORDER;
+}
+
+bool AiPlayer::canMoveForward()
+{
+	return this->getPosition().y < MAP_TOP_BORDER;
+}
+
+bool AiPlayer::canMoveLeft()
+{
+	return this->getPosition().x > MAP_LEFT_BORDER;
+}
+
+bool AiPlayer::canMoveRight()
+{
+	return this->getPosition().x < MAP_RIGHT_BORDER;
 }

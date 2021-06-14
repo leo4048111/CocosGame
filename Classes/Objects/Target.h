@@ -32,6 +32,8 @@ public:
 	//call method schedule update
 	virtual void update(float delta);
 
+	void moveWithPos(double posX, double posY, int dir);
+
 	void setTargetType(targetType type);
 
 	targetType getTargetType();
@@ -42,7 +44,7 @@ public:
 	void dropSpecificCollectable(collectableType type);
 
 	//attack funtions!
-	void attack();
+	void attack(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 
 	void attackEnd(Node* sender);
 

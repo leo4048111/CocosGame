@@ -85,8 +85,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
     auto glview = director->getOpenGLView();
     if(!glview) {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_MAC) || (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX)
-        glview = GLViewImpl::createWithRect("CocosGame", cocos2d::Rect(0, 0, designResolutionSize.width, designResolutionSize.height));
-        glview->setFrameZoomFactor(3.0f);
+        glview = GLViewImpl::createWithRect("POBG", cocos2d::Rect(0, 0, designResolutionSize.width, designResolutionSize.height),3.0f);
+        //glview->setIcon()
 #else
         glview = GLViewImpl::create("CocosGame");
 #endif
