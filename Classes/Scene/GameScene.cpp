@@ -39,7 +39,7 @@ bool GameScene::init()
 	//init bullet layer
 	BulletLayer* bulletLayer = BulletLayer::getInstance();
 	bulletLayer->scheduleUpdate();
-	map->addChild(bulletLayer, 50, "BulletLayer");
+	map->addChild(bulletLayer, 80, "BulletLayer");
 
 	//init sprite layer
 	SpriteLayer* spriteLayer = SpriteLayer::getInstance();

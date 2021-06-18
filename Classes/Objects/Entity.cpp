@@ -208,9 +208,9 @@ void Entity::speak(std::string str)
 	auto messageBubble = Sprite::create("objects/UI/ui_messageBubble.png");
 	m_sprite->addChild(messageBubble);
 	messageBubble->setPosition(Vec2(spriteSize.width+200,spriteSize.height+200));
-	messageBubble->setScale(4.0f);
+	messageBubble->setScale(3.0f);
 	
-	auto sentence = Label::create(str, "fonts/MomcakeThin-9Y6aZ.otf", 15);
+	auto sentence = Label::create(str, "fonts/MomcakeThin-9Y6aZ.otf", 30);
 	sentence->setColor(Color3B(0,0,0));
 	sentence->setPosition(Vec2(messageBubble->getContentSize().width/2,messageBubble->getContentSize().height/2+15));
 	messageBubble->addChild(sentence);

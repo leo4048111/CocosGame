@@ -20,7 +20,9 @@ SocketServer::SocketServer() :
 
 SocketServer::~SocketServer()
 {
+	_mutex.lock();
 	_clientSockets.clear();
+	_mutex.unlock();
 
 	if (_socketServer)
 	{
@@ -30,8 +32,8 @@ SocketServer::~SocketServer()
 
 void SocketServer::destroyInstance()
 {
-	CC_SAFE_DELETE(_instance);
 	Director::getInstance()->getScheduler()->unscheduleAllForTarget(_instance);
+	CC_SAFE_DELETE(_instance);
 }
 
 bool SocketServer::startServer()

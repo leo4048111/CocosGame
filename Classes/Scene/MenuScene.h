@@ -13,7 +13,7 @@ public:
 
 	void menuCallBack(Ref* ref);
 
-	void setBackgroundMusic();
+	void setMode();
 
 	void goToSetupScene();
 

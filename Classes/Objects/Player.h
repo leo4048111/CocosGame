@@ -100,12 +100,16 @@ private:
 
 	std::mutex _playerUpdateLock;
 
+	long long _totalUpdate;
+
 public:
 	std::string m_playerName;
 
 	cocos2d::Vec2 _fireStartPos;
 
 	cocos2d::Vec2 _fireTerminalPos;
+
+	cocos2d::Vec2 _lastPos;
 
 };
 

@@ -2,6 +2,9 @@
 #include "SetupScene.h"
 #include "Controls/Specs.h"
 #include "Controls/AudioControlPanel.h"
+#include "Network/SocketClient.h"
+#include "Network/SocketServer.h"
+
 USING_NS_CC;
 
 MenuScene* MenuScene::createMenuScene()
@@ -20,10 +23,12 @@ bool MenuScene::init()
 	auto origin = Director::getInstance()->getVisibleOrigin();
 
 	Specs::getInstance()->refreshInstance();
+	SocketServer::getInstance()->destroyInstance();
+	SocketClient::getInstance()->destroy();
 
 	auto startGameLabel = Label::createWithTTF("Press To Start", "fonts/HashedBrowns-WyJgn.ttf", 50);
 	auto startGame = MenuItemLabel::create(startGameLabel, CC_CALLBACK_1(MenuScene::menuCallBack, this));
-	auto audioControlLabel = Label::createWithTTF("Audio Off", "fonts/HashedBrowns-WyJgn.ttf", 50);
+	auto audioControlLabel = Label::createWithTTF("Field Trip Mode On", "fonts/HashedBrowns-WyJgn.ttf", 50);
 	auto audioControl = MenuItemLabel::create(audioControlLabel, CC_CALLBACK_1(MenuScene::menuCallBack,this));
 	auto quitGameLabel = Label::createWithTTF("Quit", "fonts/HashedBrowns-WyJgn.ttf", 50);
 	auto quitGame = MenuItemLabel::create(quitGameLabel, CC_CALLBACK_1(MenuScene::menuCallBack, this));
@@ -85,25 +90,25 @@ void MenuScene::menuCallBack(Ref* sender)
 		goToSetupScene();
 		break;
 	case ac:
-		setBackgroundMusic();
+		setMode();
 		break;
 	case qg:
 		exit(0);
 	}
 }
 
-void MenuScene::setBackgroundMusic()
+void MenuScene::setMode()
 {
 	MenuItemLabel* audioControl = dynamic_cast<MenuItemLabel*>(this->getChildByName("menu")->getChildByTag(ac));
-	if (audioControl->getString()== "Audio Off")
+	if (audioControl->getString() == "Field Trip Mode On")
 	{
-		CocosDenshion::SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
-		audioControl->setString("Audio  On");
+		Specs::getInstance()->toggleFieldTrip(true);
+		audioControl->setString("Field Trip Mode Off");
 	}
 	else
 	{
-		CocosDenshion::SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
-		audioControl->setString("Audio Off");
+		Specs::getInstance()->toggleFieldTrip(false);
+		audioControl->setString("Field Trip Mode On");
 	}
 }
 

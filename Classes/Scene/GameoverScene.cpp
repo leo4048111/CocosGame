@@ -36,21 +36,9 @@ bool GameoverScene::init()
 	menu->setPositionY(menu->getPositionY() - 40);
 	menu->alignItemsVerticallyWithPadding(50);
 
-	auto instructor = Sprite::create("objects/UI/ui_instructor.png");
-	instructor->setPosition(Vec2(visibleSize.width / 6, visibleSize.height * 3 / 5));
-	this->addChild(instructor);
-	instructor->setScale(0.7f);
-
-	auto messageBubble = Sprite::create("objects/UI/ui_messageBubble.png");
-	instructor->addChild(messageBubble);
-	messageBubble->setPosition(Vec2(instructor->getContentSize().width + 80, instructor->getContentSize().height));
-
-	auto word = Label::create("LOL, Such a nasty death\nDare having another try?", "fonts/HashedBrowns-WyJgn.ttf", 20);
-	if (Specs::getInstance()->isWin())
-		word->setString("A skillful candidate, well done");
-	word->setColor(Color3B(0, 0, 0));
-	word->setPosition(Vec2(messageBubble->getContentSize().width / 2, messageBubble->getContentSize().height / 2 + 15));
-	messageBubble->addChild(word);
+	auto scoreLabel = Label::createWithTTF("Highest Score: "+Value(Specs::getInstance()->getScore()).asString(), "fonts/HashedBrowns-WyJgn.ttf", 20);
+	scoreLabel->setPosition(Vec2(visibleSize.width / 2, visibleSize.height * 4 / 5));
+	this->addChild(scoreLabel);
 
 	return true;
 }

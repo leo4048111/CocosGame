@@ -32,6 +32,8 @@ public:
 
 	void setWeapon(weaponType type);
 
+	Weapon* getWeapon();
+
 	virtual void update(float delta);
 
 	void runActionAnime(int dir);

@@ -191,6 +191,7 @@ void BulletLayer::update(float delta)
 				if (str != "hostileFlameCircle" && str != "hostileSubterrainAssualt" && str != "hostileFastStrike")
 				{
 					tmpEraseHostileBullet.pushBack(currentBullet);
+					isHit = true;
 					break;
 				}
 			}
@@ -272,11 +273,18 @@ void BulletLayer::update(float delta)
 		if (tmpTarget != nullptr)
 		{
 			//speak some lines
-			tmpTarget->speak(Specs::getInstance()->speakRandom());
-			tmpTarget->dropRandomCollectable();
 			tmpEraseTarget.popBack();
 			spriteLayer->removeTarget(tmpTarget);
-			tmpTarget->runDeadAction();
+
+			if (!Specs::getInstance()->isSinglePlayer())
+			{
+				neb::CJsonObject ojson;
+				ojson.Add("Type", JsonMsgType::TargetDead);
+				ojson.Add("Tag", tmpTarget->getTag());
+			}
+
+			tmpTarget->targetDead();
+			
 		}
 	}
 
@@ -288,7 +296,16 @@ void BulletLayer::update(float delta)
 		{
 			tmpErasePlayer.popBack();
 			spriteLayer->removePlayer(tmpPlayer);
+
+			if (!Specs::getInstance()->isSinglePlayer())
+			{
+				neb::CJsonObject ojson;
+				ojson.Add("Type", JsonMsgType::PlayerDead);
+				ojson.Add("Name", tmpPlayer->getName());
+			}
+
 			tmpPlayer->runDeadAction();
+
 		}
 	}
 }

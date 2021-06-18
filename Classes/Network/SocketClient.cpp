@@ -152,8 +152,8 @@ void SocketClient::update(float delta)
 
 void SocketClient::destroy()
 {
-	if(this!=nullptr)
-	delete this;
+	if (this != nullptr)
+		this->clear();
 }
 
 void SocketClient::clear()

@@ -18,7 +18,7 @@ using namespace std;
 
 typedef enum JsonMsgType
 {
-	PlayerList, SCommand, AddOb, PlayerCount, PlayerData, PlayerName, Speak, AddTarget, TargetData, TargetAttack, AddAi
+	PlayerList, SCommand, AddOb, PlayerCount,PlayerAttack, PlayerData, PlayerName, Speak, AddTarget, TargetData, TargetAttack, AddAi,AiData, AiAttack,TargetDead,PlayerDead
 };
 
 typedef enum SocketCommand
@@ -87,6 +87,12 @@ public:
 	void _stdcall toggleAllWeapon();
 	bool isAllWeaponActivated();
 
+	void _stdcall addTarget();
+
+	//mode settings
+	void toggleFieldTrip(bool value);
+	bool isFieldTrip();
+
 	//player name setting
 	void setPlayerName(std::string name);
 
@@ -143,6 +149,9 @@ private:
 	bool m_isInfiniteAmmo;
 	bool m_isAimbot;
 	bool m_isAllWeapon;
+	
+	//mode specs
+	bool _isFieldTrip;
 
 	//chatting and radio
 	std::vector<std::string> m_targetLines;

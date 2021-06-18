@@ -3,6 +3,7 @@
 #include "Objects/CrossHair.h"
 #include "Layer/SpriteLayer.h"
 #include "Network/SocketClient.h"
+#include "Objects/MiniMap.h"
 
 USING_NS_CC;
 
@@ -52,7 +53,8 @@ bool Player::init()
 	nameLabel->setTag(100);
 	nameLabel->setColor(Color3B(255, 255, 255));
 	nameLabel->setPosition(Vec2(this->getContentSize().width / 2, 20));
-
+	_totalUpdate = 0;
+	_lastPos = Vec2(0, 0);
 	this->setName(m_playerName);
 
 	return true;
@@ -141,6 +143,7 @@ void Player::runActionAnime(int dir)
 
 void Player::update(float delta)
 {
+	_totalUpdate++;
 	//Update anime
 	double offsetX = this->getCurrentSpeed()+1.0f;
 	double offsetY = this->getCurrentSpeed()+1.0f;
@@ -180,6 +183,9 @@ void Player::update(float delta)
 		}
 	}
 
+	//update minimap
+	MiniMap::getInstance()->UpdateMe(this->getPosition());
+
 	//update visual specs
 	if (m_currentWeapon != nullptr)
 		if(m_currentWeapon->m_ammoInCurrentMagazine>=0)
@@ -214,6 +220,11 @@ void Player::update(float delta)
 	if (Specs::getInstance()->isSinglePlayer()||(!isMe()))
 		return;
 
+	if (_totalUpdate % 2 != 0)
+		return;
+	if (_lastPos == this->getPosition())
+		return;
+	_lastPos = this->getPosition();
 	neb::CJsonObject ojson = buildSyncData();
 	ojson.Add("Tag", Specs::getInstance()->getPlayerName());
 
@@ -364,6 +375,7 @@ void Player::onMouseDown(Event* event)
 	switch (mouseButton)
 	{
 	case EventMouse::MouseButton::BUTTON_LEFT:
+	{
 		if (m_currentWeapon != nullptr)
 			if (Specs::getInstance()->isAimbotActivated())
 			{
@@ -379,6 +391,28 @@ void Player::onMouseDown(Event* event)
 		_fireStartPos = BulletLayer::getInstance()->convertToNodeSpace(_fireStartPos);
 		_fireTerminalPos = BulletLayer::getInstance()->convertToNodeSpace(_fireTerminalPos);
 		m_currentWeapon->fire(_fireStartPos, _fireTerminalPos);
+
+		if (Specs::getInstance()->isSinglePlayer())
+			break;
+		neb::CJsonObject ojson;
+		ojson.Add("Type", JsonMsgType::PlayerAttack);
+		ojson.AddEmptySubArray("FireStart");
+		ojson["FireStart"].Add(_fireStartPos.x);
+		ojson["FireStart"].Add(_fireStartPos.y);
+		ojson.AddEmptySubArray("FireEnd");
+		ojson["FireEnd"].Add(_fireTerminalPos.x);
+		ojson["FireEnd"].Add(_fireTerminalPos.y);
+		ojson.Add("Tag", Specs::getInstance()->getPlayerName());
+
+		if (Specs::getInstance()->isServer()) //send as server
+		{
+			SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+		}
+		else //send as client
+		{
+			SocketClient::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+		}
+	}
 		break;
 	default:
 		break;
@@ -528,15 +562,6 @@ neb::CJsonObject Player::buildSyncData()
 	ojson["Position"].Add(this->getPosition().x);
 	ojson["Position"].Add(this->getPosition().y);
 
-	//fire data
-	ojson.Add("IsFire", m_mouseButtonMap[EventMouse::MouseButton::BUTTON_LEFT]);
-	ojson.AddEmptySubArray("FireStart");
-	ojson["FireStart"].Add(_fireStartPos.x);
-	ojson["FireStart"].Add(_fireStartPos.y);
-	ojson.AddEmptySubArray("FireEnd");
-	ojson["FireEnd"].Add(_fireTerminalPos.x);
-	ojson["FireEnd"].Add(_fireTerminalPos.y);
-
 	//Specs
 	ojson.Add("Health", this->getHealthPercentage());
 	ojson.Add("Stamina", this->getStaminaPercentage());
@@ -547,16 +572,50 @@ neb::CJsonObject Player::buildSyncData()
 
 void Player::updateWithSyncData(neb::CJsonObject ojson)
 {
-	////update pos
-	//int boolValue = 0;
-	//ojson["KeyMap"].Get(0,boolValue);
-	//m_keyMap[EventKeyboard::KeyCode::KEY_W] = boolValue > 0;
-	//ojson["KeyMap"].Get(1, boolValue);
-	//m_keyMap[EventKeyboard::KeyCode::KEY_A] = boolValue > 0;
-	//ojson["KeyMap"].Get(2, boolValue);
-	//m_keyMap[EventKeyboard::KeyCode::KEY_S] = boolValue > 0;
-	//ojson["KeyMap"].Get(3, boolValue);
-	//m_keyMap[EventKeyboard::KeyCode::KEY_D] = boolValue > 0;
+	//update pos
+	int boolValue = 0;
+	ojson["KeyMap"].Get(0,boolValue);
+	if (boolValue)
+	{
+		m_sprite->stopActionByTag(actions::stand);
+		runActionAnime(actions::forward);
+	}
+	else
+	{
+		m_sprite->stopActionByTag(actions::forward);
+	}
+	ojson["KeyMap"].Get(1, boolValue);
+	if (boolValue)
+	{
+		m_sprite->stopActionByTag(actions::stand);
+		runActionAnime(actions::left);
+	}
+	else
+	{
+		m_sprite->stopActionByTag(actions::left);
+
+	}
+	ojson["KeyMap"].Get(2, boolValue);
+	if (boolValue)
+	{
+		m_sprite->stopActionByTag(actions::stand);
+		runActionAnime(actions::right);
+	}
+	else
+	{
+		m_sprite->stopActionByTag(actions::right);
+
+	}
+	ojson["KeyMap"].Get(3, boolValue);
+	if (boolValue)
+	{
+		m_sprite->stopActionByTag(actions::stand);
+		runActionAnime(actions::back);
+	}
+	else
+	{
+		m_sprite->stopActionByTag(actions::back);
+	}
 
 	//update pos
 	double posx, posy;
@@ -566,20 +625,6 @@ void Player::updateWithSyncData(neb::CJsonObject ojson)
 
 	//update weapon
 	ojson.Get("Slot", m_currentWeaponSlot);
-
-	//fire
-	int boolValue = 0;
-	ojson.Get("IsFire", boolValue);
-	m_mouseButtonMap[EventMouse::MouseButton::BUTTON_LEFT] = boolValue > 0;
-	ojson["FireStart"].Get(0, _fireStartPos.x);
-	ojson["FireStart"].Get(1, _fireStartPos.y);
-	ojson["FireEnd"].Get(0, _fireTerminalPos.x);
-	ojson["FireEnd"].Get(1, _fireTerminalPos.y);
-
-	if (m_mouseButtonMap[EventMouse::MouseButton::BUTTON_LEFT])
-	{
-		m_currentWeapon->fire(_fireStartPos, _fireTerminalPos);
-	}
 
 	//update specs
 	double health;

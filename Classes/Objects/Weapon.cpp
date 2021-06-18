@@ -222,7 +222,9 @@ void Weapon::fire(Vec2 startPos,Vec2 terminalPos)
 		return;
 	}
 
-	if ((isCurrentMagazineNotEmpty())||Specs::getInstance()->isInfiniteAmmoActivated())
+	auto parent = dynamic_cast<Entity*>(this->getParent()->getParent());
+
+	if ((isCurrentMagazineNotEmpty())||Specs::getInstance()->isInfiniteAmmoActivated()||!parent->isMe())
 	{
 		switch (this->getWeaponType())
 		{
@@ -250,7 +252,8 @@ void Weapon::fire(Vec2 startPos,Vec2 terminalPos)
 		default:
 			break;
 		}
-		if(!Specs::getInstance()->isInfiniteAmmoActivated())
+		if (Specs::getInstance()->isInfiniteAmmoActivated() || !parent->isMe())
+			return;
 		m_ammoInCurrentMagazine--;
 	}
 	else

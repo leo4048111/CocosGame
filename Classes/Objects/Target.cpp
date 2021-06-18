@@ -2,6 +2,7 @@
 #include "Controls/Specs.h"
 #include "Layer/UILayer.h"
 #include "Layer/SpriteLayer.h"
+#include "Objects/MiniMap.h"
 #include "Network/SocketServer.h"
 #include "CJsonObject/CJsonObject.hpp"
 #include <vector>
@@ -124,6 +125,7 @@ void Target::update(float delta)
 	double posX = this->getPosition().x + offsetX;
 	double posY = this->getPosition().y + offsetY;
 	this->runAction(MoveTo::create(0.5f, Vec2(posX, posY)));
+	MiniMap::getInstance()->updateTarget(this->getTag(), Vec2(posX, posY));
 
 	if (Specs::getInstance()->isSinglePlayer())
 		return;
@@ -136,6 +138,15 @@ void Target::update(float delta)
 	ojson.Add("Tag", this->getTag());
 	SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
 
+}
+
+void Target::targetDead()
+{
+	this->speak(Specs::getInstance()->speakRandom());
+	this->dropRandomCollectable();
+	this->runDeadAction();
+
+	MiniMap::getInstance()->removeTarget(this->getTag());
 }
 
 void Target::setTargetType(targetType type)

@@ -3,6 +3,7 @@
 #include "Controls/AudioControlPanel.h"
 #include "../objects/Player.h"
 #include "Controls/Specs.h"
+#include "Objects/MiniMap.h"
 
 USING_NS_CC;
 
@@ -33,10 +34,14 @@ bool UILayer::init()
 	//init timer
 	int runTime = static_cast<int>(Specs::getInstance()->getCurrentTime() - Specs::getInstance()->getStartTime())*1000 / CLOCKS_PER_SEC;
 	m_labelTimer = Label::createWithTTF("Survived for: "+Value(runTime).asString() + "s", "fonts/Retrofunkscriptpersonaluse-v6XO.otf", 15);
-	m_labelTimer->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height));
+	m_labelTimer->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height-10));
 	m_labelTimer->setAnchorPoint(Vec2::ANCHOR_MIDDLE_TOP);
 	m_labelTimer->setTextColor(Color4B(205, 92, 92, 200));
 	this->addChild(m_labelTimer, 100,"Timer");
+	auto icon = Sprite::create("objects/UI/ui_timer.png");
+	icon->setScale(0.5f);
+	m_labelTimer->addChild(icon);
+	icon->setPosition(Vec2(icon->getPosition().x - 10, icon->getPosition().y+10));
 
 	//init crosshair
 	auto crossHair = CrossHair::getInstance();
@@ -47,7 +52,7 @@ bool UILayer::init()
 	m_labelScoreBoard = Label::createWithTTF("Score:0", "fonts/RetroNewVersion-v6Jy.ttf", 15);
 	this->addChild(m_labelScoreBoard,30,"ScoreBoard");
 	m_labelScoreBoard->setColor(Color3B(255, 215, 0));
-	m_labelScoreBoard->setPosition(Vec2(m_labelScoreBoard->getContentSize().width/2+20, visibleSize.height- m_labelScoreBoard->getContentSize().height));
+	m_labelScoreBoard->setPosition(Vec2(m_labelScoreBoard->getContentSize().width/2+30, visibleSize.height- m_labelScoreBoard->getContentSize().height));
 
 	//init current mainCharacter spec labels
 	m_currentSpeedLabel = Label::createWithTTF("Speed:0", "fonts/Retrofunkscriptpersonaluse-v6XO.otf", 15);
@@ -128,6 +133,11 @@ bool UILayer::init()
 	AudioControlPanel* audioControlPanel = AudioControlPanel::createAudioControlPanel();
 	this->addChild(audioControlPanel);
 	audioControlPanel->setPosition(visibleSize.width - audioControlPanel->getContentSize().width - 150, visibleSize.height - audioControlPanel->getContentSize().height - 50);
+
+	//init minimap
+	auto miniMap = MiniMap::getInstance();
+	this->addChild(miniMap);
+	miniMap->setPosition(Vec2(visibleSize.width * 5/7, visibleSize.height / 7));
 
 	this->setName("UILayer");
 	return true;

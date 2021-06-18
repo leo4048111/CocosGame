@@ -55,13 +55,14 @@ void GameSettingsLayer::backToGameScene()
 
 void GameSettingsLayer::backToMenuScene()
 {
-	if (Specs::getInstance()->isServer())
-	{
-		SocketServer::getInstance()->onDisconnect = nullptr;
-		SocketServer::getInstance()->onNewConnection = nullptr;
-		SocketServer::getInstance()->onRecv = nullptr;
-		SocketServer::getInstance()->onStart = nullptr;
-	}
+	SocketServer::getInstance()->onDisconnect = nullptr;
+	SocketServer::getInstance()->onNewConnection = nullptr;
+	SocketServer::getInstance()->onRecv = nullptr;
+	SocketServer::getInstance()->onStart = nullptr;
+	SocketServer::getInstance()->destroyInstance();
+	SocketClient::getInstance()->onRecv = nullptr;
+	SocketClient::getInstance()->onDisconnect = nullptr;
+	SocketClient::getInstance()->destroy();
 	auto scene = MenuScene::createMenuScene();
 	auto transition = TransitionFlipY::create(1.0f, scene);
 	Director::getInstance()->replaceScene(transition);

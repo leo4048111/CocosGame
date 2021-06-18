@@ -2,6 +2,7 @@
 #include "UILayer.h"
 #include "Controls/Specs.h"
 #include "CJsonObject/CJsonObject.hpp"
+#include "Objects/MiniMap.h"
 
 USING_NS_CC;
 
@@ -66,6 +67,7 @@ void SpriteLayer::update(float delta)
 	//update target
 	if (m_targets.size() < MIN_TARGETS_COUNT+Specs::getInstance()->getCurrentRound())
 	{
+		if(!Specs::getInstance()->isFieldTrip())
 		addTarget();
 	}
 }
@@ -159,7 +161,7 @@ void SpriteLayer::addAiPlayer()
 	//init ai player
 	auto aiPlayer = AiPlayer::createPlayer("AI_" + Value(_aiCount).asString());
 
-	this->addChild(aiPlayer, 20, _aiCount);
+	this->addChild(aiPlayer, 20, aiPlayer->getName());
 	_aiCount++;
 	aiPlayer->setPosition(dst);
 	aiPlayer->scheduleUpdate();
@@ -174,11 +176,12 @@ void SpriteLayer::addAiPlayer()
 	ojson.Add("Weapon", aiPlayer->getCurrentWeapon()->getWeaponType());
 	ojson.Add("PosX", aiPlayer->getPosition().x);
 	ojson.Add("PosY", aiPlayer->getPosition().y);
-	ojson.Add("Tag", aiPlayer->getName());
+	ojson.Add("Name", aiPlayer->getName());
+	ojson.Add("Tag", aiPlayer->getTag());
 	SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
 }
 
-void SpriteLayer::addAiPlayer(double posX, double posY, weaponType weapon, std::string name)
+void SpriteLayer::addAiPlayer(double posX, double posY, weaponType weapon, std::string name,int tag)
 {
 	auto aiPlayer = AiPlayer::createPlayer(name);
 	this->addChild(aiPlayer, 20, name);
@@ -195,6 +198,11 @@ void SpriteLayer::addTarget()
 	this->addChild(target, 20);
 	target->setPosition(Vec2(random() % (int)(MAP_RIGHT_BORDER-MAP_LEFT_BORDER)+ MAP_LEFT_BORDER, random() % (int)(MAP_TOP_BORDER - MAP_BOTTOM_BORDER) + MAP_BOTTOM_BORDER));
 
+	m_targets.pushBack(target);
+	target->scheduleUpdate();
+
+	MiniMap::getInstance()->addTarget(target->getTag(),target->getPosition());
+
 	if (Specs::getInstance()->isSinglePlayer())
 		return;
 
@@ -205,24 +213,20 @@ void SpriteLayer::addTarget()
 	ojson.Add("PosY", target->getPosition().y);
 	ojson.Add("Tag", target->getTag());
 	SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
-
-	m_targets.pushBack(target);
-	target->scheduleUpdate();
 }
 
-void SpriteLayer::addTarget(double posX,double posY,targetType type,int tag)
+void SpriteLayer::addTarget(double posX, double posY, targetType type, int tag)
 {
 	auto target = Target::createTarget();
 	target->setTargetType(type);
 	target->showHealthBar();
 	target->showStaminaBar();
 	this->addChild(target, 20);
-	target->setPosition(Vec2(posX,posY));
+	target->setPosition(Vec2(posX, posY));
 	target->setTag(tag);
-	target->setTargetType((targetType)(random() % 4));
-
 	m_targets.pushBack(target);
 
+	MiniMap::getInstance()->addTarget(target->getTag(),target->getPosition());
 	//dont update 
 }
 
@@ -300,6 +304,20 @@ void SpriteLayer::onRecvServer(HSocket socket, const char* data, int count)
 		ojson.Get("Sentence", str);
 		m_playerSocketMap[socket]->speak(str);
 		Chatbox::getInstance()->appendTextInChat(str);
+		ojson.Add("Tag", Specs::getInstance()->m_allPlayerSocket[socket]); //broadcast the message to each socket
+		SocketServer::getInstance()->castMessage(ojson.ToString().c_str(), ojson.ToString().length(), socket);
+	}
+	case JsonMsgType::PlayerAttack:
+	{
+		//fire
+		Vec2 startPos, terPos;
+		ojson["FireStart"].Get(0, startPos.x);
+		ojson["FireStart"].Get(1, startPos.y);
+		ojson["FireEnd"].Get(0, terPos.x);
+		ojson["FireEnd"].Get(1, terPos.y);
+		if (m_playerSocketMap[socket] != NULL)
+			m_playerSocketMap[socket]->getCurrentWeapon()->fire(startPos,terPos);
+		SocketServer::getInstance()->castMessage(ojson.ToString().c_str(), ojson.ToString().length(), socket);
 	}
 	break;
 	default:
@@ -309,6 +327,7 @@ void SpriteLayer::onRecvServer(HSocket socket, const char* data, int count)
 
 void SpriteLayer::onRecvClient(const char* data, int count)
 {
+	log(data);
 	neb::CJsonObject ojson(data);
 	//log(data);
 	if (!ojson.Parse(data))
@@ -333,8 +352,22 @@ void SpriteLayer::onRecvClient(const char* data, int count)
 			player->updateWithSyncData(ojson);
 		_socketLock.unlock();
 	}
-		break;
-
+	break;
+	case JsonMsgType::PlayerAttack:
+	{
+		//fire
+		Vec2 startPos, terPos;
+		ojson["FireStart"].Get(0, startPos.x);
+		ojson["FireStart"].Get(1, startPos.y);
+		ojson["FireEnd"].Get(0, terPos.x);
+		ojson["FireEnd"].Get(1, terPos.y);
+		std::string name;
+		ojson.Get("Tag", name);
+		auto player = dynamic_cast<Player*>(this->getChildByName(name)); 
+		if(player!=nullptr)
+			player->getCurrentWeapon()->fire(startPos, terPos);
+	}
+	break;
 	case JsonMsgType::Speak:
 	{
 		std::string str;
@@ -372,8 +405,12 @@ void SpriteLayer::onRecvClient(const char* data, int count)
 		int tag;
 		ojson.Get("Tag", tag);
 		auto target = dynamic_cast<Target*>(this->getChildByTag(tag));
-		if(target!=NULL)
-		target->moveWithPos(PosX, PosY, dir);
+		if (target != NULL)
+		{
+			target->moveWithPos(PosX, PosY, dir);
+			MiniMap::getInstance()->updateTarget(target->getTag(), Vec2(PosX, PosY));
+		}
+
 	}
 	break;
 	case JsonMsgType::TargetAttack:
@@ -414,10 +451,53 @@ void SpriteLayer::onRecvClient(const char* data, int count)
 		int wType;
 		ojson.Get("Weapon", wType);
 		std::string name;
-		ojson.Get("Tag", name);
-		addAiPlayer(PosX, PosY, (weaponType)wType, name);
+		ojson.Get("Name", name);
+		int tag;
+		ojson.Get("Tag", tag);
+		addAiPlayer(PosX, PosY, (weaponType)wType, name,tag);
 	}
 	break;
+	case JsonMsgType::AiData:
+	{
+		double PosX, PosY;
+		ojson.Get("PosX", PosX);
+		ojson.Get("PosY", PosY);
+		std::string name;
+		ojson.Get("Name", name);
+		auto ai = dynamic_cast<Entity*>(this->getChildByName(name));
+		if (ai == NULL)
+			break;
+		ai->setPosition(Vec2(PosX, PosY));
+		double health, stam;
+		ojson.Get("Health", health);
+		ojson.Get("Stamina", stam);
+		ai->setHealth(health);
+		ai->setStamina(stam);
+	}
+	break;
+	case JsonMsgType::AiAttack:
+	{
+		std::string name;
+		ojson.Get("Name", name);
+		auto ai = dynamic_cast<AiPlayer*>(this->getChildByName(name));
+		if (ai == NULL)
+			break;
+		double startX, startY;
+		ojson["Start"].Get(0, startX);
+		ojson["Start"].Get(1, startY);
+		double terX, terY;
+		ojson["Ter"].Get(0, terX);
+		ojson["Ter"].Get(1, terY);
+		ai->getWeapon()->fire(Vec2(startX, startY), Vec2(terX, terY));
+	}
+	break;
+	case JsonMsgType::PlayerDead:
+	{
+		std::string name;
+		ojson.Get("Name", name);
+		auto player = dynamic_cast<Entity*>(this->getChildByName(name));
+		
+	}
 	default:
 		break;
 	}

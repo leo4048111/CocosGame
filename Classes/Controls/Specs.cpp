@@ -1,5 +1,6 @@
 #include "Specs.h"
 #include "cocos2d.h"
+#include "Layer/SpriteLayer.h"
 
 USING_NS_CC;
 
@@ -19,6 +20,7 @@ Specs::Specs()
 	m_lastRound = -1;
 	m_isLost = false;
 	m_isWin = false;
+	_isFieldTrip = false;
 
 	//init cheats
 	m_isAimbot = false;
@@ -263,3 +265,17 @@ bool Specs::isServer()
 	return m_isServer;
 }
 
+void Specs::toggleFieldTrip(bool value)
+{
+	_isFieldTrip = value;
+}
+
+bool Specs::isFieldTrip()
+{
+	return _isFieldTrip;
+}
+
+void Specs::addTarget()
+{
+	SpriteLayer::getInstance()->addTarget();
+}

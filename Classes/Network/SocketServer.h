@@ -55,7 +55,7 @@ private:
 private:
 	std::list<HSocket> _clientSockets;
 	std::list<SocketMessage*> _UIMessageQueue;  // contains all messages
-	std::mutex   _UIMessageQueueMutex;      //mutex variable for resolving thread collision
+	std::mutex   _UIMessageQueueMutex;      
 	std::mutex _sendMessageLock;
 
 

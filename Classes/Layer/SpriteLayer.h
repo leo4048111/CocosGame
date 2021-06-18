@@ -57,7 +57,7 @@ public:
 
 	void addAiPlayer();
 
-	void addAiPlayer(double posX, double posY, weaponType weapon, std::string name);
+	void addAiPlayer(double posX, double posY, weaponType weapon, std::string name,int tag);
 
 	void addTarget();
 

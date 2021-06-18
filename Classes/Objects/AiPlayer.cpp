@@ -2,6 +2,7 @@
 #include "Controls/Specs.h"
 #include "Layer/SpriteLayer.h"
 #include "Algorithm/msws.h"
+#include "Network/SocketServer.h"
 
 USING_NS_CC;
 
@@ -81,25 +82,13 @@ bool AiPlayer::loadGraphs()
 	}
 }
 
+Weapon* AiPlayer::getWeapon()
+{
+	return m_currentWeapon;
+}
+
 void AiPlayer::update(float delta)
 {
-	time_t currentTime = time(NULL);
-	if (currentTime - m_lastUpdate>=2.0f)
-	{
-		AiControlAutoUpdate();
-		auto allTargets = SpriteLayer::getInstance()->getAllTargets();
-		Vec2 startPos = m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition());
-		Vec2 terminalPos = allTargets.front()->getParent()->convertToWorldSpace(allTargets.front()->getPosition());
-		m_currentWeapon->pointTo(startPos, terminalPos);
-		m_currentWeapon->fire(startPos, terminalPos);
-		if (m_currentWeapon->isCurrentMagazineNotEmpty())
-		{
-			m_currentWeapon->getBackupMagazine();
-			m_currentWeapon->reload();
-		}
-		m_lastUpdate = currentTime;
-	}
-
 	//Update anime
 	double offsetX = this->getCurrentSpeed();
 	double offsetY = this->getCurrentSpeed();
@@ -118,7 +107,7 @@ void AiPlayer::update(float delta)
 	{
 		this->setPosition(this->getPosition() + Vec2(0, offsetY));
 	}
-	
+
 	if (m_keyMap[EventKeyboard::KeyCode::KEY_S])
 	{
 		this->setPosition(this->getPosition() - Vec2(0, offsetY));
@@ -130,6 +119,62 @@ void AiPlayer::update(float delta)
 	if (m_keyMap[EventKeyboard::KeyCode::KEY_D])
 	{
 		this->setPosition(this->getPosition() + Vec2(offsetX, 0));
+	}
+
+	neb::CJsonObject ojson;
+	ojson.Add("Type", JsonMsgType::AiData);
+	//keymap data
+	ojson.AddEmptySubArray("KeyMap");
+	ojson["KeyMap"].Add(m_keyMap[EventKeyboard::KeyCode::KEY_W]);
+	ojson["KeyMap"].Add(m_keyMap[EventKeyboard::KeyCode::KEY_A]);
+	ojson["KeyMap"].Add(m_keyMap[EventKeyboard::KeyCode::KEY_S]);
+	ojson["KeyMap"].Add(m_keyMap[EventKeyboard::KeyCode::KEY_D]);
+
+	//position data
+	ojson.Add("PosX", this->getPosition().x);
+	ojson.Add("PosY", this->getPosition().y);
+
+	//health and stam
+	ojson.Add("Health", this->getHealthPercentage());
+	ojson.Add("Stamina", this->getStaminaPercentage());
+
+	//name
+	ojson.Add("Name", this->getName());
+
+	SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+
+	time_t currentTime = time(NULL);
+	if (currentTime - m_lastUpdate >= 2.0f)
+	{
+		AiControlAutoUpdate();
+		auto allTargets = SpriteLayer::getInstance()->getAllTargets();
+		if (allTargets.empty())
+			return;
+
+		Vec2 startPos = m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition());
+		Vec2 terminalPos = allTargets.front()->getParent()->convertToWorldSpace(allTargets.front()->getPosition());
+		Vec2 sPos = BulletLayer::getInstance()->convertToNodeSpace(startPos);
+		Vec2 tPos = BulletLayer::getInstance()->convertToNodeSpace(terminalPos);
+
+		neb::CJsonObject ojson;
+		ojson.Add("Type", JsonMsgType::AiAttack);
+		ojson.AddEmptySubArray("Start");
+		ojson["Start"].Add(startPos.x);
+		ojson["Start"].Add(startPos.y);
+		ojson.AddEmptySubArray("Ter");
+		ojson["Ter"].Add(terminalPos.x);
+		ojson["Ter"].Add(terminalPos.y);
+		ojson.Add("Name", this->getName());
+		SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+
+		m_currentWeapon->pointTo(startPos, terminalPos);
+		m_currentWeapon->fire(sPos, tPos);
+		if (m_currentWeapon->isCurrentMagazineNotEmpty())
+		{
+			m_currentWeapon->getBackupMagazine();
+			m_currentWeapon->reload();
+		}
+		m_lastUpdate = currentTime;
 	}
 }
 

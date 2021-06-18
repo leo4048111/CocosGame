@@ -43,6 +43,8 @@ public:
 
 	void dropSpecificCollectable(collectableType type);
 
+	void targetDead();
+
 	//attack funtions!
 	void attack(cocos2d::Vec2 startPos, cocos2d::Vec2 terminalPos);
 
