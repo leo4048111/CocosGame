@@ -45,8 +45,20 @@ bool Entity::init()
 	m_currentSpeed = 0.25f;
 	m_currentResistance = 20.0f;
 	
+	_score = 0;
+
 	m_isMe = false;
 	return true;
+}
+
+int Entity::getScore()
+{
+	return _score;
+}
+
+void Entity::addScore(int score)
+{
+	_score += score;
 }
 
 double Entity::getHealthPercentage()

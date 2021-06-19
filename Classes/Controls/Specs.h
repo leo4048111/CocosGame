@@ -15,6 +15,7 @@ using namespace std;
 #define MAP_RIGHT_BORDER 1235
 #define MAP_TOP_BORDER 1242.29
 #define MAP_BOTTOM_BORDER 53.54
+#define MAX_SCORE 40
 
 typedef enum JsonMsgType
 {
@@ -62,6 +63,10 @@ public:
 	bool isWin();
 
 	bool isEnd();
+
+	bool isStart();
+
+	void setStart(bool value);
 
 	//time specs
 	time_t getStartTime();
@@ -140,6 +145,7 @@ private:
 	int m_lastRound;
 	bool m_isLost;
 	bool m_isWin;
+	bool _isStart;
 
 	//Score board specs
 	int m_currentScore;
@@ -163,6 +169,8 @@ private:
 	public:
 	std::map<HSocket,std::string> m_allPlayerSocket;
 	std::vector<std::string> m_allPlayerName;
+
+	std::vector<std::string> _chickenEaters;
 
 	//audio files
 	private:

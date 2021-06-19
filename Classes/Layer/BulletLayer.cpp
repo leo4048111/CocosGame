@@ -486,8 +486,8 @@ void BulletLayer::initHostileBulletDamageMap()
 	m_bulletDamageMap.insert(std::make_pair("bullet", 20.0f));
 	m_bulletDamageMap.insert(std::make_pair("lazer", 0.5f));
 	m_bulletDamageMap.insert(std::make_pair("sprayBullet", 15.0f));
-	m_bulletDamageMap.insert(std::make_pair("toxicBomb", 0.25f));
-	m_bulletDamageMap.insert(std::make_pair("flame", 0.25f));
+	m_bulletDamageMap.insert(std::make_pair("toxicBomb", 0.7f));
+	m_bulletDamageMap.insert(std::make_pair("flame", 0.5f));
 	m_bulletDamageMap.insert(std::make_pair("meleeAttack", 2.0f));
 
 }
@@ -533,7 +533,7 @@ void BulletLayer::addFlameCircle(Node* sender, Vec2 startPos, Vec2 terminalPos)
 
 	//set bullet rotation
 	pointBulletTo(bullet, route, 0);
-	bullet->setScale(0.4f);
+	bullet->setScale(0.3f);
 	bullet->setPosition(thisStartPos);
 
 	auto scaleby = ScaleBy::create(c_totalExpessionPeriodLength, 10.0f); //zoom out

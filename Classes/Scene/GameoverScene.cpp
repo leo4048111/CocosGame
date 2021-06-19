@@ -26,6 +26,15 @@ bool GameoverScene::init()
 	{
 		notification->setString("You win");
 		notification->setColor(Color3B(207, 167, 36));
+		auto ceNotif = Label::createWithTTF("Chicken Eaters:\n", "fonts/HashedBrowns-WyJgn.ttf", 15);
+		this->addChild(ceNotif);
+		ceNotif->setPosition(Vec2(visibleSize.width / 2, visibleSize.height * 4 / 5));
+		std::string names;
+		for (auto str : Specs::getInstance()->_chickenEaters)
+		{
+			names += str + "  ";
+		}
+		ceNotif->setString("Chicken Eaters : \n" + names);
 	}
 	auto backToMenuLabel = Label::createWithTTF("Back To Menu","fonts/HashedBrowns-WyJgn.ttf",20);
 	auto backToMenu = MenuItemLabel::create(backToMenuLabel, CC_CALLBACK_1(GameoverScene::gameoverCallBack, this));
@@ -37,7 +46,7 @@ bool GameoverScene::init()
 	menu->alignItemsVerticallyWithPadding(50);
 
 	auto scoreLabel = Label::createWithTTF("Highest Score: "+Value(Specs::getInstance()->getScore()).asString(), "fonts/HashedBrowns-WyJgn.ttf", 20);
-	scoreLabel->setPosition(Vec2(visibleSize.width / 2, visibleSize.height * 4 / 5));
+	scoreLabel->setPosition(Vec2(visibleSize.width / 2, visibleSize.height * 7/11));
 	this->addChild(scoreLabel);
 
 	return true;

@@ -43,6 +43,8 @@ public:
 
 	std::vector<Entity*> getAllPlayers();
 
+	std::vector <std::string>getAllPlayerNames();
+
 	std::vector<Entity*> getObstacles();
 
 	//init obstacles

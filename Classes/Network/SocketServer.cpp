@@ -20,18 +20,31 @@ SocketServer::SocketServer() :
 
 SocketServer::~SocketServer()
 {
-	_mutex.lock();
 	_clientSockets.clear();
-	_mutex.unlock();
-
-	if (_socketServer)
-	{
-		this->closeConnect(_socketServer);
-	}
 };
 
 void SocketServer::destroyInstance()
 {
+	onDisconnect = nullptr;
+	onNewConnection = nullptr;
+	onRecv = nullptr;
+	onStart = nullptr;
+
+	if (_socketServer)
+	{
+		this->closeConnect(_socketServer);
+		_socketServer = SOCKET_ERROR;
+	}
+
+	_mutex.lock();
+	for(auto s: _clientSockets)
+	{
+		this->closeConnect(s);
+	}
+	_mutex.unlock();
+
+	Sleep(500);
+
 	Director::getInstance()->getScheduler()->unscheduleAllForTarget(_instance);
 	CC_SAFE_DELETE(_instance);
 }
@@ -154,15 +167,17 @@ void SocketServer::recvMessage(HSocket socket)
 		if (ret < 0) //invalid data
 		{
 			log("recv(%d) error!", socket);
-			_mutex.lock();
-			this->closeConnect(socket);
-			_clientSockets.remove(socket);
-			if (onDisconnect != nullptr)
+			if (_socketServer==SOCKET_ERROR)
 			{
-				onDisconnect(socket);
+				_mutex.lock();
+				this->closeConnect(socket);
+				_clientSockets.remove(socket);
+				if (onDisconnect != nullptr)
+				{
+					onDisconnect(socket);
+				}
+				_mutex.unlock();
 			}
-			_mutex.unlock();
-
 			break;
 		}
 		else

@@ -56,7 +56,7 @@ void SpriteLayer::update(float delta)
 {
 	int maxPlayerCount = Specs::getInstance()->getMaxPlayer();
 
-	if (!Specs::getInstance()->isServer())
+	if (!Specs::getInstance()->isSinglePlayer()&&!Specs::getInstance()->isServer())
 		return;
 
 	if (m_players.size()< Specs::getInstance()->getMaxPlayer())
@@ -238,6 +238,16 @@ Vector<Target*> SpriteLayer::getAllTargets()
 std::vector<Entity*> SpriteLayer::getAllPlayers()
 {
 	return m_players;
+}
+
+std::vector<std::string> SpriteLayer::getAllPlayerNames()
+{
+	std::vector<std::string> ret;
+	for (auto p : m_players)
+	{
+		ret.push_back(p->getName());
+	}
+	return ret;
 }
 
 std::vector<Entity*> SpriteLayer::getObstacles()

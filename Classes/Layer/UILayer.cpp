@@ -197,12 +197,11 @@ void UILayer::update(float delta)
 
 	//update player status window
 	m_playerHp->setPercentage(player->getHealthPercentage());
-	double test = player->getSpeedPercentage();
 	m_playerSpeed->setPercentage(player->getSpeedPercentage());
 	m_playerArmor->setPercentage(player->getCurrentResistance());
 
 	//update game status
-	if (Specs::getInstance()->getCurrentRound() == 20)
+	if (Specs::getInstance()->getScore() >= MAX_SCORE)
 		Specs::getInstance()->setWinOrLose(true);
 }
 

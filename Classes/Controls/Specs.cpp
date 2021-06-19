@@ -21,6 +21,7 @@ Specs::Specs()
 	m_isLost = false;
 	m_isWin = false;
 	_isFieldTrip = false;
+	_isStart = false;
 
 	//init cheats
 	m_isAimbot = false;
@@ -53,6 +54,7 @@ void Specs::refreshInstance()
 	m_lastRound = -1;
 	m_isLost = false;
 	m_isWin = false;
+	_isStart = false;
 
 	//init cheats
 	m_isAimbot = false;
@@ -63,6 +65,18 @@ void Specs::refreshInstance()
 	//init socket specs
 	m_allPlayerSocket.clear();
 
+	_chickenEaters.clear();
+
+}
+
+bool Specs::isStart()
+{
+	return _isStart;
+}
+
+void Specs::setStart(bool value)
+{
+	_isStart = value;
 }
 
 void Specs::addScore(int score)

@@ -75,6 +75,11 @@ public:
 
 	void setMe(bool value);
 
+	//score
+	void addScore(int score);
+
+	int getScore();
+
 private:
 	double m_maxHealth;
 	double m_currentHealth;
@@ -90,6 +95,8 @@ private:
 	double m_currentSpeed;
 
 	bool m_isMe;
+
+	int _score;
 
 };
 

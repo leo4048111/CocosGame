@@ -150,7 +150,7 @@ void CreateRoomScene::onNewConnection(HSocket socket)
 {
 	neb::CJsonObject ojson;
 	ojson.Add("Type", JsonMsgType::SCommand);
-	if (m_maxPlayer >= MAX_PLAYER)
+	if (m_maxPlayer >= MAX_PLAYER||Specs::getInstance()->isStart())
 	{
 		ojson.Add("Cmd", SocketCommand::CANT_JOIN);
 		SocketServer::getInstance()->sendMessage(socket, ojson.ToString().c_str(), ojson.ToString().length());

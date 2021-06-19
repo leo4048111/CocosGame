@@ -154,6 +154,9 @@ void SocketClient::destroy()
 {
 	if (this != nullptr)
 		this->clear();
+
+	onRecv = nullptr;
+	onDisconnect = nullptr;
 }
 
 void SocketClient::clear()
