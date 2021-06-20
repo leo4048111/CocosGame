@@ -185,7 +185,9 @@ void SocketServer::recvMessage(HSocket socket)
 			ret = recv(socket, buff, dataLen, 0);
 			buff[ret] = 0;
 
+#ifdef DEBUG
 			log("recv msg : %s", buff);
+#endif
 			if (ret > 0 && onRecv != nullptr)
 			{
 				std::lock_guard<std::mutex> lk(_UIMessageQueueMutex);

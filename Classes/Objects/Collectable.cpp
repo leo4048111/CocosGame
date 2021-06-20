@@ -154,7 +154,8 @@ void Collectable::useCollectable()
 	auto moveto = MoveTo::create(1.5f, Vec2(notification->getPosition().x, notification->getPosition().y + 50));
 	auto fadeout = FadeOut::create(1.5f);
 	auto spawn = Spawn::create(moveto, fadeout, NULL);
-	notification->runAction(spawn);
+	auto seq = Sequence::create(spawn, CallFunc::create(CC_CALLBACK_0(Label::removeFromParent, notification)), NULL);
+	notification->runAction(seq);
 }
 
 collectableType Collectable::getCollectableType()

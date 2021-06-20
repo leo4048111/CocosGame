@@ -82,6 +82,7 @@ private:
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_bombAnime;
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_hit1Anime;
 	cocos2d::Vector<cocos2d::SpriteFrame*> m_fastStrikeAnime;
+	cocos2d::Vector<cocos2d::SpriteFrame*> m_flameThrower;
 
 
 };

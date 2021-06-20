@@ -62,7 +62,7 @@ void Target::update(float delta)
 	}
 
 	//Target always moves towards main character
-	double offset = 200*this->getCurrentSpeed();
+	double offset = 145*this->getCurrentSpeed();
 	auto mainCharacter=this->getParent()->getChildByName(Specs::getInstance()->getPlayerName());
 	Vec2 mainCharacterPos = mainCharacter->getParent()->convertToWorldSpaceAR(mainCharacter->getPosition());
 	Vec2 targetPos = this->getParent()->convertToWorldSpaceAR(this->getPosition());

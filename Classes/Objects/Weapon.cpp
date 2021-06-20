@@ -1,6 +1,10 @@
 #include "Weapon.h"
 #include "Controls/Specs.h"
 #include "Layer/UILayer.h"
+#include "CJsonObject/CJsonObject.hpp"
+#include "network/SocketClient.h"
+#include "network/SocketServer.h"
+
 
 USING_NS_CC;
 
@@ -110,6 +114,7 @@ void Weapon::setWeaponType(weaponType type)
 		m_maxAmmoPerMagazine = 120;
 		m_backupAmmo = 120;
 		m_isAutoFire = true;
+		break;
 	default:
 		return ;
 	}

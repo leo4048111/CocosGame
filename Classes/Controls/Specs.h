@@ -15,11 +15,11 @@ using namespace std;
 #define MAP_RIGHT_BORDER 1235
 #define MAP_TOP_BORDER 1242.29
 #define MAP_BOTTOM_BORDER 53.54
-#define MAX_SCORE 4000
+#define MAX_SCORE 10000
 
 typedef enum JsonMsgType
 {
-	PlayerList, SCommand, AddOb, PlayerCount,PlayerAttack, PlayerData, PlayerName, Speak, AddTarget, TargetData, TargetAttack, AddAi,AiData, AiAttack,TargetDead,PlayerDead,Score
+	PlayerList, SCommand, AddOb, PlayerCount,PlayerAttack, PlayerData, PlayerName,SwapWeapon, Speak, AddTarget, TargetData, TargetAttack, AddAi,AiData, AiAttack,TargetDead,PlayerDead,Score
 };
 
 typedef enum SocketCommand

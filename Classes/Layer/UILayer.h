@@ -6,7 +6,7 @@
 #include "Objects/Chatbox.h"
 #include <vector>
 
-#define SCORE_PER_ROUND 200
+#define SCORE_PER_ROUND 500
 
 class UILayer :public cocos2d::Layer
 {

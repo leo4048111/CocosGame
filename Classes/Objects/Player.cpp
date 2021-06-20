@@ -189,8 +189,6 @@ void Player::update(float delta)
 		MiniMap::getInstance()->UpdateMe(this->getPosition());
 	}
 
-	
-
 	//update visual specs
 	if (m_currentWeapon != nullptr)
 		if(m_currentWeapon->m_ammoInCurrentMagazine>=0)
@@ -199,7 +197,6 @@ void Player::update(float delta)
 			m_magazineSpecLabel->setString("inf/inf");
 
 	//auto fire weapon
-	swapWeapon(m_currentWeaponSlot);
 	if (m_mouseButtonMap[EventMouse::MouseButton::BUTTON_LEFT] && m_currentWeapon->m_isAutoFire)
 	{
 		if (isMe())
@@ -218,6 +215,26 @@ void Player::update(float delta)
 		}
 		_fireStartPos = BulletLayer::getInstance()->convertToNodeSpace(_fireStartPos);
 		_fireTerminalPos = BulletLayer::getInstance()->convertToNodeSpace(_fireTerminalPos);
+		if (!Specs::getInstance()->isSinglePlayer())
+		{
+			neb::CJsonObject ojson;
+			ojson.Add("Type", JsonMsgType::PlayerAttack);
+			ojson.AddEmptySubArray("FireStart");
+			ojson["FireStart"].Add(_fireStartPos.x);
+			ojson["FireStart"].Add(_fireStartPos.y);
+			ojson.AddEmptySubArray("FireEnd");
+			ojson["FireEnd"].Add(_fireTerminalPos.x);
+			ojson["FireEnd"].Add(_fireTerminalPos.y);
+			ojson.Add("Tag", Specs::getInstance()->getPlayerName());
+			if (Specs::getInstance()->isServer()) //send as server
+			{
+				SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+			}
+			else //send as client
+			{
+				SocketClient::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+			}
+		}
 		m_currentWeapon->fire(_fireStartPos, _fireTerminalPos);
 	}
 
@@ -277,25 +294,25 @@ void Player::onKeyPressed(cocos2d::EventKeyboard::KeyCode keycode, cocos2d::Even
 		fastMeleeAttack();
 		break;
 	case EventKeyboard::KeyCode::KEY_1:
-		m_currentWeaponSlot = 1;
+		swapWeapon(1);
 		break;
 	case EventKeyboard::KeyCode::KEY_2:
-		m_currentWeaponSlot = 2;
+		swapWeapon(2);
 		break;
 	case EventKeyboard::KeyCode::KEY_3:
-		m_currentWeaponSlot = 3;
+		swapWeapon(3);
 		break;
 	case EventKeyboard::KeyCode::KEY_4:
-		m_currentWeaponSlot = 4;
+		swapWeapon(4);
 		break;
 	case EventKeyboard::KeyCode::KEY_5:
-		m_currentWeaponSlot = 5;
+		swapWeapon(5);
 		break;
 	case EventKeyboard::KeyCode::KEY_6:
-		m_currentWeaponSlot = 6;
+		swapWeapon(6);
 		break;
 	case EventKeyboard::KeyCode::KEY_7:
-		m_currentWeaponSlot = 7;
+		swapWeapon(7);
 		break;
 	case EventKeyboard::KeyCode::KEY_R:
 		m_currentWeapon->reload();
@@ -440,14 +457,13 @@ void Player::swapWeapon(int num)
 	{
 		auto notification = Label::createWithTTF("This weapon isn't unlocked yet", "fonts/Notification Font.ttf", 10);
 		notification->setColor(Color3B(255, 4, 56));
-		notification->setPosition(Vec2(this->getParent()->getContentSize().width / 2, -2));
-		this->getParent()->addChild(notification);
-		auto fadein = FadeIn::create(0.25f);
-		auto fadeout = FadeOut::create(0.25f);
-		auto fadeSequence = Sequence::create(fadein, fadeout, NULL);
-		auto repeat = Repeat::create(fadeSequence, 2);
-		auto sequence = Sequence::create(repeat, CallFunc::create(CC_CALLBACK_0(Sprite::removeFromParent, notification)), NULL);
-		notification->runAction(sequence);
+		notification->setPosition(Vec2(this->getContentSize().width / 2, -2));
+		this->addChild(notification);
+		auto moveto = MoveTo::create(1.5f, Vec2(notification->getPosition().x, notification->getPosition().y + 50));
+		auto fadeout = FadeOut::create(1.5f);
+		auto spawn = Spawn::create(moveto, fadeout, NULL);
+		auto seq = Sequence::create(spawn, CallFunc::create(CC_CALLBACK_0(Label::removeFromParent, notification)), NULL);
+		notification->runAction(seq);
 		return;
 	}
 
@@ -465,6 +481,24 @@ void Player::swapWeapon(int num)
 
 	m_magazineSpecLabel->setString(Value(m_currentWeapon->m_ammoInCurrentMagazine).asString() + "/" + Value(m_currentWeapon->m_backupAmmo).asString());
 
+	if (Specs::getInstance()->isSinglePlayer())
+		return;
+
+	if (isMe())
+	{
+		neb::CJsonObject ojson;
+		ojson.Add("Type", JsonMsgType::SwapWeapon);
+		ojson.Add("Slot", num);
+		ojson.Add("Tag", Specs::getInstance()->getPlayerName());
+		if (Specs::getInstance()->isServer()) //send as server
+		{
+			SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+		}
+		else //send as client
+		{
+			SocketClient::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+		}
+	}
 }
 
 void Player::unlockWeapon(int num)
@@ -559,9 +593,6 @@ neb::CJsonObject Player::buildSyncData()
 	ojson["KeyMap"].Add(m_keyMap[EventKeyboard::KeyCode::KEY_S]);
 	ojson["KeyMap"].Add(m_keyMap[EventKeyboard::KeyCode::KEY_D]);
 
-	//weapon data
-	ojson.Add("Slot", m_currentWeaponSlot);
-
 	//position data
 	ojson.AddEmptySubArray("Position");
 	ojson["Position"].Add(this->getPosition().x);
@@ -627,9 +658,6 @@ void Player::updateWithSyncData(neb::CJsonObject ojson)
 	ojson["Position"].Get(0, posx);
 	ojson["Position"].Get(1, posy);
 	this->setPosition(Vec2(posx, posy));
-
-	//update weapon
-	ojson.Get("Slot", m_currentWeaponSlot);
 
 	//update specs
 	double health;

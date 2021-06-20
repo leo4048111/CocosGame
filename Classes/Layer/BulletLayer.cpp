@@ -75,6 +75,11 @@ bool BulletLayer::loadGraphs()
 		{
 			m_fastStrikeAnime.pushBack(cache->getSpriteFrameByName("effect_fastStrike_" + Value(c).asString()));
 		}
+		cache->addSpriteFramesWithFile("objects/effect/effect_flame.plist");
+		for (int c = 0; c <= 5; c++)
+		{
+			m_flameThrower.pushBack(cache->getSpriteFrameByName("effect_flame_" + Value(c).asString()));
+		}
 
 		return true;
 	}
@@ -426,9 +431,9 @@ void BulletLayer::addToxicBomb(Node* sender, Vec2 startPos, Vec2 terminalPos)
 
 void BulletLayer::addFlameThrower(Node* sender, Vec2 startPos, Vec2 terminalPos)
 {
-	const double c_flameSurvivalDuration= 0.2f;
+	const double c_flameSurvivalDuration= 0.5f;
 	auto flame = Sprite::create("objects/ammo/ammo_flame.png");
-	flame->setScale(0.3f);
+	flame->setScale(1.0f);
 	flame->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
 	this->addChild(flame);
 	m_allFriendlyBullets.pushBack(flame);
@@ -441,10 +446,16 @@ void BulletLayer::addFlameThrower(Node* sender, Vec2 startPos, Vec2 terminalPos)
 	flame->setPosition(startPos);
 
 	//flame anime and auto cleanup
+	auto animation = Animation::createWithSpriteFrames(m_flameThrower, 0.5f / m_flameThrower.size());
+	auto animate = Animate::create(animation);
+	auto action4 = Repeat::create(animate, 1);
+
 	auto fadein = FadeIn::create(c_flameSurvivalDuration / 2);
 	auto fadeout = FadeOut::create(c_flameSurvivalDuration / 2);
+	auto seq = Sequence::create(fadein, fadeout, NULL);
+	auto spawn = Spawn::create(seq, action4,NULL);
 	CallFuncN* callFunc = CallFuncN::create(this, callfuncN_selector(BulletLayer::cleanBullet));
-	auto sequence = Sequence::create(fadein, fadeout, callFunc,NULL);
+	auto sequence = Sequence::create(spawn, callFunc,NULL);
 
 	flame->runAction(sequence);
 	flame->setName("flame");
@@ -485,7 +496,7 @@ void BulletLayer::initHostileBulletDamageMap()
 	m_bulletDamageMap.insert(std::make_pair("hostileSubterrainAssualt", 0.25f));
 	m_bulletDamageMap.insert(std::make_pair("hostileFastStrike", 0.25f));
 	m_bulletDamageMap.insert(std::make_pair("bullet", 20.0f));
-	m_bulletDamageMap.insert(std::make_pair("lazer", 0.5f));
+	m_bulletDamageMap.insert(std::make_pair("lazer", 1.5f));
 	m_bulletDamageMap.insert(std::make_pair("sprayBullet", 15.0f));
 	m_bulletDamageMap.insert(std::make_pair("toxicBomb", 0.7f));
 	m_bulletDamageMap.insert(std::make_pair("flame", 0.5f));
@@ -557,7 +568,6 @@ void BulletLayer::addSubterrainAssualt(Node* sender, Vec2 startPos, Vec2 termina
 	auto bullet = Sprite::create("objects/UI/ui_attackWarning.png");
 	this->addChild(bullet);
 
-	auto func = CC_CALLBACK_1(m_allHostileBullets.pushBack,bullet)
 	m_allHostileBullets.pushBack(bullet);
 
 	Vec2 thisStartPos = this->convertToNodeSpace(SpriteLayer::getInstance()->convertToWorldSpace(startPos));

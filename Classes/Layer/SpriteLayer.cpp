@@ -333,6 +333,15 @@ void SpriteLayer::onRecvServer(HSocket socket, const char* data, int count)
 		SocketServer::getInstance()->castMessage(ojson.ToString().c_str(), ojson.ToString().length(), socket);
 	}
 	break;
+	case JsonMsgType::SwapWeapon:
+	{
+		int slot;
+		ojson.Get("Slot", slot);
+		if (m_playerSocketMap[socket] != NULL)
+			m_playerSocketMap[socket]->swapWeapon(slot);
+		SocketServer::getInstance()->castMessage(ojson.ToString().c_str(), ojson.ToString().length(), socket);
+	}
+	break;
 	default:
 		break;
 	}
@@ -517,6 +526,18 @@ void SpriteLayer::onRecvClient(const char* data, int count)
 		int score;
 		ojson.Get("Score", score);
 		Specs::getInstance()->setScore(score);
+	}
+	break;
+	case JsonMsgType::SwapWeapon:
+	{
+		int slot;
+		ojson.Get("Slot", slot);
+		std::string name;
+		ojson.Get("Tag", name);
+		auto player = dynamic_cast<Player*>(this->getChildByName(name));
+		if (player == NULL)
+			break;
+		player->swapWeapon(slot);
 	}
 	break;
 	default:

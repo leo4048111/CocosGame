@@ -236,7 +236,7 @@ std::vector<std::string> Specs::getAllBgMusic()
 
 void Specs::initBgMusicPath()
 {
-	getAllFiles("Audio/BG", m_allBgMusic, "mp3");
+	getAllFiles("Resources/Audio/BG", m_allBgMusic, "mp3");
 	m_currentBgMusic = m_allBgMusic.size();
 }
 
