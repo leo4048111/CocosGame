@@ -201,9 +201,9 @@ void Player::update(float delta)
 	{
 		if (isMe())
 		{
-			if (Specs::getInstance()->isAimbotActivated())
+			auto allTargets = SpriteLayer::getInstance()->getAllTargets();
+			if (Specs::getInstance()->isAimbotActivated()&&(!allTargets.empty()))
 			{
-				auto allTargets = SpriteLayer::getInstance()->getAllTargets();
 				_fireStartPos = m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition());
 				_fireTerminalPos = allTargets.front()->getParent()->convertToWorldSpace(allTargets.front()->getPosition());
 			}
@@ -398,10 +398,9 @@ void Player::onMouseDown(Event* event)
 	{
 	case EventMouse::MouseButton::BUTTON_LEFT:
 	{
-		if (m_currentWeapon != nullptr)
-			if (Specs::getInstance()->isAimbotActivated())
+			auto allTargets = SpriteLayer::getInstance()->getAllTargets();
+			if (Specs::getInstance()->isAimbotActivated() && (!allTargets.empty()))
 			{
-				auto allTargets = SpriteLayer::getInstance()->getAllTargets();
 				_fireStartPos = m_currentWeapon->getParent()->convertToWorldSpace(m_currentWeapon->getPosition());
 				_fireTerminalPos = allTargets.front()->getParent()->convertToWorldSpace(allTargets.front()->getPosition());
 			}
