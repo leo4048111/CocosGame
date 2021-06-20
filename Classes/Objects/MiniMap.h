@@ -33,6 +33,12 @@ public:
 
 	void removeTarget(int tag);
 
+	void addAi(std::string name, cocos2d::Vec2 Pos);
+
+	void updateAi(std::string name, cocos2d::Vec2 newPos);
+
+	void removeAi(std::string name);
+
 private:
 
 	cocos2d::TMXTiledMap* _map;

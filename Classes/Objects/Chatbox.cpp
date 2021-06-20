@@ -158,6 +158,7 @@ void Chatbox::mapAllCheats()
 	m_cheatFunctionMap.insert(std::make_pair("/aimbot", &Specs::toggleAimbot));
 	m_cheatFunctionMap.insert(std::make_pair("/allWeapons", &Specs::toggleAllWeapon));
 	m_cheatFunctionMap.insert(std::make_pair("/addTarget", &Specs::addTarget));
+	m_cheatFunctionMap.insert(std::make_pair("/addAi", &Specs::addAi));
 
 }
 

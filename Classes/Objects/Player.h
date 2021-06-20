@@ -12,7 +12,7 @@
 #define SLIDE_COOLDOWN 2.5
 enum actions
 {
-	forward,back,left,right,stand,leftSlide,rightSlide
+	forward,back,left,right,stand,leftSlide,rightSlide,parachute
 };
 
 class Player : public Entity

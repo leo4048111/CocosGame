@@ -58,3 +58,27 @@ void MiniMap::removeTarget(int tag)
 	if (icon != nullptr)
 		icon->removeFromParent();
 }
+
+void MiniMap::addAi(std::string name, Vec2 pos)
+{
+	auto icon = Sprite::create("objects/UI/ui_ai.png");
+	_map->addChild(icon);
+	icon->setScale(1.5f);
+	icon->setName(name);
+	icon->setPosition(pos);
+}
+
+void MiniMap::updateAi(std::string name, Vec2 newPos)
+{
+	auto icon = _map->getChildByName(name);
+	auto moveto = MoveTo::create(0.5f, newPos);
+	if (icon != nullptr)
+		icon->setPosition(newPos);
+}
+
+void MiniMap::removeAi(std::string name)
+{
+	auto icon = _map->getChildByName(name);
+	if (icon != nullptr)
+		icon->removeFromParent();
+}

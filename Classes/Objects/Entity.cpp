@@ -176,6 +176,11 @@ void Entity::addStaminaRecovery(double stamina)
 void Entity::setStamina(double stamina)
 {
 	m_currentStamina = stamina;
+	if (m_currentStamina > m_maxStamina)
+		m_currentStamina = m_maxStamina;
+	if (m_currentStamina < 0)
+		m_currentStamina = 0;
+	this->resetStaminaBar();
 }
 
 void Entity::showStaminaBar()

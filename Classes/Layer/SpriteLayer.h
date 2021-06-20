@@ -11,7 +11,7 @@
 #include "Objects/Entity.h"
 #include <map>
 
-#define MIN_TARGETS_COUNT 6
+#define MIN_TARGETS_COUNT 5
 
 
 class SpriteLayer :public cocos2d::Layer
@@ -95,6 +95,7 @@ private:
 
 	//aiplayer count
 	int _aiCount;
+
 
 };
 

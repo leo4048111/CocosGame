@@ -3,6 +3,7 @@
 #include "Layer/SpriteLayer.h"
 #include "Algorithm/msws.h"
 #include "Network/SocketServer.h"
+#include "Objects/MiniMap.h"
 
 USING_NS_CC;
 
@@ -103,49 +104,48 @@ void AiPlayer::update(float delta)
 		this->addStamina(this->getStaminaRecovery());
 	}
 
-	if (m_keyMap[EventKeyboard::KeyCode::KEY_W])
+	if (m_keyMap[EventKeyboard::KeyCode::KEY_W]&&canMoveForward())
 	{
 		this->setPosition(this->getPosition() + Vec2(0, offsetY));
 	}
 
-	if (m_keyMap[EventKeyboard::KeyCode::KEY_S])
+	if (m_keyMap[EventKeyboard::KeyCode::KEY_S]&&canMoveBack())
 	{
 		this->setPosition(this->getPosition() - Vec2(0, offsetY));
 	}
-	if (m_keyMap[EventKeyboard::KeyCode::KEY_A])
+	if (m_keyMap[EventKeyboard::KeyCode::KEY_A]&&canMoveLeft())
 	{
 		this->setPosition(this->getPosition() - Vec2(offsetX, 0));
 	}
-	if (m_keyMap[EventKeyboard::KeyCode::KEY_D])
+	if (m_keyMap[EventKeyboard::KeyCode::KEY_D]&&canMoveRight())
 	{
 		this->setPosition(this->getPosition() + Vec2(offsetX, 0));
 	}
 
-	neb::CJsonObject ojson;
-	ojson.Add("Type", JsonMsgType::AiData);
-	//keymap data
-	ojson.AddEmptySubArray("KeyMap");
-	ojson["KeyMap"].Add(m_keyMap[EventKeyboard::KeyCode::KEY_W]);
-	ojson["KeyMap"].Add(m_keyMap[EventKeyboard::KeyCode::KEY_A]);
-	ojson["KeyMap"].Add(m_keyMap[EventKeyboard::KeyCode::KEY_S]);
-	ojson["KeyMap"].Add(m_keyMap[EventKeyboard::KeyCode::KEY_D]);
+	MiniMap::getInstance()->updateAi(this->getName(), this->getPosition());
 
-	//position data
-	ojson.Add("PosX", this->getPosition().x);
-	ojson.Add("PosY", this->getPosition().y);
-
-	//health and stam
-	ojson.Add("Health", this->getHealthPercentage());
-	ojson.Add("Stamina", this->getStaminaPercentage());
-
-	//name
-	ojson.Add("Name", this->getName());
-
-	SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+	
 
 	time_t currentTime = time(NULL);
 	if (currentTime - m_lastUpdate >= 2.0f)
 	{
+		m_lastUpdate = currentTime;
+		neb::CJsonObject ojson1;
+		ojson1.Add("Type", JsonMsgType::AiData);
+
+		//position data
+		ojson1.Add("PosX", this->getPosition().x);
+		ojson1.Add("PosY", this->getPosition().y);
+
+		//health and stam
+		ojson1.Add("Health", this->getHealthPercentage());
+		ojson1.Add("Stamina", this->getStaminaPercentage());
+
+		//name
+		ojson1.Add("Name", this->getName());
+
+		SocketServer::getInstance()->sendMessage(ojson1.ToString().c_str(), ojson1.ToString().length());
+
 		AiControlAutoUpdate();
 		auto allTargets = SpriteLayer::getInstance()->getAllTargets();
 		if (allTargets.empty())
@@ -174,7 +174,6 @@ void AiPlayer::update(float delta)
 			m_currentWeapon->getBackupMagazine();
 			m_currentWeapon->reload();
 		}
-		m_lastUpdate = currentTime;
 	}
 }
 

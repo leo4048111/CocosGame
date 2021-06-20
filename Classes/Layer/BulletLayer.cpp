@@ -2,6 +2,7 @@
 #include "SpriteLayer.h"
 #include "objects/CrossHair.h"
 #include "UILayer.h"
+#include "objects/MiniMap.h"
 #include "Controls/Specs.h"
 
 USING_NS_CC;
@@ -296,7 +297,7 @@ void BulletLayer::update(float delta)
 		{
 			tmpErasePlayer.popBack();
 			spriteLayer->removePlayer(tmpPlayer);
-
+			MiniMap::getInstance()->removeAi(tmpPlayer->getName());
 			if (!Specs::getInstance()->isSinglePlayer())
 			{
 				neb::CJsonObject ojson;
@@ -480,7 +481,7 @@ void BulletLayer::addMeleeAttack(Node* sender, Vec2 startPos, Vec2 terminalPos)
 void BulletLayer::initHostileBulletDamageMap()
 {
 	m_bulletDamageMap.insert(std::make_pair("hostileSpiritualPower", 30));
-	m_bulletDamageMap.insert(std::make_pair("hostileFlameCircle", 2.0f));
+	m_bulletDamageMap.insert(std::make_pair("hostileFlameCircle", 0.5f));
 	m_bulletDamageMap.insert(std::make_pair("hostileSubterrainAssualt", 0.25f));
 	m_bulletDamageMap.insert(std::make_pair("hostileFastStrike", 0.25f));
 	m_bulletDamageMap.insert(std::make_pair("bullet", 20.0f));
@@ -555,6 +556,8 @@ void BulletLayer::addSubterrainAssualt(Node* sender, Vec2 startPos, Vec2 termina
 	//create bullet sprite
 	auto bullet = Sprite::create("objects/UI/ui_attackWarning.png");
 	this->addChild(bullet);
+
+	auto func = CC_CALLBACK_1(m_allHostileBullets.pushBack,bullet)
 	m_allHostileBullets.pushBack(bullet);
 
 	Vec2 thisStartPos = this->convertToNodeSpace(SpriteLayer::getInstance()->convertToWorldSpace(startPos));

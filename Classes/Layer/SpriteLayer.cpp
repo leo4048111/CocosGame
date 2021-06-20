@@ -156,7 +156,7 @@ void SpriteLayer::addAiPlayer()
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	auto origin = Director::getInstance()->getVisibleOrigin();
-	Vec2 dst = Vec2(Vec2(random() % (int)(MAP_RIGHT_BORDER - MAP_LEFT_BORDER) + MAP_LEFT_BORDER, random() % (int)(MAP_TOP_BORDER - MAP_BOTTOM_BORDER) + MAP_BOTTOM_BORDER));
+	Vec2 dst = Vec2(random() % (int)(MAP_RIGHT_BORDER - MAP_LEFT_BORDER) + MAP_LEFT_BORDER, random() % (int)(MAP_TOP_BORDER - MAP_BOTTOM_BORDER) + MAP_BOTTOM_BORDER);
 
 	//init ai player
 	auto aiPlayer = AiPlayer::createPlayer("AI_" + Value(_aiCount).asString());
@@ -167,6 +167,8 @@ void SpriteLayer::addAiPlayer()
 	aiPlayer->scheduleUpdate();
 
 	m_players.push_back(aiPlayer);
+
+	MiniMap::getInstance()->addAi(aiPlayer->getName(), aiPlayer->getPosition());
 
 	if (Specs::getInstance()->isSinglePlayer())
 		return;
@@ -189,6 +191,7 @@ void SpriteLayer::addAiPlayer(double posX, double posY, weaponType weapon, std::
 	aiPlayer->setPosition(Vec2(posX,posY));
 	aiPlayer->setWeapon(weapon);
 	m_players.push_back(aiPlayer);
+	MiniMap::getInstance()->addAi(aiPlayer->getName(), aiPlayer->getPosition());
 }
 
 void SpriteLayer::addTarget()
@@ -508,6 +511,14 @@ void SpriteLayer::onRecvClient(const char* data, int count)
 		auto player = dynamic_cast<Entity*>(this->getChildByName(name));
 		
 	}
+	break;
+	case JsonMsgType::Score:
+	{
+		int score;
+		ojson.Get("Score", score);
+		Specs::getInstance()->setScore(score);
+	}
+	break;
 	default:
 		break;
 	}

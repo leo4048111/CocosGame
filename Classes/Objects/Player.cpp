@@ -127,7 +127,10 @@ void Player::runActionAnime(int dir)
 		anime = Animation::createWithSpriteFrames(m_leftSlideAnime, 0.5f / 2);
 		break;
 	case actions::rightSlide:
-		anime = Animation::createWithSpriteFrames(m_leftSlideAnime, 0.5f / 2);
+		anime = Animation::createWithSpriteFrames(m_rightSlideAnime, 0.5f / 2);
+		break;
+	case actions::parachute:
+		anime = Animation::createWithSpriteFrames(m_parachuteAnime, 0.5f / 1);
 		break;
 	default:
 		break;
@@ -139,6 +142,7 @@ void Player::runActionAnime(int dir)
 		action->setTag(dir);
 		m_sprite->runAction(action);
 	}
+
 }
 
 void Player::update(float delta)
@@ -181,10 +185,11 @@ void Player::update(float delta)
 			if (this->canMoveRight())
 			this->setPosition(this->getPosition() + Vec2(offsetX, 0));
 		}
+		//update minimap
+		MiniMap::getInstance()->UpdateMe(this->getPosition());
 	}
 
-	//update minimap
-	MiniMap::getInstance()->UpdateMe(this->getPosition());
+	
 
 	//update visual specs
 	if (m_currentWeapon != nullptr)

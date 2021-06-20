@@ -192,11 +192,22 @@ void Weapon::pointTo(Vec2 startPos, Vec2 terminalPos)
 
 void Weapon::reload()
 {
-	if (m_backupAmmo>0)
+	if (m_backupAmmo<=0)
 	{
-		m_backupAmmo -= m_maxAmmoPerMagazine - m_ammoInCurrentMagazine;
+		return;
+	}
+
+	if ((m_backupAmmo+m_ammoInCurrentMagazine) <= m_maxAmmoPerMagazine)
+	{
+		m_backupAmmo = 0;
 		m_ammoInCurrentMagazine = m_maxAmmoPerMagazine;
 	}
+	else
+	{
+		m_backupAmmo = m_backupAmmo + m_ammoInCurrentMagazine - m_maxAmmoPerMagazine;
+		m_ammoInCurrentMagazine = m_maxAmmoPerMagazine;
+	}
+
 }
 
 double Weapon::getWeaponDamage()

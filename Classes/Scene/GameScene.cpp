@@ -80,10 +80,17 @@ void GameScene::update(float delta)
 {
 	//update camera 
 	TMXTiledMap* map = dynamic_cast<TMXTiledMap*>(this->getChildByName("Map"));
-	Vec2 mainCharacterPos = map->getChildByName("SpriteLayer")->getChildByName(Specs::getInstance()->getPlayerName())->getPosition();
+	Vec2 mainCharacterPos = SpriteLayer::getInstance()->getChildByName(Specs::getInstance()->getPlayerName())->getPosition();
 	Vec2 mapPos = map->getContentSize() / 2;
 	Vec2 offsetPos = mainCharacterPos - mapPos;
-	map->setPosition(Vec2(m_origin.x + m_visibleSize.width / 2-offsetPos.x, m_origin.y + m_visibleSize.height / 2-offsetPos.y));
+	map->setPosition(Vec2(m_origin.x + m_visibleSize.width / 2 - offsetPos.x, m_origin.y + m_visibleSize.height / 2 - offsetPos.y));
+
+	if (Specs::getInstance()->isServer())
+	{
+		neb::CJsonObject ojson;
+		ojson.Add("Type", JsonMsgType::Score);
+		ojson.Add("Score", Specs::getInstance()->getScore());
+	}
 
 	//gameover
 	if (Specs::getInstance()->isEnd())

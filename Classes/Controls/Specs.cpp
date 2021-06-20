@@ -26,7 +26,7 @@ Specs::Specs()
 	//init cheats
 	m_isAimbot = false;
 	m_isInfiniteAmmo = false;
-	m_isInvincible = true;
+	m_isInvincible = false;
 	m_isAllWeapon = false;
 
 	//init player name
@@ -59,12 +59,12 @@ void Specs::refreshInstance()
 	//init cheats
 	m_isAimbot = false;
 	m_isInfiniteAmmo = false;
-	m_isInvincible = true;
+	m_isInvincible = false;
 	m_isAllWeapon = false;
 
 	//init socket specs
 	m_allPlayerSocket.clear();
-
+	m_allPlayerName.clear();
 	_chickenEaters.clear();
 
 }
@@ -82,6 +82,11 @@ void Specs::setStart(bool value)
 void Specs::addScore(int score)
 {
 	m_currentScore += score;
+}
+
+void Specs::setScore(int score)
+{
+	m_currentScore = score;
 }
 
 int Specs::getScore()
@@ -292,4 +297,9 @@ bool Specs::isFieldTrip()
 void Specs::addTarget()
 {
 	SpriteLayer::getInstance()->addTarget();
+}
+
+void Specs::addAi()
+{
+	SpriteLayer::getInstance()->addAiPlayer();
 }
