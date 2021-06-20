@@ -450,7 +450,7 @@ void Player::onMouseUp(Event* event)
 
 void Player::swapWeapon(int num)
 {
-	if (m_lastWeaponSlot == num)
+	if (m_currentWeaponSlot == num)
 		return;
 
 	if (m_allWeaponsMap[num]->isLocked() && (!Specs::getInstance()->isAllWeaponActivated())&&isMe())
@@ -528,7 +528,8 @@ void Player::addWeapon(Weapon* weapon)
 
 void Player::initAllWeapon()
 {
-	m_lastWeaponSlot = 1;
+	m_lastWeaponSlot = 0;
+	m_currentWeaponSlot = 1;
 
 	auto wbigKnife = Weapon::createWeapon();
 	wbigKnife->setWeaponType(weaponType::bigKnife);
@@ -580,6 +581,27 @@ void Player::fastMeleeAttack()
 	_fireStartPos = BulletLayer::getInstance()->convertToNodeSpace(_fireStartPos);
 	_fireTerminalPos = BulletLayer::getInstance()->convertToNodeSpace(_fireTerminalPos);
 	m_currentWeapon->fire(_fireStartPos, _fireTerminalPos);
+
+	if (Specs::getInstance()->isSinglePlayer())
+		return;
+	neb::CJsonObject ojson;
+	ojson.Add("Type", JsonMsgType::PlayerAttack);
+	ojson.AddEmptySubArray("FireStart");
+	ojson["FireStart"].Add(_fireStartPos.x);
+	ojson["FireStart"].Add(_fireStartPos.y);
+	ojson.AddEmptySubArray("FireEnd");
+	ojson["FireEnd"].Add(_fireTerminalPos.x);
+	ojson["FireEnd"].Add(_fireTerminalPos.y);
+	ojson.Add("Tag", Specs::getInstance()->getPlayerName());
+
+	if (Specs::getInstance()->isServer()) //send as server
+	{
+		SocketServer::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+	}
+	else //send as client
+	{
+		SocketClient::getInstance()->sendMessage(ojson.ToString().c_str(), ojson.ToString().length());
+	}
 }
 
 neb::CJsonObject Player::buildSyncData()

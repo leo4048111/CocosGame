@@ -158,6 +158,7 @@ void AppDelegate::applicationWillEnterForeground() {
 void AppDelegate::preloadAllAudios()
 {
     auto allNames = Specs::getInstance()->getAllBgMusic();
+
     for (auto fileName : allNames)
     {
         CocosDenshion::SimpleAudioEngine::getInstance()->preloadBackgroundMusic(("Audio/BG/"+ fileName).c_str());
